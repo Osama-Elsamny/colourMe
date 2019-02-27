@@ -1,4 +1,0 @@
-package com.colourMe.gameManager;
-
-public class Board {
-}
