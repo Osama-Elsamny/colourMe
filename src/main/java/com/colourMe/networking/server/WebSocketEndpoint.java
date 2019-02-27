@@ -1,4 +1,4 @@
-package com.colourMe.webSocket;
+package com.colourMe.networking.server;
 
 import javax.websocket.*;
 import javax.websocket.server.*;
