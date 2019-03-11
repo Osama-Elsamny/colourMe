@@ -1,10 +1,25 @@
 package com.colourMe.game;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameService {
-    // TODO: Add jsonParser
+    private GameConfig gameConfig;
+
     private Board board;
 
+    private Map<String, Player> players;
+
     public GameService() {
-        board = new Board(10, 10);
+        this.players = new HashMap<>();
+    }
+
+    public void init(GameConfig gameConfig) {
+        this.gameConfig = gameConfig;
+        this.board = new Board(gameConfig.getSize());
+    }
+
+    public void spawnPlayer(String playerId, Player player) {
+        players.put(playerId, player);
     }
 }

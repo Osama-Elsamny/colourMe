@@ -57,7 +57,7 @@ public class WebSocketEndpoint {
 
     }
 
-    private static void broadcast(final JsonElement message) {
+    private void broadcast(final JsonElement message) {
         servers.forEach(x -> {
             synchronized (x) {
                 try {

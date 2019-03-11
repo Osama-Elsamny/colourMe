@@ -1,20 +1,27 @@
 package com.colourMe.messages;
 
 import com.colourMe.actions.ActionBase;
+import com.colourMe.actions.InitAction;
 import com.colourMe.game.GameService;
 import com.google.gson.JsonElement;
-import java.util.HashMap;
+
+import java.util.EnumMap;
 
 public class MessageHandler {
-    private HashMap<String, ActionBase> actionMap;
+    private EnumMap<MessageType, ActionBase> actionMap;
     private GameService gameService;
 
     public MessageHandler() {
-        gameService = new GameService();
-        actionMap = new HashMap<>();
+        this.gameService = new GameService();
+        this.actionMap = new EnumMap<>(MessageType.class);
+        buildActions();
     }
 
     public JsonElement processMessage(Message message) {
-        return actionMap.get(message.getMessageType()).execute(message.getData(), gameService);
+        return actionMap.get(message.getMessageType()).execute(message, gameService);
+    }
+
+    private void buildActions() {
+        actionMap.put(MessageType.InitRequest, new InitAction());
     }
 }

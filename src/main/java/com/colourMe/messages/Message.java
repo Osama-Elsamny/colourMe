@@ -3,17 +3,23 @@ package com.colourMe.messages;
 import com.google.gson.JsonElement;
 
 public class Message {
-    public Message(String messageType, JsonElement data, String clientId) {
+    private MessageType messageType;
+
+    private JsonElement data;
+
+    private String clientId;
+
+    public Message(MessageType messageType, JsonElement data, String clientId) {
         this.messageType = messageType;
         this.data = data;
         this.clientId = clientId;
     }
 
-    public String getMessageType() {
+    public MessageType getMessageType() {
         return messageType;
     }
 
-    public void setMessageType(String messageType) {
+    public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
     }
 
@@ -32,8 +38,4 @@ public class Message {
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
-
-    private String messageType;
-    private JsonElement data;
-    private String clientId;
 }
