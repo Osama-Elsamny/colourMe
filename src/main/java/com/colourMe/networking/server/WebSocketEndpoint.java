@@ -2,6 +2,7 @@ package com.colourMe.networking.server;
 
 import com.colourMe.messages.Message;
 import com.colourMe.messages.MessageHandler;
+import com.colourMe.messages.MessageType;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -40,7 +41,7 @@ public class WebSocketEndpoint {
     @OnMessage
     public void onMessage(Session session, JsonElement request) {
         JsonObject jsonObject = request.getAsJsonObject();
-        Message message = new Message(jsonObject.get("messageType").getAsString(),
+        Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
                 jsonObject.get("data"),
                 session.getId());
         JsonElement response = messageHandler.processMessage(message);
