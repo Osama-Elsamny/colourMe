@@ -13,7 +13,7 @@ public class Main {
         try{
             server.start();
             System.out.println("Server has started!");
-            Thread.sleep(60000);
+            Thread.sleep(30000);
         } catch (Exception ex){
             ex.printStackTrace();
         } finally {
