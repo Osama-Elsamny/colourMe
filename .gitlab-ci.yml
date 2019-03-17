@@ -26,7 +26,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew check
+    - ./gradlew check --stacktrace --info # AHAD: Added to help with debugging
 
 after_script:
   - echo "End CI"

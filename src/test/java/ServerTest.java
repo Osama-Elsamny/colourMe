@@ -15,6 +15,7 @@ import java.util.concurrent.*;
 
 public class ServerTest{
     private Gson gson;
+    public static final int MULTI_DELAY_THRESHOLD = 100;
     public static final int DELAY_THRESHOLD = 50;
     private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
     private static final String serverAddress = "ws://127.0.0.1:8080/connect/test";
@@ -92,7 +93,7 @@ public class ServerTest{
             }
             avg = sum/NUM_TASKS;
             System.out.println("Average delay of requests : " + avg);
-            assert (avg < DELAY_THRESHOLD);
+            assert (avg < MULTI_DELAY_THRESHOLD);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
