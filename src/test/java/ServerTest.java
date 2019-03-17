@@ -4,13 +4,11 @@ import com.colourMe.messages.Message;
 import com.colourMe.messages.MessageType;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import javafx.concurrent.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -82,7 +80,6 @@ public class ServerTest{
         int NUM_TASKS = 1000;
 
         try {
-
             ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
             List<Callable<Long>> tasks = new ArrayList<>(NUM_TASKS);
             for (int i=0; i< NUM_TASKS; i++)
