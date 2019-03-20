@@ -1,0 +1,14 @@
+#exit{
+    -fx-font-size: 30px ;
+
+}
+
+.root{
+    -fx-background-color: darkslateblue;
+}
+#welcomeStatment{
+    -fx-text-alignment: justify ;
+}
+#testing{
+    -fx-text-alignment: justify ;
+}
