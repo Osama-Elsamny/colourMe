@@ -8,27 +8,28 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class guiMain extends Application {
-    long counter = 0;
+    Color userColor = Color.BLUE;
+    long userColorCode = -16776961;
     private StackPane createCell(BooleanProperty cellSwitch) {
         StackPane cell = new StackPane();
         Canvas cellCanvas = new Canvas(100,100);
+        // could use the following 2 lines to set it to the parent width
+        //cellCanvas.widthProperty().bind(cell.widthProperty());
+        //cellCanvas.heightProperty().bind(cell.heightProperty());
         final GraphicsContext graphicsContext = cellCanvas.getGraphicsContext2D();
         initDraw(graphicsContext);
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                counter = 0;
                 graphicsContext.beginPath();
                 graphicsContext.moveTo(event.getX(), event.getY());
-                counter++;
-                //System.out.println(event.getX());
-                //System.out.println(event.getY());
 //                graphicsContext.stroke();
             }
         });
@@ -38,11 +39,6 @@ public class guiMain extends Application {
             public void handle(MouseEvent event) {
                 graphicsContext.lineTo(event.getX(), event.getY());
                 graphicsContext.stroke();
-//                System.out.println("------------------------");
-//                counter++;
-//                System.out.println("X " + event.getX());
-//                System.out.println("Y " + event.getY());
-//                System.out.println("------------------------");
 //              graphicsContext.closePath();
 //              graphicsContext.beginPath();
 //              graphicsContext.moveTo(event.getX(), event.getY());
@@ -52,10 +48,28 @@ public class guiMain extends Application {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
+                double canvasWidth = graphicsContext.getCanvas().getWidth();
+                double canvasHeight = graphicsContext.getCanvas().getHeight();
+                double colorCount = 0;
                 graphicsContext.lineTo(event.getX(), event.getY());
                 graphicsContext.stroke();
                 graphicsContext.closePath();
-                System.out.println(counter);
+                WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
+                for(int i = 0; i < canvasWidth; i++){
+                    for(int j = 0; j < canvasHeight; j++){
+                        //System.out.println(snap.getPixelReader().getArgb(i,j));
+                        if(snap.getPixelReader().getArgb(i,j) == userColorCode){
+                            colorCount++;
+                        }
+                    }
+                }
+                if(colorCount/10000 > 0.95){
+                    graphicsContext.setFill(userColor);
+                    graphicsContext.fillRect(0,0, canvasWidth, canvasHeight);
+                }else{
+                    graphicsContext.clearRect(0,0, canvasWidth, canvasHeight);
+                    initDraw(graphicsContext);
+                }
             }
         });
         cell.getChildren().add(cellCanvas);
@@ -100,7 +114,7 @@ public class guiMain extends Application {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(5);
         gc.strokeRect(0, 0, canvasWidth, canvasHeight);
-        gc.setStroke(Color.BLUE);
+        gc.setStroke(userColor);
         gc.setLineWidth(10);
     }
 
