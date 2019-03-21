@@ -20,14 +20,14 @@
    <left>
       <AnchorPane prefHeight="423.0" prefWidth="199.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="hostGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToLobby" prefHeight="102.0" prefWidth="243.0" text="Host Game" />
+            <Button fx:id="hostGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToInitializeGamePage" prefHeight="102.0" prefWidth="243.0" text="Host Game" />
          </children>
       </AnchorPane>
    </left>
    <right>
       <AnchorPane prefHeight="423.0" prefWidth="199.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="joinGame" layoutY="161.0" mnemonicParsing="false" prefHeight="102.0" prefWidth="243.0" text="Join Game" />
+            <Button fx:id="joinGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToLobby" prefHeight="102.0" prefWidth="243.0" text="Join Game" />
          </children>
       </AnchorPane>
    </right>
