@@ -1,0 +1,12 @@
+#welcomeStatment{
+    -fx-text-alignment: justify ;
+    -fx-alignment: center;
+    -fx-background-color: red;
+    -fx-font-size: 48;
+}
+#nameLabel{
+    -fx-font-size: 30px ;
+}
+#nameTF{
+    -fx-font-size: 25px;
+}

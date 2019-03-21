@@ -7,11 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <Label prefHeight="55.0" prefWidth="602.0" style="-fx-background-color: red; -fx-alignment: center;" text="Welcome to ColourMe" BorderPane.alignment="CENTER" />
-   </top>
    <right>
       <AnchorPane prefHeight="345.0" prefWidth="112.0" style="-fx-background-color: grey;" BorderPane.alignment="CENTER">
          <children>
@@ -22,8 +18,14 @@
          </children>
       </AnchorPane>
    </right>
+   <bottom>
+      <AnchorPane prefHeight="80.0" prefWidth="600.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER" />
+   </bottom>
+   <left>
+      <AnchorPane prefHeight="277.0" prefWidth="109.0" style="-fx-background-color: blue;" BorderPane.alignment="CENTER" />
+   </left>
    <center>
-      <GridPane alignment="CENTER" gridLinesVisible="true" prefHeight="212.0" prefWidth="337.0" BorderPane.alignment="CENTER">
+      <GridPane fx:id="grid" BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -35,10 +37,11 @@
         </rowConstraints>
       </GridPane>
    </center>
-   <bottom>
-      <AnchorPane prefHeight="68.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
-   </bottom>
-   <left>
-      <AnchorPane prefHeight="277.0" prefWidth="109.0" BorderPane.alignment="CENTER" />
-   </left>
+   <top>
+      <AnchorPane prefHeight="64.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" prefHeight="64.0" prefWidth="600.0" style="-fx-background-color: red;" text="Welcome to ColorMe" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </top>
 </BorderPane>
