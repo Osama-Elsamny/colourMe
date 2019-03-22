@@ -4,8 +4,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Rectangle?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: whight;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.colourMe.gui.lobbyController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.colourMe.gui.lobbyController">
    <top>
        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="104.0" prefWidth="600.0" BorderPane.alignment="CENTER">
            <children>
@@ -36,10 +38,40 @@
                <top>
                   <AnchorPane prefHeight="35.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label prefHeight="35.0" prefWidth="600.0" text="Please wait until all player join the game" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <Label fx:id="promptLabel" prefHeight="35.0" prefWidth="600.0" text="Please choose a color and  wait until all player join the game " AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </top>
+               <center>
+                  <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="blueButton" layoutX="48.0" layoutY="121.0" mnemonicParsing="false" onAction="#handleBlueButton" text="Blue" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#0084ff" height="100.0" layoutX="25.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: Blue;" width="100.0" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="redButton" layoutX="48.0" layoutY="121.0" mnemonicParsing="false" onAction="#handleRedButton" text="Red" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="100.0" layoutX="25.0" layoutY="14.0" stroke="RED" strokeType="INSIDE" style="-fx-fill: red;" width="100.0" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="100.0" layoutX="25.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: black;" width="100.0" />
+                              <Button fx:id="blackButton" layoutX="48.0" layoutY="121.0" mnemonicParsing="false" onAction="#handleBlackButton" text="Black" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="100.0" layoutX="25.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: orange;" width="100.0" />
+                              <Button fx:id="orangeButton" layoutX="46.0" layoutY="121.0" mnemonicParsing="false" onAction="#handleOrangeButton" text="Orange" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </HBox>
+               </center>
             </BorderPane>
          </children>
       </AnchorPane>

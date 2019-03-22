@@ -10,3 +10,6 @@
 #nameTF{
     -fx-font-size: 25px;
 }
+.root{
+    -fx-background-color: grey;
+}

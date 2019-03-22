@@ -4,3 +4,11 @@
     -fx-background-color: red;
     -fx-font-size: 48;
 }
+.root{
+    -fx-background-color: grey;
+}
+#promptLabel{
+    -fx-font-size: 20;
+    -fx-font-color: black;
+    -fx-background-color: white;
+}

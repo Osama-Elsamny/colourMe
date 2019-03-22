@@ -15,6 +15,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,9 +23,16 @@ import java.io.IOException;
 public class lobbyController {
     @FXML
     private Label welcomeStatment;
-
     @FXML
     private Button startGame;
+    @FXML
+    private Button blueButton;
+    @FXML
+    private Button redButton;
+    @FXML
+    private Button blackButton;
+    @FXML
+    private Button orangeButton;
 
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
@@ -179,5 +187,25 @@ public class lobbyController {
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    @FXML
+    void handleBlueButton(ActionEvent event){
+        blueButton.setDisable(true);
+        System.out.println("Blue is chosen");
+    }
+    @FXML
+    void handleRedButton(ActionEvent event){
+        redButton.setDisable(true);
+        System.out.println("Red is chosen");
+    }
+    @FXML
+    void handleBlackButton(ActionEvent event){
+        blackButton.setDisable(true);
+        System.out.println("Black is chosen");
+    }
+    @FXML
+    void handleOrangeButton(ActionEvent event){
+        orangeButton.setDisable(true);
+        System.out.println("Orange is chosen");
     }
 }
