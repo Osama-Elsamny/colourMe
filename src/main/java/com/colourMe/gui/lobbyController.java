@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class lobbyController {
     @FXML
@@ -33,6 +34,13 @@ public class lobbyController {
     @FXML
     private Button orangeButton;
 
+    private final int COORDINATE_BUFFER_MAX_SIZE = 6;
+    private final int COORDINATE_COUNTER_LIMIT = 3;
+    // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
+    private int coordinateCounter = 0;
+    private int requestCounter = 0; // Counts number of requests made per cell colouring
+    private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
+
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
 
@@ -47,8 +55,10 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
+                initCounters();
                 graphicsContext.beginPath();
                 graphicsContext.moveTo(event.getX(), event.getY());
+                coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
 //                graphicsContext.stroke();
             }
         });
@@ -57,6 +67,7 @@ public class lobbyController {
             @Override
             public void handle(MouseEvent event) {
                 graphicsContext.lineTo(event.getX(), event.getY());
+                addCoordinateToQueue(event, graphicsContext);
                 graphicsContext.stroke();
 //              graphicsContext.closePath();
 //              graphicsContext.beginPath();
@@ -139,6 +150,35 @@ public class lobbyController {
 //        gc.strokeRect(0, 0, canvasWidth, canvasHeight);
         gc.setStroke(userColor);
         gc.setLineWidth(10);
+    }
+
+    // Called in Mouse OnClick
+    private void initCounters(){
+        requestCounter = 0;
+        coordinateCounter = 0;
+    }
+
+    // Called in Mouse OnDrag
+    private void addCoordinateToQueue(MouseEvent event, GraphicsContext gc){
+        coordinateCounter++;
+        if (coordinateBuffer.size() <= COORDINATE_BUFFER_MAX_SIZE
+            && coordinateCounter > COORDINATE_COUNTER_LIMIT
+            && event.getX() > 0 && event.getX() < gc.getCanvas().getWidth()
+            && event.getY() > 0 && event.getY() < gc.getCanvas().getHeight()){
+
+            coordinateCounter = 0;
+            coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
+        }
+        if (coordinateBuffer.size() > COORDINATE_BUFFER_MAX_SIZE){
+            while(! coordinateBuffer.isEmpty()) {
+                coordinateCounter = 0;
+                requestCounter++;
+                coordinateBuffer.remove();
+                System.out.println("Coordinate buffer emptied");
+                System.out.println("Request #: " + requestCounter);
+            }
+            // TODO: Add coordinates to send buffer
+        }
     }
 
     @FXML
