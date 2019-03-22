@@ -27,8 +27,8 @@ public class lobbyController {
     @FXML
     private Button startGame;
 
-    private final int COORDINATE_BUFFER_MAX_SIZE = 8;
-    private final int COORDINATE_COUNTER_LIMIT = 4;
+    private final int COORDINATE_BUFFER_MAX_SIZE = 6;
+    private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private int coordinateCounter = 0;
     private int requestCounter = 0; // Counts number of requests made per cell colouring
