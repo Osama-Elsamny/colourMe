@@ -13,9 +13,9 @@ import java.io.IOException;
 public class mainPageController{
     @FXML
     public void goToInitializeGamePage(ActionEvent event) throws IOException{
-        Parent root = FXMLLoader.load(getClass().getResource("initializeGame.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/initializeGame.fxml"));
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("initializeGame.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/initializeGame.css").toExternalForm());
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
@@ -24,9 +24,9 @@ public class mainPageController{
     }
     @FXML
     void goToLobby(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("lobby.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/lobby.fxml"));
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("lobby.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/lobby.css").toExternalForm());
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");

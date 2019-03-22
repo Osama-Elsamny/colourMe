@@ -30,9 +30,9 @@ public class initializeGameController {
     @FXML
     void getUserName(ActionEvent event) throws IOException {
         System.out.println(nameTF.getText());
-        Parent root = FXMLLoader.load(getClass().getResource("lobby.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/lobby.fxml"));
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("lobby.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/lobby.css").toExternalForm());
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");

@@ -10,9 +10,9 @@ import java.io.IOException;
 public class guiMain extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException{
-        Parent root = FXMLLoader.load(getClass().getResource("mainPage.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/mainPage.fxml"));
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("mainPage.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/mainPage.css").toExternalForm());
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();

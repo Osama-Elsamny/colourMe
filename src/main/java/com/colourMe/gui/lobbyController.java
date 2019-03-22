@@ -15,7 +15,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -183,7 +182,7 @@ public class lobbyController {
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
         Scene scene = new Scene(root, 600, 600);
-        scene.getStylesheets().add(getClass().getResource("grid-with-borders.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/grid-with-borders.css").toExternalForm());
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
