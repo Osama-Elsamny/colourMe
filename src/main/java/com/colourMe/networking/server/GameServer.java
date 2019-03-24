@@ -1,9 +1,11 @@
 package com.colourMe.networking.server;
 
+import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.google.gson.JsonElement;
 import org.glassfish.tyrus.server.Server;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -77,6 +79,10 @@ public class GameServer extends Thread {
             successful = false;
         }
         return successful;
+    }
+
+    public boolean initGameService(GameConfig gc){
+        throw new NotImplementedException();
     }
 
     public void finish(){
