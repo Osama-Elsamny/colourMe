@@ -21,15 +21,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
         encoders = MessageEncoder.class
 )
 public class GameServerEndpoint {
-
-    private MessageExecutor messageExecutor;
     private Session session;
     private static Set<GameServerEndpoint> servers = new CopyOnWriteArraySet<>();
     private static HashMap<String, String> users = new HashMap<>();
-
-    public GameServerEndpoint() {
-        messageExecutor = new MessageExecutor();
-    }
 
     @OnOpen
     public void onOpen(Session session,
@@ -45,8 +39,9 @@ public class GameServerEndpoint {
         Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
                 jsonObject.get("data"),
                 jsonObject.get("clientId").getAsString());
-        JsonElement response = messageExecutor.processMessage(message);
-        broadcast(response);
+        boolean result = GameServer.addToIncoming(message);
+        System.out.println("Added message to incoming queue " +
+                (result ? "successfully" : "unsuccessfully"));
     }
 
     @OnClose
@@ -59,7 +54,7 @@ public class GameServerEndpoint {
 
     }
 
-    private void broadcast(final JsonElement message) {
+    public static void broadcast(final JsonElement message) {
         servers.forEach(x -> {
             synchronized (x) {
                 try {

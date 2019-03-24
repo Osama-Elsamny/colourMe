@@ -2,6 +2,7 @@
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.After;
@@ -21,12 +22,12 @@ public class GameServerEndpointTest {
     private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
     private static final String serverAddress = "ws://127.0.0.1:8080/connect/" + DEFAULT_ID;
     private TestClient client;
-    private TestServer server;
+    private GameServer server;
 
     @Before
     public void init() {
         this.gson = new Gson();
-        this.server = new TestServer();
+        this.server = new GameServer();
         server.start();
 
         // Give some time for server to start

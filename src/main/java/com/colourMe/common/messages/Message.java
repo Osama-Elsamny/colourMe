@@ -3,6 +3,7 @@ package com.colourMe.common.messages;
 import com.google.gson.JsonElement;
 
 public class Message {
+    private long timestamp;
     private MessageType messageType;
 
     private JsonElement data;
@@ -13,6 +14,7 @@ public class Message {
         this.messageType = messageType;
         this.data = data;
         this.clientId = clientId;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public MessageType getMessageType() {
@@ -37,5 +39,13 @@ public class Message {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }
