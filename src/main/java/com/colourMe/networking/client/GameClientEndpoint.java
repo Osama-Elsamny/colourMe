@@ -1,11 +1,11 @@
-package main.java.com.colourMe.networking.client;
+package com.colourMe.networking.client;
 
 import java.net.URI;
 import com.google.gson.JsonElement;
-import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.websocket.*;
 
-import main.java.com.colourMe.common.marshalling.*;
+import com.colourMe.common.marshalling.*;
 
 /**
  * ColourMe ClientEndPoint
@@ -19,7 +19,7 @@ import main.java.com.colourMe.common.marshalling.*;
 public class GameClientEndpoint {
 
     public Session session;
-    private PriorityQueue<JsonElement> receivedQueue;
+    private LinkedBlockingQueue<JsonElement> receivedQueue;
 
     /**
      * Constructor
@@ -54,7 +54,11 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, JsonElement update) {
-        receivedQueue.add(update);
+        try {
+            receivedQueue.put(update);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -67,7 +71,7 @@ public class GameClientEndpoint {
 
     }
 
-    public void addReceiveQueue(PriorityQueue<JsonElement> queue) {
+    public void addReceiveQueue(LinkedBlockingQueue<JsonElement> queue) {
         this.receivedQueue = queue;
     }
 

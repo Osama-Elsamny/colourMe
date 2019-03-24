@@ -1,9 +1,16 @@
-package main.java.com.colourMe.networking.client;
+package com.colourMe.networking.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import com.google.gson.JsonObject;
+import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
+
 
 /**
  * ColourMe Client
@@ -16,10 +23,10 @@ public class GameClient implements Runnable{
     private int connectionAttempt = 0;
 
     private String serverAddr;
-    public final PriorityQueue<JsonElement> receivedQueue;
-    public final PriorityQueue<JsonElement> sendQueue;
+    public final LinkedBlockingQueue<JsonElement> receivedQueue;
+    public final LinkedBlockingQueue<JsonElement> sendQueue;
 
-    GameClient (PriorityQueue<JsonElement> receive,  PriorityQueue<JsonElement> send, String serverAddress){
+    GameClient (LinkedBlockingQueue<JsonElement> receive,  LinkedBlockingQueue<JsonElement> send, String serverAddress){
         receivedQueue = receive;
         sendQueue = send;
         serverAddr = serverAddress;
@@ -43,6 +50,24 @@ public class GameClient implements Runnable{
                         }
                     }
                 }
+
+                // Failure Case.
+                sendQueue.clear();
+                receivedQueue.clear();
+
+                // Construct message
+                JsonObject data = new JsonObject();
+                data.addProperty("Disconnect", true);
+                Message msg = new Message(MessageType.Disconnect, data, "");
+                Gson gson = new Gson();
+                JsonElement message = gson.toJsonTree(msg);
+
+                try {
+                    receivedQueue.put(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             } catch (URISyntaxException ex) {
                 if (connectionAttempt < maxTries){
                     connectionAttempt++;

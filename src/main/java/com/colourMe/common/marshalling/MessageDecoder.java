@@ -1,4 +1,4 @@
-package main.java.com.colourMe.common.marshalling;
+package com.colourMe.common.marshalling;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
