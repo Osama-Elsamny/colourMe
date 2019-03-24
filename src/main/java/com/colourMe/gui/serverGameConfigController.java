@@ -38,7 +38,7 @@ public class serverGameConfigController {
     private Button backButton;
 
     @FXML
-    void getGameConfig(ActionEvent event) throws IOException {
+    void getGameConfigInput(ActionEvent event) throws IOException {
         getUserName();
         getPenSize();
         getBoardSize();
