@@ -12,3 +12,23 @@
     -fx-font-color: black;
     -fx-background-color: white;
 }
+#player1Label{
+    -fx-font-size: 15;
+    -fx-font-color: black;
+    -fx-font-weight: bold;
+}
+#player2Label{
+    -fx-font-size: 15;
+    -fx-font-color: black;
+    -fx-font-weight: bold;
+}
+#player3Label{
+    -fx-font-size: 15;
+    -fx-font-color: black;
+    -fx-font-weight: bold;
+}
+#player4Label{
+    -fx-font-size: 15;
+    -fx-font-color: black;
+    -fx-font-weight: bold;
+}

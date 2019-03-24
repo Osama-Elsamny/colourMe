@@ -15,19 +15,19 @@
       </AnchorPane>
    </top>
    <bottom>
-      <Button fx:id="exit" mnemonicParsing="false" prefHeight="73.0" prefWidth="336.0" text="Exit" BorderPane.alignment="CENTER" />
+      <Button fx:id="exit" mnemonicParsing="false" onAction="#exitGame" prefHeight="73.0" prefWidth="336.0" text="Exit" BorderPane.alignment="CENTER" />
    </bottom>
    <left>
       <AnchorPane prefHeight="423.0" prefWidth="199.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="hostGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToInitializeGamePage" prefHeight="102.0" prefWidth="243.0" text="Host Game" />
+            <Button fx:id="hostGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToServerGameConfig" prefHeight="102.0" prefWidth="243.0" text="Host Game" />
          </children>
       </AnchorPane>
    </left>
    <right>
       <AnchorPane prefHeight="423.0" prefWidth="199.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="joinGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToLobby" prefHeight="102.0" prefWidth="243.0" text="Join Game" />
+            <Button fx:id="joinGame" layoutY="161.0" mnemonicParsing="false" onAction="#goToClientGameConfig" prefHeight="102.0" prefWidth="243.0" text="Join Game" />
          </children>
       </AnchorPane>
    </right>

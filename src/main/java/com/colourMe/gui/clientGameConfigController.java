@@ -10,29 +10,45 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
-public class initializeGameController {
+public class clientGameConfigController {
 
     @FXML
     private Label welcomeStatment;
-
     @FXML
     private Label nameLabel;
-
     @FXML
     private TextField nameTF;
-
+    @FXML
+    private Label ipAddressLabel;
+    @FXML
+    private TextField ipAddressTF;
     @FXML
     private Button nextButton;
+    @FXML
+    private Button backButton;
 
     @FXML
-    void getUserName(ActionEvent event) throws IOException {
+    void getGameConfig(ActionEvent event) throws IOException {
+        getUserName();
+        getIPAddress();
+        startScene(event, "lobby");
+    }
+    @FXML
+    void goToMainScreen(ActionEvent event) throws IOException{
+        startScene(event, "mainPage");
+    }
+    private void getUserName() {
         System.out.println(nameTF.getText());
-        Parent root = FXMLLoader.load(getClass().getResource("/lobby.fxml"));
+    }
+    private void getIPAddress() {
+        System.out.println(ipAddressTF.getText());
+    }
+    private void startScene(ActionEvent event, String fileName) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/lobby.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
@@ -40,3 +56,4 @@ public class initializeGameController {
         primaryStage.show();
     }
 }
+

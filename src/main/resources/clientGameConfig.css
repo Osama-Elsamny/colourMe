@@ -4,12 +4,6 @@
     -fx-background-color: red;
     -fx-font-size: 48;
 }
-#nameLabel{
-    -fx-font-size: 30px ;
-}
-#nameTF{
-    -fx-font-size: 25px;
-}
 .root{
     -fx-background-color: grey;
 }

@@ -25,3 +25,18 @@
 }
 .topAnchorPane{
 }
+.player1AnchorPane{
+    /*-fx-background-color: blue;*/
+}
+.player2AnchorPane{
+    /*-fx-background-color: orange;*/
+}
+.player3AnchorPane{
+    /*-fx-background-color: black;*/
+}
+.player4AnchorPane{
+    /*-fx-background-color: red;*/
+}
+.vbox{
+    /*-fx-background-color: yellow;*/
+}
