@@ -1,124 +1,86 @@
-
-import com.colourMe.common.gameState.GameConfig;
-import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageType;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.colourMe.networking.server.GameServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.*;
-
 public class GameServerTest {
-    private Gson gson;
-    public static final int MULTI_DELAY_THRESHOLD = 100;
-    public static final int DELAY_THRESHOLD = 50;
-    private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
-    private static final String serverAddress = "ws://127.0.0.1:8080/connect/test";
-    private TestClient client;
-    private TestServer server;
+    GameServer server;
+    // Milliseconds
+    private final long MAX_SERVER_START_TIME = 1000;
+    private final long MAX_SERVER_SHUTDOWN_TIME = 1000;
 
     @Before
-    public void init() {
-        this.gson = new Gson();
-        this.server = new TestServer();
-        server.start();
-
-        // Give some time for server to start
-        try {Thread.sleep(10); } catch (Exception ex) {}
-
-        this.client = new TestClient(serverAddress);
+    public void init(){
+        this.server = new GameServer();
     }
 
     @After
-    public void end() {
-        this.client.disconnect();
-        this.server.finish();
-        try { Thread.sleep(1000); } catch(Exception ex) {}
-    }
-
-    public String getDefaultInitMessage(){
-
-        Message message = new Message(MessageType.InitRequest, null, "127.0.0.1");
-        GameConfig config = new GameConfig(10, 5, 10, new ArrayList<>());
-        message.setData(gson.toJsonTree(config));
-        return gson.toJson(message);
-    }
-
-    public String getExpectedInitResponse(){
-        JsonObject response = new JsonObject();
-        response.addProperty("messageType", MessageType.InitResponse.name());
-        response.addProperty("data", "{\"successful\": true}");
-        return response.getAsJsonObject().toString();
+    public void end(){
+        server.finish();
+        waitTillServerFinishes();
+        server = null;
     }
 
     @Test
-    public void verifyInitActionResponse(){
-
-         String response = client.sendMessage(getDefaultInitMessage());
-         assert (response.equals(getExpectedInitResponse()));
+    public void verifyRunningForUnStartedServer(){
+        assert(! server.isRunning());
     }
 
     @Test
-    public void verifyInitActionDelay(){
-        long delay = System.currentTimeMillis();
-        String response = client.sendMessage(getDefaultInitMessage());
-        delay = System.currentTimeMillis() - delay;
-        System.out.println("Delay for response: " +  delay);
-        assert (delay < DELAY_THRESHOLD) || response == null;
+    public void verifyServerStart(){
+        server.start();
+        sleep(MAX_SERVER_START_TIME);
+        assert(server.isRunning());
+        server.finish();
     }
 
     @Test
-    public void verifyMultiClientDelay(){
-        long value;
-        double avg;
-        double sum = 0;
-        int NUM_THREADS = 10;
-        int NUM_TASKS = 1000;
+    public void verifyServerFinish(){
+        server.start();
+        server.finish();
+        sleep(MAX_SERVER_SHUTDOWN_TIME);
+        assert(!server.isRunning());
+    }
 
+    @Test
+    public void verifyServerStartTime(){
+        long time = System.currentTimeMillis();
+        server.start();
+        waitTillServerRuns();
+        time = System.currentTimeMillis() - time;
+        System.out.println("Took " + time + "ms to start server");
+        assert(time < MAX_SERVER_START_TIME);
+    }
+
+    @Test
+    public void verifyServerEndTime(){
+        server.start();
+        waitTillServerRuns();
+
+        long time = System.currentTimeMillis();
+        server.finish();
+        waitTillServerFinishes();
+        time = System.currentTimeMillis() - time;
+
+        System.out.println("Took " + time + "ms to stop server");
+        assert(time < MAX_SERVER_SHUTDOWN_TIME);
+    }
+
+    // HELPER Functions
+    private void sleep(long millis){
         try {
-            ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
-            List<Callable<Long>> tasks = new ArrayList<>(NUM_TASKS);
-            for (int i=0; i< NUM_TASKS; i++)
-                tasks.add(this::simulateClientWorkFlow);
-            List<Future<Long>> futures = service.invokeAll(tasks);
-
-            for(Future<Long> future: futures){
-                value = future.get();
-                sum += value;
-            }
-            avg = sum/NUM_TASKS;
-            System.out.println("Average delay of requests : " + avg);
-            assert (avg < MULTI_DELAY_THRESHOLD);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            Thread.sleep(millis);
+        } catch(Exception ex) {
+            System.err.println(ex.getMessage());
             ex.printStackTrace();
-            assert (false);
         }
     }
 
-    private Long simulateClientWorkFlow() {
-        TestClient randClient = generateRandomClient();
-        long delay = System.currentTimeMillis();
-        String response = randClient.sendMessage(getDefaultInitMessage());
-        delay = System.currentTimeMillis() - delay;
-        System.out.println(Thread.currentThread().getName() + ": Delay -> " + delay);
-        randClient.disconnect();
-        return response != null ? delay : null;
+    private void waitTillServerRuns(){
+        while(!server.isRunning()) {}
     }
 
-    private TestClient generateRandomClient() {
-        // Used to generate unique user id
-        Random random = new Random();
-        long x = random.nextLong();
-        long y = random.nextLong();
-        String id = "" + x + y;
-        return new TestClient(this.baseAddress + id);
+    private void waitTillServerFinishes(){
+        while(server.isRunning()) {}
     }
-
-
 }

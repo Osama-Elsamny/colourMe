@@ -3,7 +3,7 @@ package com.colourMe.networking.server;
 import org.glassfish.tyrus.server.Server;
 
 public class GameServer extends Thread {
-    private boolean running = false;
+    private volatile boolean running = false;
     private volatile boolean finished = false;
 
     @Override
@@ -14,12 +14,13 @@ public class GameServer extends Thread {
             server.start();
             this.running = true;
             System.out.println("GameServer has started!");
-            while(!finished){}
+            while(!finished){ }
         } catch (Exception ex){
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         } finally {
             server.stop();
+            this.running = false;
         }
     }
 
@@ -28,7 +29,7 @@ public class GameServer extends Thread {
     }
 
     public boolean isRunning() {
-        return running;
+        return this.running;
     }
 
 }
