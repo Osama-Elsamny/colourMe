@@ -1,4 +1,4 @@
-package com.colourMe.game;
+package com.colourMe.common.gameState;
 
 public class Cell {
     private int state = -1;

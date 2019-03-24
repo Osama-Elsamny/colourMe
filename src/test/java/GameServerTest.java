@@ -1,7 +1,7 @@
 
-import com.colourMe.game.GameConfig;
-import com.colourMe.messages.Message;
-import com.colourMe.messages.MessageType;
+import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.After;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
-public class ServerTest{
+public class GameServerTest {
     private Gson gson;
     public static final int MULTI_DELAY_THRESHOLD = 100;
     public static final int DELAY_THRESHOLD = 50;

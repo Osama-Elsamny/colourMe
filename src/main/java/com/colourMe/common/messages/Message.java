@@ -1,4 +1,4 @@
-package com.colourMe.messages;
+package com.colourMe.common.messages;
 
 import com.google.gson.JsonElement;
 

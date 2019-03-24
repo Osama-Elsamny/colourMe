@@ -1,17 +1,17 @@
-package com.colourMe.messages;
+package com.colourMe.common.messages;
 
-import com.colourMe.actions.ActionBase;
-import com.colourMe.actions.InitAction;
-import com.colourMe.game.GameService;
+import com.colourMe.common.actions.ActionBase;
+import com.colourMe.common.actions.InitAction;
+import com.colourMe.common.gameState.GameService;
 import com.google.gson.JsonElement;
 
 import java.util.EnumMap;
 
-public class MessageHandler {
+public class MessageExecutor {
     private EnumMap<MessageType, ActionBase> actionMap;
     private GameService gameService;
 
-    public MessageHandler() {
+    public MessageExecutor() {
         this.gameService = new GameService();
         this.actionMap = new EnumMap<>(MessageType.class);
         buildActions();

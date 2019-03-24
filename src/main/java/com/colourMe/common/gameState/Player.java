@@ -1,6 +1,4 @@
-package com.colourMe.game;
-
-import java.util.ArrayList;
+package com.colourMe.common.gameState;
 
 public class Player {
     private boolean pixels[][];

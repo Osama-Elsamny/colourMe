@@ -1,4 +1,4 @@
-package com.colourMe.game;
+package com.colourMe.common.gameState;
 
 import java.util.List;
 

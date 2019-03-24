@@ -1,4 +1,4 @@
-package com.colourMe.networking.server;
+package com.colourMe.common.marshalling;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -6,7 +6,7 @@ import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
 
-public class MessageEncoder implements Encoder.Text<JsonElement> {
+public class MessageEncoder implements javax.websocket.Encoder.Text<JsonElement> {
     private static Gson gson = new Gson();
 
     @Override

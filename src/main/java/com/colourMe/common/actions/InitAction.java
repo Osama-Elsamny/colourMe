@@ -1,8 +1,8 @@
-package com.colourMe.actions;
+package com.colourMe.common.actions;
 
-import com.colourMe.game.GameConfig;
-import com.colourMe.game.GameService;
-import com.colourMe.messages.*;
+import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.gameState.GameService;
+import com.colourMe.common.messages.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

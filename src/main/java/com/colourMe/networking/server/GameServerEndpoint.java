@@ -1,8 +1,10 @@
 package com.colourMe.networking.server;
 
-import com.colourMe.messages.Message;
-import com.colourMe.messages.MessageHandler;
-import com.colourMe.messages.MessageType;
+import com.colourMe.common.marshalling.MessageDecoder;
+import com.colourMe.common.marshalling.MessageEncoder;
+import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageExecutor;
+import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -18,16 +20,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
         decoders = MessageDecoder.class,
         encoders = MessageEncoder.class
 )
-public class WebSocketEndpoint {
+public class GameServerEndpoint {
 
-    private static final String MESSAGE_FORMAT = "{\"from\" : \"%s\", \"Content\" : \"%s\" }";
-    private MessageHandler messageHandler;
+    private MessageExecutor messageExecutor;
     private Session session;
-    private static Set<WebSocketEndpoint> servers = new CopyOnWriteArraySet<>();
+    private static Set<GameServerEndpoint> servers = new CopyOnWriteArraySet<>();
     private static HashMap<String, String> users = new HashMap<>();
 
-    public WebSocketEndpoint() {
-        messageHandler = new MessageHandler();
+    public GameServerEndpoint() {
+        messageExecutor = new MessageExecutor();
     }
 
     @OnOpen
@@ -44,7 +45,7 @@ public class WebSocketEndpoint {
         Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
                 jsonObject.get("data"),
                 session.getId());
-        JsonElement response = messageHandler.processMessage(message);
+        JsonElement response = messageExecutor.processMessage(message);
         broadcast(response);
     }
 
