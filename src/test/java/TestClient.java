@@ -7,19 +7,28 @@ public class TestClient {
     private int NUM_TRIES = 0;
     private final int RETRY_COUNT = 3;
     private volatile boolean received = true;
+    private String user;
     private String testResponse;
     private Session session;
 
-
-    public TestClient(String url){
+    public void BaseConstructor(String url){
         try {
-            URI endpointURI = new URI(url);
+            URI endpointURI = new URI(url + user);
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+
+    public TestClient(String url, String user){
+        BaseConstructor(url+user);
+    }
+
+    public TestClient(String url){
+        BaseConstructor(url);
     }
 
     @OnOpen

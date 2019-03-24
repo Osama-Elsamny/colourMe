@@ -15,10 +15,11 @@ import java.util.concurrent.*;
 
 public class GameServerEndpointTest {
     private Gson gson;
-    public static final int MULTI_DELAY_THRESHOLD = 100;
-    public static final int DELAY_THRESHOLD = 50;
+    private static final int MULTI_DELAY_THRESHOLD = 100;
+    private static final int DELAY_THRESHOLD = 50;
+    private static final String DEFAULT_ID = "test";
     private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
-    private static final String serverAddress = "ws://127.0.0.1:8080/connect/test";
+    private static final String serverAddress = "ws://127.0.0.1:8080/connect/" + DEFAULT_ID;
     private TestClient client;
     private TestServer server;
 
@@ -117,7 +118,7 @@ public class GameServerEndpointTest {
         long x = random.nextLong();
         long y = random.nextLong();
         String id = "" + x + y;
-        return new TestClient(this.baseAddress + id);
+        return new TestClient(this.baseAddress, id);
     }
 
 
