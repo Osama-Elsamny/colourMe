@@ -30,18 +30,9 @@ public class GameServer extends Thread {
             server.start();
             this.running = true;
             System.out.println("GameServer has started!");
+
             while(!finished){
-                // Read each message from Incoming
-                synchronized (incoming) {
-                    while(! incoming.isEmpty()){
-                        // Read message
-                        Message m = incoming.take();
-                        // Process message
-                        JsonElement response = messageExecutor.processMessage(m);
-                        // Broadcast response to everyone
-                        GameServerEndpoint.broadcast(response);
-                    }
-                }
+                processIncoming();
                 Thread.sleep(1);
             }
         } catch (Exception ex){
@@ -50,6 +41,26 @@ public class GameServer extends Thread {
         } finally {
             server.stop();
             this.running = false;
+        }
+    }
+
+    private void processIncoming(){
+
+        // Read each message from Incoming
+        synchronized (incoming) {
+            try {
+                while (!incoming.isEmpty()) {
+                    // Read message
+                    Message m = incoming.take();
+                    // Process message
+                    JsonElement response = messageExecutor.processMessage(m);
+                    // Broadcast response to everyone
+                    GameServerEndpoint.broadcast(response);
+                }
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+            }
         }
     }
 
