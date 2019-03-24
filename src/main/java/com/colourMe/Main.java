@@ -1,5 +1,5 @@
 package com.colourMe;
-import com.colourMe.networking.server.WebSocketEndpoint;
+import com.colourMe.networking.server.GameServerEndpoint;
 import org.glassfish.tyrus.server.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +21,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
         Server server = new Server("localhost", 8080, "",
-                null, WebSocketEndpoint.class);
+                null, GameServerEndpoint.class);
         try{
             server.start();
             System.out.println("Server has started!");
