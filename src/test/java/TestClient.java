@@ -1,19 +1,23 @@
+import com.colourMe.common.messages.Message;
+import com.google.gson.Gson;
+
 import javax.websocket.*;
 import java.net.URI;
-import java.util.concurrent.CountDownLatch;
 
 @ClientEndpoint
 public class TestClient {
+
     private int NUM_TRIES = 0;
     private final int RETRY_COUNT = 3;
     private volatile boolean received = true;
-    private String user;
+    private String id = "test";
     private String testResponse;
     private Session session;
+    private Gson gson = new Gson();
 
     public void BaseConstructor(String url){
         try {
-            URI endpointURI = new URI(url + user);
+            URI endpointURI = new URI(url);
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);
         } catch (Exception ex) {
@@ -22,9 +26,9 @@ public class TestClient {
         }
     }
 
-
-    public TestClient(String url, String user){
-        BaseConstructor(url+user);
+    public TestClient(String url, String id){
+        this.id = id;
+        BaseConstructor(url + id);
     }
 
     public TestClient(String url){
@@ -33,14 +37,15 @@ public class TestClient {
 
     @OnOpen
     public void onOpen(Session s){
-        System.out.println("Connected to server");
+        System.out.println("Connected to server with id: " + id);
         this.session = s;
     }
 
     @OnMessage
     public void onMessage(String s){
         // Only set testResponse for messages sent by the Client
-        if(!received) {
+        Message message = gson.fromJson(s, Message.class);
+        if(message.getClientId().equals(id)) {
             System.out.println("Received " + s);
             this.testResponse = s;
             received = true;
@@ -74,4 +79,9 @@ public class TestClient {
             ex.printStackTrace();
         }
     }
+
+    public String getClientId(){
+        return id;
+    }
+
 }

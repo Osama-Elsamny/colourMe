@@ -12,13 +12,14 @@ public class InitAction extends ActionBase {
         Gson gson = new Gson();
         GameConfig gameConfig = gson.fromJson(message.getData(), GameConfig.class);
         gameService.init(gameConfig);
-        return createSuccessResponse();
+        return createSuccessResponse(message.getClientId());
     }
 
-    public JsonElement createSuccessResponse() {
+    public JsonElement createSuccessResponse(String clientId) {
         JsonObject response = new JsonObject();
         response.addProperty("messageType", MessageType.InitResponse.name());
         response.addProperty("data", "{\"successful\": true}");
+        response.addProperty("clientId", clientId);
         return response;
     }
 }

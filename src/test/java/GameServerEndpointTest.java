@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 
 public class GameServerEndpointTest {
     private Gson gson;
-    private static final int MULTI_DELAY_THRESHOLD = 100;
+    private static final int MULTI_DELAY_THRESHOLD = 150;
     private static final int DELAY_THRESHOLD = 50;
     private static final String DEFAULT_ID = "test";
     private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
@@ -42,24 +42,29 @@ public class GameServerEndpointTest {
         try { Thread.sleep(1000); } catch(Exception ex) {}
     }
 
-    public String getDefaultInitMessage(){
+    public String getDefaultInitMessage(String id){
 
-        Message message = new Message(MessageType.InitRequest, null, "127.0.0.1");
+        Message message = new Message(MessageType.InitRequest, null, id);
         GameConfig config = new GameConfig(10, 5, 10, new ArrayList<>());
         message.setData(gson.toJsonTree(config));
         return gson.toJson(message);
+    }
+
+    public String getDefaultInitMessage(){
+
+        return getDefaultInitMessage(DEFAULT_ID);
     }
 
     public String getExpectedInitResponse(){
         JsonObject response = new JsonObject();
         response.addProperty("messageType", MessageType.InitResponse.name());
         response.addProperty("data", "{\"successful\": true}");
+        response.addProperty("clientId", DEFAULT_ID);
         return response.getAsJsonObject().toString();
     }
 
     @Test
     public void verifyInitActionResponse(){
-
          String response = client.sendMessage(getDefaultInitMessage());
          assert (response.equals(getExpectedInitResponse()));
     }
@@ -105,7 +110,7 @@ public class GameServerEndpointTest {
     private Long simulateClientWorkFlow() {
         TestClient randClient = generateRandomClient();
         long delay = System.currentTimeMillis();
-        String response = randClient.sendMessage(getDefaultInitMessage());
+        String response = randClient.sendMessage(getDefaultInitMessage(randClient.getClientId()));
         delay = System.currentTimeMillis() - delay;
         System.out.println(Thread.currentThread().getName() + ": Delay -> " + delay);
         randClient.disconnect();

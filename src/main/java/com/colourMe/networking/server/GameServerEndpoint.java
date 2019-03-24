@@ -44,7 +44,7 @@ public class GameServerEndpoint {
         JsonObject jsonObject = request.getAsJsonObject();
         Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
                 jsonObject.get("data"),
-                session.getId());
+                jsonObject.get("clientId").getAsString());
         JsonElement response = messageExecutor.processMessage(message);
         broadcast(response);
     }
