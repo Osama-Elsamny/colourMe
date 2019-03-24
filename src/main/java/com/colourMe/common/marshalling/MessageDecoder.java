@@ -1,14 +1,12 @@
-package com.colourMe.networking.server;
+package com.colourMe.common.marshalling;
 
-import com.colourMe.messages.Message;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-public class MessageDecoder implements Decoder.Text<JsonElement> {
+public class MessageDecoder implements javax.websocket.Decoder.Text<JsonElement> {
     private static Gson gson = new Gson();
 
     @Override
