@@ -1,0 +1,20 @@
+#exit{
+    -fx-font-size: 30px ;
+
+}
+
+.root{
+    -fx-background-color: grey;
+}
+#welcomeStatment{
+    -fx-text-alignment: justify ;
+    -fx-alignment: center;
+    -fx-background-color: red;
+    -fx-font-size: 48;
+}
+#hostGame{
+    -fx-font-size: 30px ;
+}
+#joinGame{
+    -fx-font-size: 30px ;
+}

@@ -1,5 +1,6 @@
 package com.colourMe.common.gameState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameConfig {
@@ -15,6 +16,7 @@ public class GameConfig {
         this.size = size;
         this.ratio = ratio;
         this.thickness = thickness;
+        this.ipAddresses = new ArrayList<>();
     }
 
     public int getSize() {
@@ -47,5 +49,9 @@ public class GameConfig {
 
     public void setIpAddresses(List<String> ipAddresses) {
         this.ipAddresses = ipAddresses;
+    }
+
+    public void addIp(String ip) {
+        this.ipAddresses.add(ip);
     }
 }

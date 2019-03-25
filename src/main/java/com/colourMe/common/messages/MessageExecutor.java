@@ -1,13 +1,15 @@
 package com.colourMe.common.messages;
 
 import com.colourMe.common.actions.ActionBase;
-import com.colourMe.common.actions.InitAction;
+import com.colourMe.common.actions.ConnectRequestAction;
 import com.colourMe.common.gameState.GameService;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.util.EnumMap;
 
 public class MessageExecutor {
+    private Gson gson = new Gson();
     private EnumMap<MessageType, ActionBase> actionMap;
     private GameService gameService;
 
@@ -18,10 +20,11 @@ public class MessageExecutor {
     }
 
     public JsonElement processMessage(Message message) {
-        return actionMap.get(message.getMessageType()).execute(message, gameService);
+        Message response = actionMap.get(message.getMessageType()).execute(message, gameService);
+        return gson.toJsonTree(response);
     }
 
     private void buildActions() {
-        actionMap.put(MessageType.InitRequest, new InitAction());
+        actionMap.put(MessageType.ConnectRequest, new ConnectRequestAction());
     }
 }

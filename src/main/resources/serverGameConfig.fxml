@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.colourMe.gui.serverGameConfigController">
+    <top>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="104.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="welcomeStatment" prefHeight="104.0" prefWidth="600.0" text="Welcome to ColourMe" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                </Label>
+            </children>
+        </AnchorPane>
+    </top>
+   <center>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="nameLabel" layoutX="30.0" layoutY="14.0" prefHeight="44.0" prefWidth="97.0" style="-fx-font-size: 25px;" text="Name:" />
+            <TextField fx:id="nameTF" layoutX="153.0" layoutY="14.0" style="-fx-font-size: 20px;" />
+            <Label fx:id="penSizeLabel" layoutX="30.0" layoutY="67.0" prefHeight="44.0" prefWidth="111.0" style="-fx-font-size: 25px;" text="Pen Size:" />
+            <TextField fx:id="penSizeTF" layoutX="153.0" layoutY="67.0" style="-fx-font-size: 20px;" />
+            <Label fx:id="boardSizeLabel" layoutX="23.0" layoutY="120.0" prefHeight="44.0" prefWidth="123.0" style="-fx-font-size: 25px;" text="Board Size:" />
+            <TextField fx:id="boardSizeTF" layoutX="153.0" layoutY="120.0" style="-fx-font-size: 20px;" />
+            <TextField fx:id="coverageTF" layoutX="153.0" layoutY="169.0" style="-fx-font-size: 20px;" />
+            <Label fx:id="coverageLabel" layoutX="24.0" layoutY="169.0" prefHeight="44.0" prefWidth="123.0" style="-fx-font-size: 25px;" text="Coverage:" />
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <AnchorPane prefHeight="69.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <BorderPane prefHeight="200.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <right>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="nextButton" layoutX="73.0" layoutY="14.0" mnemonicParsing="false" onAction="#getGameConfigInput" text="Next" />
+                     </children>
+                  </AnchorPane>
+               </right>
+               <left>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="backButton" layoutX="48.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToMainScreen" text="Back" />
+                     </children>
+                  </AnchorPane>
+               </left>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </bottom>
+</BorderPane>
