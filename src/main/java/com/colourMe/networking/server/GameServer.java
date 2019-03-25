@@ -5,7 +5,6 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.google.gson.JsonElement;
 import org.glassfish.tyrus.server.Server;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -18,15 +17,14 @@ public class GameServer extends Thread {
     private static Comparator<Message> messageComparator = (m1, m2) ->
             (int) (m1.getTimestamp() - m2.getTimestamp());
 
-    private static PriorityBlockingQueue<Message> incoming =
+    private static final PriorityBlockingQueue<Message> incoming =
             new PriorityBlockingQueue<>(10, messageComparator);
 
     @Override
     public void run(){
+        this.messageExecutor = new MessageExecutor();
         Server server = new Server("localhost", 8080, "",
                 null, GameServerEndpoint.class);
-
-        this.messageExecutor = new MessageExecutor();
 
         try{
             server.start();
@@ -81,8 +79,18 @@ public class GameServer extends Thread {
         return successful;
     }
 
-    public boolean initGameService(GameConfig gc){
-        throw new NotImplementedException();
+    public boolean initGameService(GameConfig config){
+        boolean successful;
+        try {
+            System.out.println("Config: " + config);
+            messageExecutor.initGameConfig(config);
+            successful = true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+            successful = false;
+        }
+        return successful;
     }
 
     public void finish(){

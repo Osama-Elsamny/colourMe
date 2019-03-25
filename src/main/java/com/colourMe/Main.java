@@ -20,16 +20,5 @@ public class Main extends Application {
     }
     public static void main(String[] args) {
         launch(args);
-        Server server = new Server("localhost", 8080, "",
-                null, GameServerEndpoint.class);
-        try{
-            server.start();
-            System.out.println("Server has started!");
-            Thread.sleep(60000);
-        } catch (Exception ex){
-            ex.printStackTrace();
-        } finally {
-            server.stop();
-        }
     }
 }

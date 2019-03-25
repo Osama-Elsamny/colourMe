@@ -20,8 +20,14 @@ public class GameService {
     }
 
     public void init(GameConfig gameConfig) {
-        this.gameConfig = gameConfig;
-        this.board = new Board(gameConfig.getSize());
+        try {
+            this.gameConfig = gameConfig;
+            this.board = new Board(gameConfig.getSize());
+        } catch (Exception ex){
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+
+        }
     }
 
     public JsonElement getGameConfigAsJson() {
