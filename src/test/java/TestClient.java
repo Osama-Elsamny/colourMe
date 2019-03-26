@@ -7,8 +7,6 @@ import java.net.URI;
 @ClientEndpoint
 public class TestClient {
 
-    private int NUM_TRIES = 0;
-    private final int RETRY_COUNT = 3;
     private volatile boolean received = true;
     private String id = "test";
     private Message testResponse;

@@ -14,16 +14,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
-public class GameServerEndpointTest {
-    private Gson gson;
-    private static final String LOCALHOST_IP = "127.0.0.1";
-    private static final int MULTI_DELAY_THRESHOLD = 150;
-    private static final int DELAY_THRESHOLD = 50;
-    private static final String DEFAULT_ID = "test";
-    private static final String baseAddress = "ws://127.0.0.1:8080/connect/";
-    private static final String serverAddress = "ws://127.0.0.1:8080/connect/" + DEFAULT_ID;
-    private TestClient client;
-    private GameServer server;
+public class GameServerEndpointTest extends NetworkingTestBase {
+    TestClient client;
 
     @Before
     public void init() {
@@ -45,35 +37,10 @@ public class GameServerEndpointTest {
         try { Thread.sleep(1000); } catch(Exception ex) {}
     }
 
-    private GameConfig getDefaultGameConfig(){
-        return new GameConfig(5, (float) 0.9, 10, new ArrayList<>());
-    }
-
-    public Message getDefaultConnectMessage(String id){
-        Message message = new Message(MessageType.ConnectRequest, null, id);
-        JsonObject data = new JsonObject();
-        data.addProperty("ip", LOCALHOST_IP);
-        message.setData(data);
-        return message;
-    }
-
-    private Message getDefaultConnectMessage(){
-
-        return getDefaultConnectMessage(DEFAULT_ID);
-    }
-
-    private Message getExpectedInitResponse(){
-        GameConfig config = getDefaultGameConfig();
-        config.addIp(LOCALHOST_IP);
-        Message response = new Message(MessageType.ConnectResponse, null, DEFAULT_ID);
-        response.setData(gson.toJsonTree(config));
-        return response;
-    }
-
     @Test
     public void verifyInitActionResponse(){
          Message response = client.sendMessage(getDefaultConnectMessage());
-         assert (response.equals(getExpectedInitResponse()));
+         assert (response.equals(getExpectedConnectResponse()));
     }
 
     @Test
