@@ -9,8 +9,8 @@ import com.google.gson.JsonObject;
 public class ConnectRequestAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
-        if(data.has("ip")) {
-            gameService.addIpToConfig(data.get("ip").getAsString());
+        if(data.has("clientIP")) {
+            gameService.spawnPlayer(message.getClientId(), data.get("clientIP").getAsString());
             JsonElement gameConfig = gameService.getGameConfigAsJson();
             return new Message(MessageType.ConnectResponse, gameConfig, message.getClientId());
         }
