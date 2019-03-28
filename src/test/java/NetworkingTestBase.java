@@ -24,7 +24,7 @@ public class NetworkingTestBase {
     public Message getDefaultConnectMessage(String id){
         Message message = new Message(MessageType.ConnectRequest, null, id);
         JsonObject data = new JsonObject();
-        data.addProperty("ip", LOCALHOST_IP);
+        data.addProperty("clientIP", LOCALHOST_IP);
         message.setData(data);
         return message;
     }
