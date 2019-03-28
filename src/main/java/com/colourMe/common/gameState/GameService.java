@@ -31,6 +31,9 @@ public class GameService {
         return gson.toJsonTree(this.gameConfig);
     }
 
+    // Return GameConfig
+    public GameConfig getGameConfig() { return gameConfig; }
+
     // Acquire a cell
     public boolean acquireCell(int row, int col, double x, double y, String clientId) {
         if(isCellAvailable(row, col)) {
@@ -63,4 +66,5 @@ public class GameService {
     private boolean isCellAvailable(int row, int col) {
         return this.cells[row][col].getState() == CellState.AVAILABLE;
     }
+
 }
