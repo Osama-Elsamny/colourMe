@@ -38,13 +38,13 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     }
 
     @Test
-    public void verifyInitActionResponse(){
+    public void verifyConnectActionResponse(){
          Message response = client.sendMessage(getDefaultConnectMessage());
          assert (response.equals(getExpectedConnectResponse()));
     }
 
     @Test
-    public void verifyInitActionDelay(){
+    public void verifyConnectActionDelay(){
         long delay = System.currentTimeMillis();
         Message response = client.sendMessage(getDefaultConnectMessage());
         delay = System.currentTimeMillis() - delay;
