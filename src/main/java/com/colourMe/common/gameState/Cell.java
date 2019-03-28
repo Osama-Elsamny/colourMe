@@ -1,23 +1,25 @@
 package com.colourMe.common.gameState;
 
 public class Cell {
-    private int state = -1;
+    private CellState state = CellState.AVAILABLE;
 
-    private int clientId = -1;
+    private String clientId;
 
-    public int getState() {
+    public Cell() {}
+
+    public CellState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CellState state) {
         this.state = state;
     }
 
-    public int getClientId() {
+    public String getClientId() {
         return clientId;
     }
 
-    public void setClientId(int clientId) {
+    public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 }

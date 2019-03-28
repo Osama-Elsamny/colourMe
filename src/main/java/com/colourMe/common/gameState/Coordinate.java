@@ -1,4 +1,4 @@
-package com.colourMe.gui;
+package com.colourMe.common.gameState;
 
 public class Coordinate {
     public double x;
