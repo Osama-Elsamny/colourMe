@@ -43,6 +43,11 @@ public class GameService {
         return false;
     }
 
+    public boolean playerHasCell(int row, int col, String playerID) {
+        // TODO: Implement when Arsalan pushes his changes
+        return false;
+    }
+
     // Get the size of the board
     public int getBoardSize() {
         return this.cells.length;

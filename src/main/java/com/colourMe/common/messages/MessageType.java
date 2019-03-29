@@ -4,6 +4,8 @@ public enum MessageType {
     ConnectRequest,
     GetCellRequest,
     GetCellResponse,
+    CellUpdateRequest,
+    CellUpdateResponse,
     ConnectResponse,
     Disconnect
 }
