@@ -49,9 +49,6 @@ public class lobbyController {
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private int coordinateCounter = 0;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
-    private double t = 0;
-    private int x = 1;
-    private int y = 1;
     private Scene scene;
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
