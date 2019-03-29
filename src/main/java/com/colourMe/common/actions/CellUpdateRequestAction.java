@@ -10,7 +10,7 @@ public class CellUpdateRequestAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         // Expects row, col, x, y
         Message response;
-        String playerID = message.getClientId();
+        String playerID = message.getPlayerID();
         JsonObject data = message.getData().getAsJsonObject();
         boolean playerOwnsCell = playerOwnsCell(gameService, data, playerID);
         response = playerOwnsCell ?
