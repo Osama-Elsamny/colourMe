@@ -36,7 +36,7 @@ public class GameService {
 
     // Acquire a cell
     public boolean acquireCell(int row, int col, double x, double y, String playerID) {
-        if(isCellAvailable(row, col)) {
+        if (isCellAvailable(row, col)) {
             this.cells[row][col].setPlayerID(playerID);
             this.cells[row][col].setState(CellState.LOCKED);
             return true;
@@ -47,7 +47,7 @@ public class GameService {
 
     // Release a cell
     public boolean releaseCell(int row, int col, String playerID, boolean hasColoured) {
-        if(cellOwner(row, col) == playerID){
+        if (cellOwner(row, col).equals(playerID)) {
             if(hasColoured) {
                 this.cells[row][col].setState(CellState.COLOURED);
                 players.get(playerID).incrementScore();
@@ -60,8 +60,13 @@ public class GameService {
     }
 
     // Get cell owner
-    public String cellOwner(int row, int col){
+    public String cellOwner(int row, int col) {
         return this.cells[row][col].getPlayerID();
+    }
+
+    public boolean playerHasCell(int row, int col, String playerID) {
+        return cells[row][col].getState().equals(CellState.LOCKED)
+                && cellOwner(row, col).equals(playerID);
     }
 
     // Get the size of the board
