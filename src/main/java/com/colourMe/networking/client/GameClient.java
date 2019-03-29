@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
@@ -21,10 +21,10 @@ public class GameClient extends Thread{
     private int connectionAttempt = 0;
 
     private String serverAddr;
-    public LinkedBlockingQueue<JsonElement> receivedQueue;
-    public LinkedBlockingQueue<JsonElement> sendQueue;
+    public final PriorityBlockingQueue<JsonElement> receivedQueue;
+    public final PriorityBlockingQueue<JsonElement> sendQueue;
 
-    GameClient (LinkedBlockingQueue<JsonElement> receive,  LinkedBlockingQueue<JsonElement> send, String serverAddress){
+    GameClient (PriorityBlockingQueue<JsonElement> receive,  PriorityBlockingQueue<JsonElement> send, String serverAddress){
 
         // Parameter Check
         if(receive == null)
@@ -51,11 +51,7 @@ public class GameClient extends Thread{
         }
         synchronized (receivedQueue){
             receivedQueue.clear();
-            try {
-                receivedQueue.put(message);
-            } catch (InterruptedException e) {
-                System.err.println("Failed to add message.");
-            }
+            receivedQueue.put(message);
         }
     }
 

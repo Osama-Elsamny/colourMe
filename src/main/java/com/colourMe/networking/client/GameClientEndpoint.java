@@ -2,7 +2,7 @@ package com.colourMe.networking.client;
 
 import java.net.URI;
 import com.google.gson.JsonElement;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import javax.websocket.*;
 
 import com.colourMe.common.marshalling.*;
@@ -19,7 +19,7 @@ import com.colourMe.common.marshalling.*;
 public class GameClientEndpoint {
 
     public Session session;
-    private LinkedBlockingQueue<JsonElement> receivedQueue;
+    private PriorityBlockingQueue<JsonElement> receivedQueue;
 
     /**
      * Constructor
@@ -54,11 +54,7 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, JsonElement update) {
-        try {
-            receivedQueue.put(update);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        receivedQueue.put(update);
     }
 
     /**
@@ -71,7 +67,7 @@ public class GameClientEndpoint {
 
     }
 
-    public void addReceiveQueue(LinkedBlockingQueue<JsonElement> queue) {
+    public void addReceiveQueue(PriorityBlockingQueue<JsonElement> queue) {
         this.receivedQueue = queue;
     }
 
