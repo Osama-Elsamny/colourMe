@@ -1,6 +1,7 @@
 package com.colourMe.common.messages;
 
 import com.colourMe.common.actions.ActionBase;
+import com.colourMe.common.actions.CellUpdateRequestAction;
 import com.colourMe.common.actions.ConnectRequestAction;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.actions.GetCellRequestAction;
@@ -32,5 +33,6 @@ public class MessageExecutor {
     public void buildServerActions() {
         actionMap.put(MessageType.ConnectRequest, new ConnectRequestAction());
         actionMap.put(MessageType.GetCellRequest, new GetCellRequestAction());
+        actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
     }
 }
