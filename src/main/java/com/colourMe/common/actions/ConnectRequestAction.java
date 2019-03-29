@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ConnectRequestAction extends ActionBase {
+    @Override
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
         if(data.has("clientIP")) {

@@ -7,6 +7,7 @@ import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 
 public class DisconnectAction extends ActionBase {
+    @Override
     public Message execute(Message message, GameService gameService) {
         GameConfig gameConfig = gameService.getGameConfig();
 
@@ -15,7 +16,7 @@ public class DisconnectAction extends ActionBase {
 
         JsonObject data = new JsonObject();
         data.addProperty("nextIP", nextIP);
-        if (nextIP == userIP){
+        if (nextIP.equals(userIP)){
             data.addProperty("startServer", true);
         }else{
             data.addProperty("startServer", false);

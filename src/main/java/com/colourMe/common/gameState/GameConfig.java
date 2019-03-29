@@ -54,6 +54,10 @@ public class GameConfig {
         this.ipAddresses.add(ip);
     }
 
+    public String getLastIP() {
+        return ipAddresses.get(size -  1);
+    }
+
     public String getNextIP(){
         if (ipAddresses.isEmpty()) return null;
         return ipAddresses.remove(0);
