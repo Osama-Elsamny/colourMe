@@ -9,7 +9,7 @@ public class ReleaseCellRequestAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
-        String playerID = message.getClientId();
+        String playerID = message.getPlayerID();
         if(isDataValid(data, playerID)) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();

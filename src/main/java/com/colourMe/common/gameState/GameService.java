@@ -61,7 +61,7 @@ public class GameService {
 
     // Get cell owner
     public String cellOwner(int row, int col){
-        return this.cells[row][col].getClientId();
+        return this.cells[row][col].getPlayerID();
     }
 
     // Get the size of the board
