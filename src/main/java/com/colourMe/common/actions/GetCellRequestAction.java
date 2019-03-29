@@ -6,6 +6,7 @@ import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 
 public class GetCellRequestAction extends ActionBase {
+    @Override
     public Message execute(Message message, GameService gameService) {
         // TODO: Check if data is null
         JsonObject data = message.getData().getAsJsonObject();
