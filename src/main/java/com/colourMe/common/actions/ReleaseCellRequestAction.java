@@ -10,7 +10,7 @@ public class ReleaseCellRequestAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
         String playerID = message.getClientId();
-        if(isDataValid(data)) {
+        if(isDataValid(data, playerID)) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
@@ -22,8 +22,9 @@ public class ReleaseCellRequestAction extends ActionBase {
         return failureResponse(data, playerID);
     }
 
-    private boolean isDataValid(JsonObject data) {
-        return data.has("row") && data.has("col") && data.has("isColoured");
+    private boolean isDataValid(JsonObject data, String playerID) {
+        return data.has("row") && data.has("col")
+                && data.has("isColoured") && (playerID != null);
     }
 
     private Message successResponse(JsonObject data, String clientId) {
