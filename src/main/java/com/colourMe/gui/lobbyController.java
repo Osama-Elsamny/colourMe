@@ -1,9 +1,11 @@
 package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -65,59 +67,65 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                initCounters();
-                graphicsContext.beginPath();
-                graphicsContext.moveTo(event.getX(), event.getY());
-                coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
-//                graphicsContext.stroke();
+                onClick(graphicsContext, event);
             }
         });
-
         cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                graphicsContext.lineTo(event.getX(), event.getY());
-                addCoordinateToQueue(event, graphicsContext);
-                graphicsContext.stroke();
-//              graphicsContext.closePath();
-//              graphicsContext.beginPath();
-//              graphicsContext.moveTo(event.getX(), event.getY());
+                onDrage(graphicsContext, event);
             }
         });
-
         cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                double canvasWidth = graphicsContext.getCanvas().getWidth();
-                double canvasHeight = graphicsContext.getCanvas().getHeight();
-                double totalPixels = 0;
-                double colorCount = 0;
-                graphicsContext.lineTo(event.getX(), event.getY());
-                graphicsContext.stroke();
-                graphicsContext.closePath();
-                WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
-                for(int i = 0; i < canvasWidth; i++){
-                    for(int j = 0; j < canvasHeight; j++){
-                        if(snap.getPixelReader().getArgb(i,j) == userColorCode){
-                            colorCount++;
-                        }
-                    }
-                }
-                totalPixels = canvasHeight * canvasWidth;
-                if(colorCount/totalPixels > 0.95){
-                    graphicsContext.setFill(userColor);
-                    graphicsContext.fillRect(0,0, canvasWidth, canvasHeight);
-                }else{
-                    graphicsContext.clearRect(0,0, canvasWidth, canvasHeight);
-                    initDraw(graphicsContext);
-                }
+                onRelease(graphicsContext, event);
             }
         });
         cell.getChildren().add(cellCanvas);
         cell.getStyleClass().add("cell");
         return cell;
     }
-
+    private void onClick(GraphicsContext graphicsContext, MouseEvent event){
+        initCounters();
+        graphicsContext.beginPath();
+        graphicsContext.moveTo(event.getX(), event.getY());
+        coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
+//                graphicsContext.stroke();
+    }
+    private void onDrage(GraphicsContext graphicsContext, MouseEvent event){
+        graphicsContext.lineTo(event.getX(), event.getY());
+        addCoordinateToQueue(event, graphicsContext);
+        graphicsContext.stroke();
+//              graphicsContext.closePath();
+//              graphicsContext.beginPath();
+//              graphicsContext.moveTo(event.getX(), event.getY());
+    }
+    private void onRelease(GraphicsContext graphicsContext, MouseEvent event){
+        double canvasWidth = graphicsContext.getCanvas().getWidth();
+        double canvasHeight = graphicsContext.getCanvas().getHeight();
+        double totalPixels = 0;
+        double colorCount = 0;
+        graphicsContext.lineTo(event.getX(), event.getY());
+        graphicsContext.stroke();
+        graphicsContext.closePath();
+        WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
+        for(int i = 0; i < canvasWidth; i++){
+            for(int j = 0; j < canvasHeight; j++){
+                if(snap.getPixelReader().getArgb(i,j) == userColorCode){
+                    colorCount++;
+                }
+            }
+        }
+        totalPixels = canvasHeight * canvasWidth;
+        if(colorCount/totalPixels > 0.95){
+            graphicsContext.setFill(userColor);
+            graphicsContext.fillRect(0,0, canvasWidth, canvasHeight);
+        }else{
+            graphicsContext.clearRect(0,0, canvasWidth, canvasHeight);
+            initDraw(graphicsContext);
+        }
+    }
     private GridPane createGrid(BooleanProperty[][] switches) {
 
         int numCols = switches.length ;
@@ -251,11 +259,21 @@ public class lobbyController {
         root.setRight(leftAnchorPane);
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+            }
+        };
+        timer.start();
         Scene scene = new Scene(root, 600, 600);
         scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    private void update(){
+
     }
     void setPlayer1LabelAsJoined(String name){
         player1Label.setText(name + " joined");
