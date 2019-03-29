@@ -18,11 +18,14 @@ public class CellUpdateRequestAction extends ActionBase {
         return response;
     }
 
+    // FIXME: Don't we expect a queue of coordinates instead of just x and y?
     private boolean isDataValid(JsonObject data) {
         return data.has("row") && data.has("col") &&
                 data.has("x") && data.has("y");
     }
 
+    // FIXME: Is this function really necessary? Can't we just call isDataValid and gameService.releaseCell from execute directly.
+    //          releaseCell do check if the user has the cell. We don't have to check it again.
     private boolean playerOwnsCell(GameService gameService, JsonObject data, String playerID){
         boolean playerOwnsCell = false;
         if (isDataValid(data)) {

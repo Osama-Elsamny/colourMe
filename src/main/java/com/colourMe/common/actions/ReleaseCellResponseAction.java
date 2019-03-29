@@ -26,6 +26,10 @@ public class ReleaseCellResponseAction extends ActionBase {
                 data.has("x") && data.has("y");
     }
 
+    // FIXME:  Why not call isDataValid and gameService.playerHasCell directly from execute.
+    //          Also gameService.releaseCell do check if the player has the cell. We don't have to check it again using gameService.playerHasCell.
+    //          Also we need to add success/failure field to the message so that GUI can either fully colour the cell or revert the changes.
+
     private boolean playerOwnsCell(GameService gameService, JsonObject data, String playerID){
         boolean playerOwnsCell = false;
         if (isDataValid(data)) {
