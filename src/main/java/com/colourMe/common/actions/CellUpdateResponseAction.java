@@ -10,7 +10,7 @@ public class CellUpdateResponseAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         boolean successful = false;
         JsonObject data = message.getData().getAsJsonObject();
-        if(data.has("successful"))
+        if (data.has("successful"))
             successful = data.get("successful").getAsBoolean();
         return successful ? message : null;
     }
