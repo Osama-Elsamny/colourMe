@@ -11,7 +11,7 @@ public class NetworkingTestBase {
     protected Gson gson;
     protected static final String LOCALHOST_IP = "127.0.0.1";
     protected static final int MULTI_DELAY_THRESHOLD = 150;
-    protected static final int DELAY_THRESHOLD = 50;
+    protected static final int DELAY_THRESHOLD = 100;
     protected static final String DEFAULT_ID = "test";
     protected static final String baseAddress = "ws://127.0.0.1:8080/connect/";
     protected static final String serverAddress = "ws://127.0.0.1:8080/connect/" + DEFAULT_ID;
