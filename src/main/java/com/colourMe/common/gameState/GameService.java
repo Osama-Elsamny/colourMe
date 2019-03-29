@@ -45,6 +45,25 @@ public class GameService {
         return false;
     }
 
+    // Release a cell
+    public boolean releaseCell(int row, int col, String playerID, boolean hasColoured) {
+        if(cellOwner(row, col) == playerID){
+            if(hasColoured) {
+                this.cells[row][col].setState(CellState.COLOURED);
+                players.get(playerID).incrementScore();
+            }else{
+                this.cells[row][col].setState(CellState.AVAILABLE);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // Get cell owner
+    public String cellOwner(int row, int col){
+        return this.cells[row][col].getClientId();
+    }
+
     // Get the size of the board
     public int getBoardSize() {
         return this.cells.length;

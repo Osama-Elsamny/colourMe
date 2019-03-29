@@ -17,6 +17,8 @@ public class Player {
         this.score = score;
     }
 
+    public void incrementScore() { this.score++; }
+
     public String getIpAddress() {
         return ipAddress;
     }
