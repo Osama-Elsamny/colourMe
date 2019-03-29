@@ -1,4 +1,6 @@
 package com.colourMe.gui;
+
+import com.colourMe.common.gameState.Coordinate;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;

@@ -1,22 +1,28 @@
 package com.colourMe.common.gameState;
 
-public class Player {
-    private boolean pixels[][];
+import java.util.List;
 
+public class Player {
     private int score = 0;
 
     private String ipAddress;
+
+    private List<Coordinate> coordinates;
 
     public Player(String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
-    public boolean[][] getPixels() {
-        return pixels;
+    public List<Coordinate> getCoordinates() {
+        return coordinates;
     }
 
-    public void setPixels(boolean[][] pixels) {
-        this.pixels = pixels;
+    public void setCoordinates(List<Coordinate> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void addCoordinate(Coordinate coordinate) {
+        this.coordinates.add(coordinate);
     }
 
     public int getScore() {

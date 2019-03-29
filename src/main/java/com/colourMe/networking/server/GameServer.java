@@ -21,21 +21,23 @@ public class GameServer extends Thread {
             new PriorityBlockingQueue<>(10, messageComparator);
 
     @Override
-    public void run(){
-        this.messageExecutor = new MessageExecutor();
+    public void run() {
         Server server = new Server("localhost", 8080, "",
                 null, GameServerEndpoint.class);
 
-        try{
+        this.messageExecutor = new MessageExecutor();
+        this.messageExecutor.buildServerActions();
+
+        try {
             server.start();
             this.running = true;
             System.out.println("GameServer has started!");
 
-            while(!finished){
+            while(!finished) {
                 processIncoming();
                 Thread.sleep(1);
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         } finally {

@@ -3,6 +3,7 @@ package com.colourMe.common.messages;
 import com.colourMe.common.actions.ActionBase;
 import com.colourMe.common.actions.ConnectRequestAction;
 import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.actions.GetCellRequestAction;
 import com.colourMe.common.gameState.GameService;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -17,7 +18,6 @@ public class MessageExecutor {
     public MessageExecutor() {
         this.gameService = new GameService();
         this.actionMap = new EnumMap<>(MessageType.class);
-        buildActions();
     }
 
     public void initGameConfig(GameConfig config){
@@ -29,7 +29,8 @@ public class MessageExecutor {
         return gson.toJsonTree(response);
     }
 
-    private void buildActions() {
+    public void buildServerActions() {
         actionMap.put(MessageType.ConnectRequest, new ConnectRequestAction());
+        actionMap.put(MessageType.GetCellRequest, new GetCellRequestAction());
     }
 }
