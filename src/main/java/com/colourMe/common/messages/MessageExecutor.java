@@ -1,11 +1,7 @@
 package com.colourMe.common.messages;
 
-import com.colourMe.common.actions.ActionBase;
-import com.colourMe.common.actions.ConnectRequestAction;
-import com.colourMe.common.actions.ReleaseCellRequestAction;
+import com.colourMe.common.actions.*;
 import com.colourMe.common.gameState.GameConfig;
-import com.colourMe.common.actions.DisconnectAction;
-import com.colourMe.common.actions.GetCellRequestAction;
 import com.colourMe.common.gameState.GameService;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -34,10 +30,12 @@ public class MessageExecutor {
     public void buildServerActions() {
         actionMap.put(MessageType.ConnectRequest, new ConnectRequestAction());
         actionMap.put(MessageType.GetCellRequest, new GetCellRequestAction());
+        actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
         actionMap.put(MessageType.ReleaseCellRequest, new ReleaseCellRequestAction());
     }
 
     public void buildClientAction() {
         actionMap.put(MessageType.Disconnect, new DisconnectAction());
+        actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
     }
 }
