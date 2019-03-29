@@ -3,8 +3,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GameServerTest {
-    GameServer server;
+public class GameServerTest extends NetworkingTestBase{
     // Milliseconds
     private final long MAX_SERVER_START_TIME = 1000;
     private final long MAX_SERVER_SHUTDOWN_TIME = 1000;
@@ -64,23 +63,5 @@ public class GameServerTest {
 
         System.out.println("Took " + time + "ms to stop server");
         assert(time < MAX_SERVER_SHUTDOWN_TIME);
-    }
-
-    // HELPER Functions
-    private void sleep(long millis){
-        try {
-            Thread.sleep(millis);
-        } catch(Exception ex) {
-            System.err.println(ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
-
-    private void waitTillServerRuns(){
-        while(!server.isRunning()) {}
-    }
-
-    private void waitTillServerFinishes(){
-        while(server.isRunning()) {}
     }
 }

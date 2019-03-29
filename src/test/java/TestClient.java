@@ -7,11 +7,9 @@ import java.net.URI;
 @ClientEndpoint
 public class TestClient {
 
-    private int NUM_TRIES = 0;
-    private final int RETRY_COUNT = 3;
     private volatile boolean received = true;
     private String id = "test";
-    private String testResponse;
+    private Message testResponse;
     private Session session;
     private Gson gson = new Gson();
 
@@ -47,7 +45,7 @@ public class TestClient {
         Message message = gson.fromJson(s, Message.class);
         if(message.getClientId().equals(id)) {
             System.out.println("Received " + s);
-            this.testResponse = s;
+            this.testResponse = message;
             received = true;
         }
     }
@@ -58,8 +56,9 @@ public class TestClient {
         session = null;
     }
 
-    public String sendMessage(String s){
+    public Message sendMessage(Message message){
         try {
+            String s = gson.toJson(message);
             this.received = false;
             this.session.getBasicRemote().sendText(s);
             while(!received) {}

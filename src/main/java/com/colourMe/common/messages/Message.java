@@ -1,5 +1,6 @@
 package com.colourMe.common.messages;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 public class Message {
@@ -47,5 +48,14 @@ public class Message {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+
+    public boolean equals(Message message){
+        boolean equal = true;
+        equal = equal && this.getClientId().equals(message.getClientId());
+        equal = equal && this.getData().toString().equals(message.getData().toString());
+        equal = equal && this.getMessageType().equals(message.getMessageType());
+        return equal;
     }
 }
