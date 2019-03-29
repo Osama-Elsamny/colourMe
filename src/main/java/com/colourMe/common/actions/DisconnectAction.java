@@ -14,11 +14,11 @@ public class DisconnectAction extends ActionBase {
         String userIP = gameService.getPlayerIP(message.getPlayerID());
 
         JsonObject data = new JsonObject();
-        data.addProperty("next_IP", nextIP);
+        data.addProperty("nextIP", nextIP);
         if (nextIP == userIP){
-            data.addProperty("start_server", true);
+            data.addProperty("startServer", true);
         }else{
-            data.addProperty("start_server", false);
+            data.addProperty("startServer", false);
         }
 
         return new Message(MessageType.Disconnect, data, null);

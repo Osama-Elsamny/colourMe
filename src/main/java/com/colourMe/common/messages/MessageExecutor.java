@@ -40,6 +40,6 @@ public class MessageExecutor {
     public void buildClientAction() {
         actionMap.put(MessageType.Disconnect, new DisconnectAction());
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
-        actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
+        actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());
     }
 }
