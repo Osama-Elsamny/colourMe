@@ -38,7 +38,7 @@ public class GameServerEndpoint {
         JsonObject jsonObject = request.getAsJsonObject();
         Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
                 jsonObject.get("data"),
-                jsonObject.get("clientId").getAsString());
+                jsonObject.get("playerID").getAsString());
         boolean result = GameServer.addToIncoming(message);
         System.out.println("Added message to incoming queue " +
                 (result ? "successfully" : "unsuccessfully"));

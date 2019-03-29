@@ -11,7 +11,7 @@ public class DisconnectAction extends ActionBase {
         GameConfig gameConfig = gameService.getGameConfig();
 
         String nextIP = gameConfig.getNextIP();
-        String userIP = gameConfig.getUserIP();
+        String userIP = gameService.getPlayerIP(message.getPlayerID());
 
         JsonObject data = new JsonObject();
         data.addProperty("next_IP", nextIP);

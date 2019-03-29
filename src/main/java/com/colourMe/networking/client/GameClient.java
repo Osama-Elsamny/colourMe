@@ -3,8 +3,6 @@ package com.colourMe.networking.client;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import com.colourMe.common.messages.Message;
@@ -21,10 +19,11 @@ public class GameClient extends Thread{
     private int connectionAttempt = 0;
 
     private String serverAddr;
-    public final PriorityBlockingQueue<JsonElement> receivedQueue;
-    public final PriorityBlockingQueue<JsonElement> sendQueue;
+    private String playerID;
+    public final PriorityBlockingQueue<Message> receivedQueue;
+    public final PriorityBlockingQueue<Message> sendQueue;
 
-    GameClient (PriorityBlockingQueue<JsonElement> receive,  PriorityBlockingQueue<JsonElement> send, String serverAddress){
+    GameClient (PriorityBlockingQueue<Message> receive,  PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
 
         // Parameter Check
         if(receive == null)
@@ -33,25 +32,27 @@ public class GameClient extends Thread{
             throw new IllegalArgumentException("Send Queue cannot be null");
         if(serverAddress == null)
             throw new IllegalArgumentException("Server Address cannot be null");
+        if(playerID == null)
+            throw new IllegalArgumentException("Player ID cannot be null");
 
         receivedQueue = receive;
         sendQueue = send;
         serverAddr = serverAddress;
+        playerID = playerID;
+
     }
 
     private void handleFailure(){
 
         // Construct message
-        Message msg = new Message(MessageType.Disconnect, null, "");
-        Gson gson = new Gson();
-        JsonElement message = gson.toJsonTree(msg);
+        Message msg = new Message(MessageType.Disconnect, null, playerID);
 
         synchronized (sendQueue){
             sendQueue.clear();
         }
         synchronized (receivedQueue){
             receivedQueue.clear();
-            receivedQueue.put(message);
+            receivedQueue.put(msg);
         }
     }
 
@@ -68,7 +69,7 @@ public class GameClient extends Thread{
                 // Send message to WebSocket.
                 while (clientEndPoint.session != null) {
                     synchronized (sendQueue) {
-                        JsonElement msg = sendQueue.poll();
+                        Message msg = sendQueue.poll();
                         if (msg != null) {
                             clientEndPoint.sendMessage(msg);
                         }

@@ -43,7 +43,7 @@ public class TestClient {
     public void onMessage(String s){
         // Only set testResponse for messages sent by the Client
         Message message = gson.fromJson(s, Message.class);
-        if(message.getClientId().equals(id)) {
+        if(message.getPlayerID().equals(id)) {
             System.out.println("Received " + s);
             this.testResponse = message;
             received = true;

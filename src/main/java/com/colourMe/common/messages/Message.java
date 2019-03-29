@@ -1,6 +1,5 @@
 package com.colourMe.common.messages;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 public class Message {
@@ -9,12 +8,12 @@ public class Message {
 
     private JsonElement data;
 
-    private String clientId;
+    private String playerID;
 
-    public Message(MessageType messageType, JsonElement data, String clientId) {
+    public Message(MessageType messageType, JsonElement data, String playerID) {
         this.messageType = messageType;
         this.data = data;
-        this.clientId = clientId;
+        this.playerID = playerID;
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -34,12 +33,12 @@ public class Message {
         this.data = data;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getPlayerID() {
+        return playerID;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setPlayerID(String playerID) {
+        this.playerID = playerID;
     }
 
     public long getTimestamp() {
@@ -53,7 +52,7 @@ public class Message {
 
     public boolean equals(Message message){
         boolean equal = true;
-        equal = equal && this.getClientId().equals(message.getClientId());
+        equal = equal && this.getPlayerID().equals(message.getPlayerID());
         equal = equal && this.getData().toString().equals(message.getData().toString());
         equal = equal && this.getMessageType().equals(message.getMessageType());
         return equal;

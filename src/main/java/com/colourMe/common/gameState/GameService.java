@@ -35,11 +35,10 @@ public class GameService {
     public GameConfig getGameConfig() { return gameConfig; }
 
     // Acquire a cell
-    public boolean acquireCell(int row, int col, double x, double y, String clientId) {
+    public boolean acquireCell(int row, int col, double x, double y, String playerID) {
         if(isCellAvailable(row, col)) {
-            this.cells[row][col].setClientId(clientId);
+            this.cells[row][col].setPlayerID(playerID);
             this.cells[row][col].setState(CellState.LOCKED);
-            players.get(clientId).addCoordinate(new Coordinate(x, y));
             return true;
         }
 
@@ -67,4 +66,5 @@ public class GameService {
         return this.cells[row][col].getState() == CellState.AVAILABLE;
     }
 
+    public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }
 }
