@@ -3,10 +3,7 @@ package com.colourMe.networking.server;
 import com.colourMe.common.marshalling.MessageDecoder;
 import com.colourMe.common.marshalling.MessageEncoder;
 import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageExecutor;
-import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import javax.websocket.*;
 import javax.websocket.server.*;
@@ -34,12 +31,8 @@ public class GameServerEndpoint {
     }
 
     @OnMessage
-    public void onMessage(Session session, JsonElement request) {
-        JsonObject jsonObject = request.getAsJsonObject();
-        Message message = new Message(MessageType.valueOf(jsonObject.get("messageType").getAsString()),
-                jsonObject.get("data"),
-                jsonObject.get("clientId").getAsString());
-        boolean result = GameServer.addToIncoming(message);
+    public void onMessage(Session session, Message request) {
+        boolean result = GameServer.addToIncoming(request);
         System.out.println("Added message to incoming queue " +
                 (result ? "successfully" : "unsuccessfully"));
     }

@@ -3,7 +3,7 @@ package com.colourMe.common.gameState;
 public class Cell {
     private CellState state = CellState.AVAILABLE;
 
-    private String clientId;
+    private String playerID;
 
     public Cell() {}
 
@@ -15,11 +15,11 @@ public class Cell {
         this.state = state;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getPlayerID() {
+        return playerID;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setPlayerID(String playerID) {
+        this.playerID = playerID;
     }
 }

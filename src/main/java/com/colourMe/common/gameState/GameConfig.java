@@ -12,6 +12,7 @@ public class GameConfig {
 
     private List<String> ipAddresses;
 
+    //TODO: Remove ipAddresses parameter if not needed.
     public GameConfig(int size, float ratio, int thickness, List<String> ipAddresses) {
         this.size = size;
         this.ratio = ratio;
@@ -47,11 +48,14 @@ public class GameConfig {
         return ipAddresses;
     }
 
-    public void setIpAddresses(List<String> ipAddresses) {
-        this.ipAddresses = ipAddresses;
-    }
+    public void setIpAddresses(List<String> ipAddresses) { this.ipAddresses = ipAddresses; }
 
     public void addIp(String ip) {
         this.ipAddresses.add(ip);
+    }
+
+    public String getNextIP(){
+        if (ipAddresses.isEmpty()) return null;
+        return ipAddresses.remove(0);
     }
 }

@@ -1,7 +1,8 @@
 package com.colourMe.networking.client;
 
 import java.net.URI;
-import com.google.gson.JsonElement;
+
+import com.colourMe.common.messages.Message;
 import java.util.concurrent.PriorityBlockingQueue;
 import javax.websocket.*;
 
@@ -19,7 +20,7 @@ import com.colourMe.common.marshalling.*;
 public class GameClientEndpoint {
 
     public Session session;
-    private PriorityBlockingQueue<JsonElement> receivedQueue;
+    private PriorityBlockingQueue<Message> receivedQueue;
 
     /**
      * Constructor
@@ -53,7 +54,7 @@ public class GameClientEndpoint {
      * @param update - The message from the server
      */
     @OnMessage
-    public void onMessage(Session session, JsonElement update) {
+    public void onMessage(Session session, Message update) {
         receivedQueue.put(update);
     }
 
@@ -67,7 +68,7 @@ public class GameClientEndpoint {
 
     }
 
-    public void addReceiveQueue(PriorityBlockingQueue<JsonElement> queue) {
+    public void addReceiveQueue(PriorityBlockingQueue<Message> queue) {
         this.receivedQueue = queue;
     }
 
@@ -76,7 +77,7 @@ public class GameClientEndpoint {
      *
      * @param message
      */
-    public void sendMessage(JsonElement message) {
+    public void sendMessage(Message message) {
         this.session.getAsyncRemote().sendObject(message);
     }
 

@@ -9,7 +9,7 @@ public class GetCellRequestAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         // TODO: Check if data is null
         JsonObject data = message.getData().getAsJsonObject();
-        String clientId = message.getClientId();
+        String clientId = message.getPlayerID();
         int boardSize = gameService.getBoardSize();
         if(isDataValid(data)) {
             int row = data.get("row").getAsInt();
