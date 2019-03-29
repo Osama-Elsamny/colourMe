@@ -5,33 +5,57 @@ import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
-import com.google.gson.JsonObject;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
-
 
 /**
  * ColourMe Client
  *
  * @author Arsalan Macknojia
  */
-public class GameClient implements Runnable{
+public class GameClient extends Thread{
 
-    private int maxTries = 3;
+    private static final int maxTries = 3;
     private int connectionAttempt = 0;
 
     private String serverAddr;
-    public final LinkedBlockingQueue<JsonElement> receivedQueue;
-    public final LinkedBlockingQueue<JsonElement> sendQueue;
+    public final PriorityBlockingQueue<JsonElement> receivedQueue;
+    public final PriorityBlockingQueue<JsonElement> sendQueue;
 
-    GameClient (LinkedBlockingQueue<JsonElement> receive,  LinkedBlockingQueue<JsonElement> send, String serverAddress){
+    GameClient (PriorityBlockingQueue<JsonElement> receive,  PriorityBlockingQueue<JsonElement> send, String serverAddress){
+
+        // Parameter Check
+        if(receive == null)
+            throw new IllegalArgumentException("Receive Queue cannot be null");
+        if(send == null)
+            throw new IllegalArgumentException("Send Queue cannot be null");
+        if(serverAddress == null)
+            throw new IllegalArgumentException("Server Address cannot be null");
+
         receivedQueue = receive;
         sendQueue = send;
         serverAddr = serverAddress;
     }
 
+    private void handleFailure(){
+
+        // Construct message
+        Message msg = new Message(MessageType.Disconnect, null, "");
+        Gson gson = new Gson();
+        JsonElement message = gson.toJsonTree(msg);
+
+        synchronized (sendQueue){
+            sendQueue.clear();
+        }
+        synchronized (receivedQueue){
+            receivedQueue.clear();
+            receivedQueue.put(message);
+        }
+    }
+
+    @Override
     public void run() {
         while (true) {
             try {
@@ -50,29 +74,12 @@ public class GameClient implements Runnable{
                         }
                     }
                 }
-
-                // Failure Case.
-                sendQueue.clear();
-                receivedQueue.clear();
-
-                // Construct message
-                JsonObject data = new JsonObject();
-                data.addProperty("Disconnect", true);
-                Message msg = new Message(MessageType.Disconnect, data, "");
-                Gson gson = new Gson();
-                JsonElement message = gson.toJsonTree(msg);
-
-                try {
-                    receivedQueue.put(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
             } catch (URISyntaxException ex) {
                 if (connectionAttempt < maxTries){
                     connectionAttempt++;
                 } else {
-                    System.err.println("URISyntaxException exception: " + ex.getMessage());
+                    // Connection Failure
+                    handleFailure();
                     break;
                 }
             }
