@@ -5,7 +5,6 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -58,7 +57,6 @@ public class lobbyController {
         StackPane cell = new StackPane();
         Canvas cellCanvas = new Canvas();
         cellCanvas.setId("canvas-" + rowNum + "-" + colNum);
-//        System.out.println(cellCanvas.getId());
         // could use the following 2 lines to set it to the parent width
         cellCanvas.widthProperty().bind(cell.widthProperty());
         cellCanvas.heightProperty().bind(cell.heightProperty());
@@ -257,14 +255,6 @@ public class lobbyController {
         root.setRight(leftAnchorPane);
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
-
-        scene = new Scene(root, 600, 600);
-
-        scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
-        primaryStage.setTitle("ColourMe");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -272,6 +262,11 @@ public class lobbyController {
             }
         };
         timer.start();
+        Scene scene = new Scene(root, 600, 600);
+        scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
+        primaryStage.setTitle("ColourMe");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
     private void update(){
         //TODO: add get Request and Process Request functions
