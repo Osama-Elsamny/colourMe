@@ -24,7 +24,7 @@ public class ReleaseCellRequestAction extends ActionBase {
 
     private boolean isDataValid(JsonObject data, String playerID) {
         return data.has("row") && data.has("col")
-                && data.has("isColoured") && (playerID != null);
+                && data.has("hasColoured") && (playerID != null);
     }
 
     private Message successResponse(JsonObject data, String clientId) {

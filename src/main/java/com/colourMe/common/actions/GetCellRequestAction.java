@@ -14,8 +14,8 @@ public class GetCellRequestAction extends ActionBase {
         if(isDataValid(data)) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            double X = data.get("X").getAsDouble();
-            double Y = data.get("Y").getAsDouble();
+            double X = data.get("x").getAsDouble();
+            double Y = data.get("y").getAsDouble();
 
             if(isRowAndColInBounds(row, col, boardSize) &&
                     gameService.acquireCell(row, col, X, Y, clientId)) {
@@ -32,7 +32,7 @@ public class GetCellRequestAction extends ActionBase {
 
     private boolean isDataValid(JsonObject data) {
         return data.has("row") && data.has("col")
-                && data.has("X") && data.has("Y");
+                && data.has("x") && data.has("y");
     }
 
     private Message successResponse(JsonObject data, String clientId) {
