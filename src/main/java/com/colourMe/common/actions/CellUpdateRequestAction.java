@@ -39,7 +39,7 @@ public class CellUpdateRequestAction extends ActionBase {
     }
 
     private Message failureResponse(JsonObject data, String playerID) {
-        data.addProperty("successful", true);
+        data.addProperty("successful", false);
         return new Message(MessageType.CellUpdateRequest, data, playerID);
     }
 
