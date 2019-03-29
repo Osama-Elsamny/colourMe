@@ -5,7 +5,6 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -49,9 +48,11 @@ public class lobbyController {
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private int coordinateCounter = 0;
-    private int requestCounter = 0; // Counts number of requests made per cell colouring
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
-
+    private double t = 0;
+    private int x = 1;
+    private int y = 1;
+    private Scene scene;
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
 
@@ -59,6 +60,7 @@ public class lobbyController {
         StackPane cell = new StackPane();
         Canvas cellCanvas = new Canvas();
         cellCanvas.setId("canvas-" + rowNum + "-" + colNum);
+//        System.out.println(cellCanvas.getId());
         // could use the following 2 lines to set it to the parent width
         cellCanvas.widthProperty().bind(cell.widthProperty());
         cellCanvas.heightProperty().bind(cell.heightProperty());
@@ -73,7 +75,7 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                onDrage(graphicsContext, event);
+                onDrag(graphicsContext, event);
             }
         });
         cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
@@ -93,7 +95,7 @@ public class lobbyController {
         coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
 //                graphicsContext.stroke();
     }
-    private void onDrage(GraphicsContext graphicsContext, MouseEvent event){
+    private void onDrag(GraphicsContext graphicsContext, MouseEvent event){
         graphicsContext.lineTo(event.getX(), event.getY());
         addCoordinateToQueue(event, graphicsContext);
         graphicsContext.stroke();
@@ -169,7 +171,6 @@ public class lobbyController {
 
     // Called in Mouse OnClick
     private void initCounters(){
-        requestCounter = 0;
         coordinateCounter = 0;
     }
 
@@ -189,7 +190,6 @@ public class lobbyController {
                 coordinateCounter = 0;
                 coordinateBuffer.remove();
             }
-            requestCounter++;
             // TODO: Add coordinates to send buffer
         }
     }
@@ -233,7 +233,7 @@ public class lobbyController {
         AnchorPane.setLeftAnchor(vbox, 0.0);
         AnchorPane.setRightAnchor(vbox, 0.0);
         AnchorPane.setBottomAnchor(vbox, 0.0);
-        addTocssFile(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, player1AnchorPane, player2AnchorPane, player3AnchorPane, player4AnchorPane);
+        addToCssFile(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, player1AnchorPane, player2AnchorPane, player3AnchorPane, player4AnchorPane);
         setComponentHeightAndWidth(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, player1AnchorPane, player2AnchorPane, player3AnchorPane, player4AnchorPane);
         //adding Label in the AnchorPanes so we can display the scores and the player names
         player1AnchorPane.getChildren().add(player1NameLabel);
@@ -259,6 +259,14 @@ public class lobbyController {
         root.setRight(leftAnchorPane);
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
+
+        scene = new Scene(root, 600, 600);
+
+        scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
+        primaryStage.setTitle("ColourMe");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -266,14 +274,9 @@ public class lobbyController {
             }
         };
         timer.start();
-        Scene scene = new Scene(root, 600, 600);
-        scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
-        primaryStage.setTitle("ColourMe");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
     private void update(){
-
+        //TODO: add get Request and Process Request functions
     }
     void setPlayer1LabelAsJoined(String name){
         player1Label.setText(name + " joined");
@@ -287,7 +290,7 @@ public class lobbyController {
     void setPlayer4LabelAsJoined(String name){
         player4Label.setText(name + " joined");
     }
-    private void addTocssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane player1AnchorPane, AnchorPane player2AnchorPane, AnchorPane player3AnchorPane, AnchorPane player4AnchorPane) {
+    private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane player1AnchorPane, AnchorPane player2AnchorPane, AnchorPane player3AnchorPane, AnchorPane player4AnchorPane) {
         //add id for the css file
         vbox.getStyleClass().add("vbox");
         player1AnchorPane.getStyleClass().add("player1AnchorPane");
@@ -317,6 +320,9 @@ public class lobbyController {
         player3AnchorPane.setPrefHeight(200);
         player4AnchorPane.setPrefWidth(200);
         player4AnchorPane.setPrefHeight(200);
+    }
+    private Node lookup(String id){
+        return scene.lookup("#" + id);
     }
     private void setXandYforLabels(Label player1NameLabel, Label player1ScoreLabel, Label player2NameLabel, Label player2ScoreLabel, Label player3NameLabel, Label player3ScoreLabel, Label player4NameLabel, Label player4ScoreLabel) {
         player1NameLabel.setLayoutX(14);
