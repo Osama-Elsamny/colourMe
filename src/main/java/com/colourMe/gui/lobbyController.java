@@ -90,15 +90,15 @@ public class lobbyController {
         graphicsContext.beginPath();
         graphicsContext.moveTo(event.getX(), event.getY());
         coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
-//                graphicsContext.stroke();
+        graphicsContext.stroke();
     }
     private void onDrag(GraphicsContext graphicsContext, MouseEvent event){
         graphicsContext.lineTo(event.getX(), event.getY());
         addCoordinateToQueue(event, graphicsContext);
         graphicsContext.stroke();
-//              graphicsContext.closePath();
-//              graphicsContext.beginPath();
-//              graphicsContext.moveTo(event.getX(), event.getY());
+        graphicsContext.closePath();
+        graphicsContext.beginPath();
+        graphicsContext.moveTo(event.getX(), event.getY());
     }
     private void onRelease(GraphicsContext graphicsContext, MouseEvent event){
         double canvasWidth = graphicsContext.getCanvas().getWidth();
