@@ -18,13 +18,13 @@ public class NetworkingTestBase {
     GameServer server;
 
     protected GameConfig getDefaultGameConfig(){
-        return new GameConfig(5, (float) 0.9, 10, new ArrayList<>());
+        return new GameConfig(5, (float) 0.9, 10);
     }
 
     public Message getDefaultConnectMessage(String id){
         Message message = new Message(MessageType.ConnectRequest, null, id);
         JsonObject data = new JsonObject();
-        data.addProperty("clientIP", LOCALHOST_IP);
+        data.addProperty("playerIP", LOCALHOST_IP);
         message.setData(data);
         return message;
     }
