@@ -294,43 +294,47 @@ public class lobbyController {
         JsonObject data = response.getData().getAsJsonObject();
         switch(response.getMessageType()) {
             case ConnectResponse:
-                handleConnect();
+                handleConnect(data);
                 break;
             case GetCellResponse:
                 break;
             case CellUpdateResponse:
-                handleCellUpdate();
+                handleCellUpdate(data, response.getPlayerID());
                 break;
             case ReleaseCellResponse:
+                handleCellRelease(data);
+                break;
             case ClientDisconnectResponse:
-
+                handleClientDisconnect(data);
+                break;
             case Disconnect:
-
+                handleDisconnect(data);
                 break;
             case DefaultType:
-
+                // TODO: Handle errors if you have any
             default:
         }
     }
 
-    private void handleConnect() {
-
+    private void handleConnect(JsonObject data) {
+        // Check the number of players
+        // If there are four players startGame() a.k.a displayBoard();
     }
 
-    private void handleCellUpdate() {
-
+    private void handleCellUpdate(JsonObject data, String playerID) {
+        // Render other clients' coordinates
     }
 
-    private void handleCellRelease() {
-
+    private void handleCellRelease(JsonObject data) {
+        // Color the cell or make it empty based on hasColoured property for the cell.
     }
 
-    private void handleDisconnect() {
-
+    private void handleDisconnect(JsonObject data) {
+        // Show reconnecting
     }
 
-    private void handleClientDisconnect() {
-
+    private void handleClientDisconnect(JsonObject data) {
+        // Show disconnected label on the gui
     }
 
     void setPlayer1LabelAsJoined(String name){
