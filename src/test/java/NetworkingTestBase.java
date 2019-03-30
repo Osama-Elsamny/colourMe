@@ -36,7 +36,7 @@ public class NetworkingTestBase {
 
     protected Message getExpectedConnectResponse(){
         GameConfig config = getDefaultGameConfig();
-        config.addIp(LOCALHOST_IP);
+        config.addplayerConfig(DEFAULT_ID, LOCALHOST_IP);
         Message response = new Message(MessageType.ConnectResponse, null, DEFAULT_ID);
         response.setData(gson.toJsonTree(config));
         return response;
