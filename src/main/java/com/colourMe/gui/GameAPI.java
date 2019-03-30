@@ -6,6 +6,7 @@ import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
+import com.google.gson.JsonObject;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -30,15 +31,68 @@ public class GameAPI {
     }
 
     //Requests
-    boolean sendConnectRequest(GameConfig gameConfig){return false;}
+    public boolean wrapInTryCatch(Runnable function) {
+        boolean successful = false;
+        try{
+            function.run();
+            successful = true;
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+        return successful;
+    }
 
-    boolean sendCellRequest(int row, int col, Coordinate coordinate){return false;}
+    public boolean sendConnectRequest(String playerID, String playerIP) {
+        return wrapInTryCatch(() -> {
+            JsonObject data = new JsonObject();
+            data.addProperty("playerIP", playerIP);
+            Message connectRequest = new Message(MessageType.ConnectRequest, data, playerID);
+            sendQueue.add(connectRequest);
+        });
+    }
 
-    boolean sendCellUpdateRequest(int row, int col, List coordinates){return false;}
+    public boolean sendGetCellRequest(String playerID, int row, int col, Coordinate coordinate) {
+        return wrapInTryCatch( () -> {
+            JsonObject data = new JsonObject();
+            data.addProperty("row", row);
+            data.addProperty("col", col);
+            data.addProperty("x", coordinate.x);
+            data.addProperty("y", coordinate.y);
+            Message getCellRequest = new Message(MessageType.GetCellRequest, data, playerID);
+            sendQueue.add(getCellRequest);
+        });
+    }
 
-    boolean sendReleaseCellRequest(int row, int col, boolean isColoured){return false;}
+    public boolean sendCellUpdateRequest(String playerID, int row, int col, List coordinates) {
+        return wrapInTryCatch( () -> {
+            JsonObject data = new JsonObject();
+            data.addProperty("row", row);
+            data.addProperty("col", col);
+            data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
+            Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
+            sendQueue.add(cellUpdateRequest);
+        });
+    }
 
-    boolean sendClientDisconnectRequest(String playerID){return false;}
+    public boolean sendReleaseCellRequest(String playerID, int row, int col, boolean hasColoured) {
+        return wrapInTryCatch( () -> {
+            JsonObject data = new JsonObject();
+            data.addProperty("row", row);
+            data.addProperty("col", col);
+            data.addProperty("hasColoured", hasColoured);
+            Message releaseCellRequest = new Message(MessageType.ReleaseCellRequest, data, playerID);
+            sendQueue.add(releaseCellRequest);
+        });
+    }
+
+    public boolean sendClientDisconnectRequest(String playerID, String reason) {
+        return wrapInTryCatch( () -> {
+            JsonObject data = new JsonObject();
+            data.addProperty("reason", reason);
+            Message disconnectRequest = new Message(null, data, playerID);
+        });
+    }
 
     //Responses
     Message processResponse() {
@@ -52,7 +106,7 @@ public class GameAPI {
         return new Message(MessageType.DefaultType, null, null);
     }
 
-    boolean hasResponse() {
+    public boolean hasResponse() {
         return !receivedQueue.isEmpty();
     }
 
