@@ -77,7 +77,7 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                onClick(graphicsContext, event, rowNum, colNum);
+                onClick(event, rowNum, colNum);
             }
         });
         cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
@@ -89,14 +89,14 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                onRelease(graphicsContext, event);
+                onRelease(graphicsContext, event, rowNum, colNum);
             }
         });
         cell.getChildren().add(cellCanvas);
         cell.getStyleClass().add("cell");
         return cell;
     }
-    private void onClick(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
+    private void onClick(MouseEvent event, int row, int col){
         initCounters();
         Coordinate coordinate = new Coordinate(event.getX(), event.getY());
         gameAPI.sendGetCellRequest(playerID, row, col, coordinate);
@@ -108,14 +108,35 @@ public class lobbyController {
         addCoordinateToQueue(event, graphicsContext, row, col);
     }
 
-    private void onRelease(GraphicsContext graphicsContext, MouseEvent event){
-        double canvasWidth = graphicsContext.getCanvas().getWidth();
-        double canvasHeight = graphicsContext.getCanvas().getHeight();
+    private void onRelease(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
+        Coordinate coordinate = new Coordinate(event.getX(), event.getY());
+        renderStroke(graphicsContext, coordinate, playerID, row, col);
+        boolean hasColoured = colourCellIfConquered(graphicsContext);
+        gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
+    }
+
+    private boolean colourCellIfConquered(GraphicsContext graphicsContext) {
         double totalPixels = 0;
         double colorCount = 0;
-        graphicsContext.lineTo(event.getX(), event.getY());
-        graphicsContext.stroke();
-        graphicsContext.closePath();
+        double canvasWidth = graphicsContext.getCanvas().getWidth();
+        double canvasHeight = graphicsContext.getCanvas().getHeight();
+
+        totalPixels = canvasHeight * canvasWidth;
+        colorCount = computePixelsColoured(graphicsContext);
+
+        boolean hasColoured = colorCount/totalPixels > 0.95;
+        if (hasColoured) {
+            colourCell(graphicsContext, userColor);
+        } else {
+            clearCell(graphicsContext);
+        }
+        return hasColoured;
+    }
+
+    private int computePixelsColoured (GraphicsContext graphicsContext) {
+        int colorCount = 0;
+        double canvasWidth = graphicsContext.getCanvas().getWidth();
+        double canvasHeight = graphicsContext.getCanvas().getHeight();
 
         WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
         for(int i = 0; i < canvasWidth; i++){
@@ -125,14 +146,21 @@ public class lobbyController {
                 }
             }
         }
-        totalPixels = canvasHeight * canvasWidth;
-        if(colorCount/totalPixels > 0.95){
-            graphicsContext.setFill(userColor);
-            graphicsContext.fillRect(0,0, canvasWidth, canvasHeight);
-        }else{
-            graphicsContext.clearRect(0,0, canvasWidth, canvasHeight);
-            initDraw(graphicsContext);
-        }
+        return colorCount;
+    }
+
+    private void colourCell(GraphicsContext graphicsContext, Color color){
+        double height = graphicsContext.getCanvas().getHeight();
+        double width = graphicsContext.getCanvas().getWidth();
+        graphicsContext.setFill(color);
+        graphicsContext.fillRect(0,0, width, height);
+    }
+
+    private void clearCell(GraphicsContext graphicsContext){
+        double height = graphicsContext.getCanvas().getHeight();
+        double width = graphicsContext.getCanvas().getWidth();
+        graphicsContext.clearRect(0,0, width, height);
+        initDraw(graphicsContext);
     }
 
     private void renderStroke(GraphicsContext graphicsContext, Coordinate coordinate,
