@@ -15,9 +15,7 @@ public class ReleaseCellRequestAction extends ActionBase {
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
 
-            if(gameService.releaseCell(row, col, playerID, hasColoured)) {
-                return successResponse(data, playerID);
-            }
+            if(gameService.releaseCell(row, col, playerID, hasColoured)) { return successResponse(data, playerID); }
         }
         return failureResponse(data, playerID);
     }

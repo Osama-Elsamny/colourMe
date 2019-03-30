@@ -10,29 +10,29 @@ public class ReleaseCellResponseAction extends ActionBase {
     public Message execute (Message message, GameService gameService){
         String playerID = message.getPlayerID();
         JsonObject data = message.getData().getAsJsonObject();
-        boolean playerOwnsCell = playerOwnsCell(gameService, data, playerID);
 
-        if (playerOwnsCell) {
+        if(isDataValid(data, playerID)) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
-            gameService.releaseCell(row, col, playerID, hasColoured);
+
+            if(gameService.releaseCell(row, col, playerID, hasColoured)) { return successResponse(data, playerID); }
         }
-        return message;
+        return failureResponse(data, playerID);
     }
 
-    private boolean isDataValid(JsonObject data) {
-        return data.has("row") && data.has("col") &&
-                data.has("x") && data.has("y");
+    private boolean isDataValid(JsonObject data, String playerID) {
+        return data.has("row") && data.has("col")
+                && data.has("hasColoured") && (playerID != null);
     }
 
-    private boolean playerOwnsCell(GameService gameService, JsonObject data, String playerID){
-        boolean playerOwnsCell = false;
-        if (isDataValid(data)) {
-            int row = data.get("row").getAsInt();
-            int col = data.get("col").getAsInt();
-            playerOwnsCell = gameService.playerHasCell(row, col, playerID);
-        }
-        return playerOwnsCell;
+    private Message successResponse(JsonObject data, String clientId) {
+        data.addProperty("successful", true);
+        return new Message(MessageType.ReleaseCellResponse, data, clientId);
+    }
+
+    private Message failureResponse(JsonObject data, String playerID) {
+        data.addProperty("successful", false);
+        return new Message(MessageType.ReleaseCellResponse, data, playerID);
     }
 }
