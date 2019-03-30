@@ -9,5 +9,6 @@ public enum MessageType {
     ConnectResponse,
     Disconnect,
     ReleaseCellRequest,
-    ReleaseCellResponse
+    ReleaseCellResponse,
+    DefaultType
 }

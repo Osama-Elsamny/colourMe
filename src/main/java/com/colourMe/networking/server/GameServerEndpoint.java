@@ -47,7 +47,7 @@ public class GameServerEndpoint {
 
     }
 
-    public static void broadcast(final JsonElement message) {
+    public static void broadcast(final Message message) {
         servers.forEach(x -> {
             synchronized (x) {
                 try {
