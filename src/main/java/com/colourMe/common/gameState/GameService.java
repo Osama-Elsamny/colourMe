@@ -2,9 +2,9 @@ package com.colourMe.common.gameState;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import javafx.scene.paint.Color;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GameService {
     private Gson gson = new Gson();
@@ -78,7 +78,7 @@ public class GameService {
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         players.put(playerId, new Player(ip));
-        this.gameConfig.addIp(ip);
+        this.gameConfig.addplayerConfig(playerId, ip);
     }
 
     // Remove a player
@@ -95,4 +95,27 @@ public class GameService {
     }
 
     public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }
+
+    public int getNumOfPlayers() {
+        return players.size();
+    }
+
+    public List<String> getPlayerIds() {
+        return new ArrayList<>(players.keySet());
+    }
+
+    public int getPlayerColourCode(String playerID) {
+        return 0;
+    }
+
+    public Color getPlayerColour(String playerID) {return null;}
+
+    public int getPlayerScore(String playerID) {
+        Player player = players.get(playerID);
+        if(player != null) {
+            return player.getScore();
+        }
+
+        throw new IllegalStateException("Player not found!");
+    }
 }
