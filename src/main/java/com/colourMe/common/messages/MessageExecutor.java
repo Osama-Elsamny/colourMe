@@ -31,6 +31,7 @@ public class MessageExecutor {
         actionMap.put(MessageType.GetCellRequest, new GetCellRequestAction());
         actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
         actionMap.put(MessageType.ReleaseCellRequest, new ReleaseCellRequestAction());
+        actionMap.put(MessageType.ClientDisconnectRequest, new ClientDisconnectRequestAction());
     }
 
     public void buildClientActions() {
@@ -38,5 +39,6 @@ public class MessageExecutor {
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
         actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());
         actionMap.put(MessageType.ConnectResponse, new ConnectResponseAction());
+        actionMap.put(MessageType.ClientDisconnectResponse, new ClientDisconnectResponseAction());
     }
 }

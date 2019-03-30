@@ -75,10 +75,18 @@ public class GameService {
         return this.gson;
     }
 
-    // Spawns a new player in the game when connected
+    // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         players.put(playerId, new Player(ip));
         this.gameConfig.addIp(ip);
+    }
+
+    // Remove a player
+    public void killPlayer(String playerID) {
+        //TODO: Release any locks acquired by the player.
+        String playerIP = players.get(playerID).getIpAddress();
+        players.remove(playerID);
+        gameConfig.removeIP(playerIP);
     }
 
     // Checks whether a given cell is available for colouring
