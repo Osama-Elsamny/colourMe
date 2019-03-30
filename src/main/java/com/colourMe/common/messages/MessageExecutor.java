@@ -39,6 +39,6 @@ public class MessageExecutor {
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
         actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());
         actionMap.put(MessageType.ConnectResponse, new ConnectResponseAction());
-        actionMap.put(MessageType.ClientDisconnectResponse, new ConnectResponseAction());
+        actionMap.put(MessageType.ClientDisconnectResponse, new ClientDisconnectResponseAction());
     }
 }

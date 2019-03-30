@@ -75,7 +75,7 @@ public class GameService {
         return this.gson;
     }
 
-    // Spawns a new player in the game when
+    // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         players.put(playerId, new Player(ip));
         this.gameConfig.addIp(ip);
