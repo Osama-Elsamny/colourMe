@@ -53,6 +53,8 @@ public class GameConfig {
         this.ipAddresses.add(ip);
     }
 
+    public void removeIP(String ip){ this.ipAddresses.remove(ip); }
+
     public String getLastIP() {
         return ipAddresses.get(ipAddresses.size() -  1);
     }
