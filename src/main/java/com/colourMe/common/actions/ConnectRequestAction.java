@@ -10,8 +10,8 @@ public class ConnectRequestAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
-        if(data.has("clientIP")) {
-            gameService.spawnPlayer(message.getPlayerID(), data.get("clientIP").getAsString());
+        if(data.has("playerIP")) {
+            gameService.spawnPlayer(message.getPlayerID(), data.get("playerIP").getAsString());
             JsonElement gameConfig = gameService.getGameConfigAsJson();
             return new Message(MessageType.ConnectResponse, gameConfig, message.getPlayerID());
         }
