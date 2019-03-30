@@ -31,7 +31,7 @@ public class GameAPI {
     }
 
     //Requests
-    boolean wrapInTryCatch(Runnable function) {
+    public boolean wrapInTryCatch(Runnable function) {
         boolean successful = false;
         try{
             function.run();
@@ -43,7 +43,7 @@ public class GameAPI {
         return successful;
     }
 
-    boolean sendConnectRequest(String playerID, String playerIP) {
+    public boolean sendConnectRequest(String playerID, String playerIP) {
         return wrapInTryCatch(() -> {
             JsonObject data = new JsonObject();
             data.addProperty("playerIP", playerIP);
@@ -52,7 +52,7 @@ public class GameAPI {
         });
     }
 
-    boolean sendGetCellRequest(String playerID, int row, int col, Coordinate coordinate) {
+    public boolean sendGetCellRequest(String playerID, int row, int col, Coordinate coordinate) {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
@@ -64,7 +64,7 @@ public class GameAPI {
         });
     }
 
-    boolean sendCellUpdateRequest(String playerID, int row, int col, List coordinates) {
+    public boolean sendCellUpdateRequest(String playerID, int row, int col, List coordinates) {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
@@ -75,7 +75,7 @@ public class GameAPI {
         });
     }
 
-    boolean sendReleaseCellRequest(String playerID, int row, int col, boolean isColoured) {
+    public boolean sendReleaseCellRequest(String playerID, int row, int col, boolean isColoured) {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
@@ -86,7 +86,7 @@ public class GameAPI {
         });
     }
 
-    boolean sendClientDisconnectRequest(String playerID, String reason) {
+    public boolean sendClientDisconnectRequest(String playerID, String reason) {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("reason", reason);
@@ -106,7 +106,7 @@ public class GameAPI {
         return new Message(MessageType.DefaultType, null, null);
     }
 
-    boolean hasResponse() {
+    public boolean hasResponse() {
         return !receivedQueue.isEmpty();
     }
 
