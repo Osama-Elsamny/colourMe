@@ -75,12 +75,12 @@ public class GameAPI {
         });
     }
 
-    public boolean sendReleaseCellRequest(String playerID, int row, int col, boolean isColoured) {
+    public boolean sendReleaseCellRequest(String playerID, int row, int col, boolean hasColoured) {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
             data.addProperty("col", col);
-            data.addProperty("isColoured", isColoured);
+            data.addProperty("hasColoured", hasColoured);
             Message releaseCellRequest = new Message(MessageType.ReleaseCellRequest, data, playerID);
             sendQueue.add(releaseCellRequest);
         });
