@@ -6,18 +6,15 @@ import com.colourMe.common.actions.CellUpdateRequestAction;
 import com.colourMe.common.actions.ConnectRequestAction;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 
 import java.util.EnumMap;
 
 public class MessageExecutor {
-    private Gson gson = new Gson();
     private EnumMap<MessageType, ActionBase> actionMap;
     private GameService gameService;
 
-    public MessageExecutor() {
-        this.gameService = new GameService();
+    public MessageExecutor(GameService gameService) {
+        this.gameService = gameService;
         this.actionMap = new EnumMap<>(MessageType.class);
     }
 
@@ -25,9 +22,8 @@ public class MessageExecutor {
         this.gameService.init(config);
     }
 
-    public JsonElement processMessage(Message message) {
-        Message response = actionMap.get(message.getMessageType()).execute(message, gameService);
-        return gson.toJsonTree(response);
+    public Message processMessage(Message message) {
+        return actionMap.get(message.getMessageType()).execute(message, gameService);
     }
 
     public void buildServerActions() {
@@ -37,7 +33,7 @@ public class MessageExecutor {
         actionMap.put(MessageType.ReleaseCellRequest, new ReleaseCellRequestAction());
     }
 
-    public void buildClientAction() {
+    public void buildClientActions() {
         actionMap.put(MessageType.Disconnect, new DisconnectAction());
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
         actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());

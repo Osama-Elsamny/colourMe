@@ -1,6 +1,7 @@
 package com.colourMe.networking.server;
 
 import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.google.gson.JsonElement;
@@ -11,6 +12,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class GameServer extends Thread {
     private MessageExecutor messageExecutor;
+    private GameService gameService;
     private volatile boolean running = false;
     private volatile boolean finished = false;
 
@@ -25,7 +27,8 @@ public class GameServer extends Thread {
         Server server = new Server("localhost", 8080, "",
                 null, GameServerEndpoint.class);
 
-        this.messageExecutor = new MessageExecutor();
+        this.gameService = new GameService();
+        this.messageExecutor = new MessageExecutor(gameService);
         this.messageExecutor.buildServerActions();
 
         try {
@@ -54,8 +57,10 @@ public class GameServer extends Thread {
                 while (!incoming.isEmpty()) {
                     // Read message
                     Message m = incoming.take();
+
                     // Process message
-                    JsonElement response = messageExecutor.processMessage(m);
+                    Message response = messageExecutor.processMessage(m);
+
                     // Broadcast response to everyone
                     GameServerEndpoint.broadcast(response);
                 }
