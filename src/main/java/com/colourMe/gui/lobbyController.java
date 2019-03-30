@@ -1,6 +1,9 @@
 package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
+import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
+import com.google.gson.JsonObject;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class lobbyController {
     @FXML
@@ -47,11 +51,17 @@ public class lobbyController {
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
+    private GameAPI gameAPI;
     private int coordinateCounter = 0;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
+
+    private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
+                            PriorityBlockingQueue<Message> receivedQueue) {
+        this.gameAPI = new GameAPI(sendQueue, receivedQueue);
+    }
 
     private StackPane createCell(BooleanProperty cellSwitch, int colNum, int rowNum) {
         StackPane cell = new StackPane();
@@ -270,7 +280,59 @@ public class lobbyController {
     }
     private void update(){
         //TODO: add get Request and Process Request functions
+        // Check if hasResponse()
+        if(gameAPI.hasResponse()) {
+            // processResponse()
+            Message response = gameAPI.processResponse();
+
+            // updateGUI()
+            renderResponse(response);
+        }
     }
+
+    private void renderResponse(Message response) {
+        JsonObject data = response.getData().getAsJsonObject();
+        switch(response.getMessageType()) {
+            case ConnectResponse:
+                handleConnect();
+                break;
+            case GetCellResponse:
+                break;
+            case CellUpdateResponse:
+                handleCellUpdate();
+                break;
+            case ReleaseCellResponse:
+            case ClientDisconnectResponse:
+
+            case Disconnect:
+
+                break;
+            case DefaultType:
+
+            default:
+        }
+    }
+
+    private void handleConnect() {
+
+    }
+
+    private void handleCellUpdate() {
+
+    }
+
+    private void handleCellRelease() {
+
+    }
+
+    private void handleDisconnect() {
+
+    }
+
+    private void handleClientDisconnect() {
+
+    }
+
     void setPlayer1LabelAsJoined(String name){
         player1Label.setText(name + " joined");
     }
