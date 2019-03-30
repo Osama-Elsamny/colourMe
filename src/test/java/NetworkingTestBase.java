@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class NetworkingTestBase {
     protected Gson gson;
     protected static final String LOCALHOST_IP = "127.0.0.1";
-    protected static final int MULTI_DELAY_THRESHOLD = 150;
+    protected static final int MULTI_DELAY_THRESHOLD = 500;
     protected static final int DELAY_THRESHOLD = 100;
     protected static final String DEFAULT_ID = "test";
     protected static final String baseAddress = "ws://127.0.0.1:8080/connect/";
@@ -30,13 +30,12 @@ public class NetworkingTestBase {
     }
 
     protected Message getDefaultConnectMessage(){
-
         return getDefaultConnectMessage(DEFAULT_ID);
     }
 
     protected Message getExpectedConnectResponse(){
         GameConfig config = getDefaultGameConfig();
-        config.addIp(LOCALHOST_IP);
+        config.addplayerConfig(DEFAULT_ID, LOCALHOST_IP);
         Message response = new Message(MessageType.ConnectResponse, null, DEFAULT_ID);
         response.setData(gson.toJsonTree(config));
         return response;

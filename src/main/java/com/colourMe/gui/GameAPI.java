@@ -95,7 +95,7 @@ public class GameAPI {
     }
 
     //Responses
-    Message processResponse() {
+    public Message processResponse() {
         Message receivedMessage = receivedQueue.poll();
 
         if(receivedMessage != null) {
@@ -111,10 +111,23 @@ public class GameAPI {
     }
 
     //Free functions
-    int getNumOfPlayers(){return 0;}
-    String[] getPlayerNames(){return null;}
-    int getPlayerColourCode(String playerID){return 0;}
-    Color getPlayerColour(String playerID){return null;}
-    int getPlayerScore(String playerID){return 0;}
-    Message getResponse(){return null;}
+    public int getNumOfPlayers() {
+        return gameService.getNumOfPlayers();
+    }
+
+    public List<String> getPlayerIds() {
+        return gameService.getPlayerIds();
+    }
+
+    public int getPlayerColourCode(String playerID) {
+        return gameService.getPlayerColourCode(playerID);
+    }
+
+    public Color getPlayerColour(String playerID) {
+        return gameService.getPlayerColour(playerID);
+    }
+
+    public int getPlayerScore(String playerID) {
+        return gameService.getPlayerScore(playerID);
+    }
 }

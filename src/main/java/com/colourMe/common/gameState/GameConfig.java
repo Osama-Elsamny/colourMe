@@ -1,5 +1,6 @@
 package com.colourMe.common.gameState;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class GameConfig {
 
     private int thickness;
 
-    private List<String> ipAddresses;
+    private List<Pair<String, String>> ipAddresses;
 
     public GameConfig(int size, float ratio, int thickness) {
         this.size = size;
@@ -43,24 +44,24 @@ public class GameConfig {
         this.thickness = thickness;
     }
 
-    public List<String> getIpAddresses() {
+    public List<Pair<String, String>> getIpAddresses() {
         return ipAddresses;
     }
 
-    public void setIpAddresses(List<String> ipAddresses) { this.ipAddresses = ipAddresses; }
+    public void setIpAddresses(List<Pair<String, String>> ipAddresses) { this.ipAddresses = ipAddresses; }
 
-    public void addIp(String ip) {
-        this.ipAddresses.add(ip);
+    public void addplayerConfig(String playerId, String ip) {
+        this.ipAddresses.add(new Pair<>(playerId, ip));
     }
 
     public void removeIP(String ip){ this.ipAddresses.remove(ip); }
 
     public String getLastIP() {
-        return ipAddresses.get(ipAddresses.size() -  1);
+        return ipAddresses.get(size -  1).getValue();
     }
 
     public String getNextIP(){
         if (ipAddresses.isEmpty()) return null;
-        return ipAddresses.remove(0);
+        return ipAddresses.remove(0).getValue();
     }
 }

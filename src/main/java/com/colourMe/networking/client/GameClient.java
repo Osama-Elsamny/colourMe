@@ -13,7 +13,7 @@ import com.colourMe.common.messages.MessageType;
  *
  * @author Arsalan Macknojia
  */
-public class GameClient extends Thread{
+public class GameClient extends Thread {
 
     private static final int maxTries = 3;
     private int connectionAttempt = 0;

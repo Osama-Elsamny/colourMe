@@ -58,7 +58,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         double avg;
         double sum = 0;
         int NUM_THREADS = 10;
-        int NUM_TASKS = 1000;
+        int NUM_TASKS = 100;
 
         try {
             ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
