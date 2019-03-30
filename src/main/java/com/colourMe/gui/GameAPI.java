@@ -130,4 +130,8 @@ public class GameAPI {
     public int getPlayerScore(String playerID) {
         return gameService.getPlayerScore(playerID);
     }
+
+    public boolean playerOwnsCell(int row, int col, String playerID) {
+        return gameService.validCellOwner(row, col, playerID);
+    }
 }

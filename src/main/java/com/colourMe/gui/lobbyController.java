@@ -6,6 +6,7 @@ import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,6 +52,7 @@ public class lobbyController {
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
+    private String playerID;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
@@ -75,13 +77,13 @@ public class lobbyController {
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                onClick(graphicsContext, event);
+                onClick(graphicsContext, event, rowNum, colNum);
             }
         });
         cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
-                onDrag(graphicsContext, event);
+                onDrag(graphicsContext, event, rowNum, colNum);
             }
         });
         cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
@@ -94,21 +96,18 @@ public class lobbyController {
         cell.getStyleClass().add("cell");
         return cell;
     }
-    private void onClick(GraphicsContext graphicsContext, MouseEvent event){
+    private void onClick(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
         initCounters();
-        graphicsContext.beginPath();
-        graphicsContext.moveTo(event.getX(), event.getY());
-        coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
-        graphicsContext.stroke();
+        Coordinate coordinate = new Coordinate(event.getX(), event.getY());
+        gameAPI.sendGetCellRequest(playerID, row, col, coordinate);
     }
-    private void onDrag(GraphicsContext graphicsContext, MouseEvent event){
-        graphicsContext.lineTo(event.getX(), event.getY());
-        addCoordinateToQueue(event, graphicsContext);
-        graphicsContext.stroke();
-        graphicsContext.closePath();
-        graphicsContext.beginPath();
-        graphicsContext.moveTo(event.getX(), event.getY());
+
+    private void onDrag(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
+        Coordinate coordinate = new Coordinate(event.getX(), event.getY());
+        renderStroke(graphicsContext, coordinate, playerID, row, col);
+        addCoordinateToQueue(event, graphicsContext, row, col);
     }
+
     private void onRelease(GraphicsContext graphicsContext, MouseEvent event){
         double canvasWidth = graphicsContext.getCanvas().getWidth();
         double canvasHeight = graphicsContext.getCanvas().getHeight();
@@ -117,6 +116,7 @@ public class lobbyController {
         graphicsContext.lineTo(event.getX(), event.getY());
         graphicsContext.stroke();
         graphicsContext.closePath();
+
         WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
         for(int i = 0; i < canvasWidth; i++){
             for(int j = 0; j < canvasHeight; j++){
@@ -134,6 +134,18 @@ public class lobbyController {
             initDraw(graphicsContext);
         }
     }
+
+    private void renderStroke(GraphicsContext graphicsContext, Coordinate coordinate,
+                               String playerID, int row, int col) {
+        if (gameAPI.playerOwnsCell(row, col, playerID)) {
+            graphicsContext.beginPath();
+            graphicsContext.moveTo(coordinate.x, coordinate.y);
+            graphicsContext.lineTo(coordinate.x, coordinate.y);
+            graphicsContext.stroke();
+            graphicsContext.closePath();
+        }
+    }
+
     private GridPane createGrid(BooleanProperty[][] switches) {
 
         int numCols = switches.length ;
@@ -181,7 +193,7 @@ public class lobbyController {
     }
 
     // Called in Mouse OnDrag
-    private void addCoordinateToQueue(MouseEvent event, GraphicsContext gc){
+    private void addCoordinateToQueue(MouseEvent event, GraphicsContext gc, int row, int col){
         coordinateCounter++;
         if (coordinateBuffer.size() <= COORDINATE_BUFFER_MAX_SIZE
             && coordinateCounter > COORDINATE_COUNTER_LIMIT
@@ -191,12 +203,13 @@ public class lobbyController {
             coordinateCounter = 0;
             coordinateBuffer.add(new Coordinate(event.getX(), event.getY()));
         }
-        if (coordinateBuffer.size() > COORDINATE_BUFFER_MAX_SIZE){
+        if (coordinateBuffer.size() > COORDINATE_BUFFER_MAX_SIZE) {
+            gameAPI.sendCellUpdateRequest(playerID, row, col, coordinateBuffer);
             while(! coordinateBuffer.isEmpty()) {
                 coordinateCounter = 0;
                 coordinateBuffer.remove();
             }
-            // TODO: Add coordinates to send buffer
+            coordinateCounter++;
         }
     }
 
