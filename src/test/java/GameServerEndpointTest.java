@@ -40,13 +40,11 @@ public class GameServerEndpointTest extends NetworkingTestBase {
          assert (response.equals(getExpectedConnectResponse()));
     }
 
-
-
     //////////////////////////////// Get Cell Response Tests //////////////////////////////////
 
     @Test
     public void verifyGetCellActionFirstCell() {
-        JsonObject data = getFirstCellData();
+        JsonObject data = getCellData(0);
         client.sendMessage(getDefaultConnectMessage());
         Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
         assert (response.equals(getResponse(MessageType.GetCellResponse, data, true)));
@@ -54,7 +52,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
 
     @Test
     public void verifyGetCellActionLastCell() {
-        JsonObject data = getLastCellData();
+        JsonObject data = getCellData(DEFAULT_BOARD_SIZE - 1);
         client.sendMessage(getDefaultConnectMessage());
         Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
         assert (response.equals(getResponse(MessageType.GetCellResponse, data, true)));
@@ -94,31 +92,31 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
     }
 
+    //////////////////////////////// Cell Update Response Tests //////////////////////////////////
+
     @Test
     public void verifyCellUpdateResponseFirstCell() {
-        JsonObject data = getCellUpdateFirstCellData();
+        JsonObject data = getCellUpdateData(0);
         client.sendMessage(getDefaultConnectMessage());
-        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(0)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
         assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
     }
 
-    //////////////////////////////// Cell Update Response Tests //////////////////////////////////
-
     @Test
     public void verifyCellUpdateResponseLastCell() {
-        JsonObject data = getCellUpdateLastCellData();
+        JsonObject data = getCellUpdateData(DEFAULT_BOARD_SIZE - 1);
         client.sendMessage(getDefaultConnectMessage());
-        client.sendMessage(getRequest(MessageType.GetCellRequest, getLastCellData()));
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(DEFAULT_BOARD_SIZE - 1)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
         assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
     }
 
     @Test
     public void verifyInvalidCellUpdateResponse() {
-        JsonObject data = getCellUpdateLastCellData();
+        JsonObject data = getCellUpdateData(0);
         client.sendMessage(getDefaultConnectMessage());
-        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(DEFAULT_BOARD_SIZE - 1)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
         assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
     }
@@ -127,10 +125,53 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     public void verifyEmptyDataCellUpdateResponse() {
         JsonObject data = new JsonObject();
         client.sendMessage(getDefaultConnectMessage());
-        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(0)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
         assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
     }
+
+    //////////////////////////////// Release Cell Response Tests //////////////////////////////////
+
+    @Test
+    public void verifyReleaseCellResponseFirstCell() {
+        JsonObject data = getReleaseCellData(true, 0);
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(0)));
+        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(0)));
+        Message response = client.sendMessage(getRequest(MessageType.ReleaseCellRequest, data));
+        assert (response.equals(getResponse(MessageType.ReleaseCellResponse, data, true)));
+    }
+
+    @Test
+    public void verifyReleaseCellResponseLastCell() {
+        JsonObject data = getReleaseCellData(true, DEFAULT_BOARD_SIZE - 1);
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(DEFAULT_BOARD_SIZE - 1)));
+        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(DEFAULT_BOARD_SIZE - 1)));
+        Message response = client.sendMessage(getRequest(MessageType.ReleaseCellRequest, data));
+        assert (response.equals(getResponse(MessageType.ReleaseCellResponse, data, true)));
+    }
+
+    @Test
+    public void verifyReleaseCellEmptyDataResponse() {
+        JsonObject data = new JsonObject();
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(0)));
+        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(0)));
+        Message response = client.sendMessage(getRequest(MessageType.ReleaseCellRequest, data));
+        assert (response.equals(getResponse(MessageType.ReleaseCellResponse, data, false)));
+    }
+
+    @Test
+    public void verifyReleaseCellInvalidResponse() {
+        JsonObject data = getReleaseCellData(true, DEFAULT_BOARD_SIZE - 1);
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getCellData(0)));
+        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(0)));
+        Message response = client.sendMessage(getRequest(MessageType.ReleaseCellRequest, data));
+        assert (response.equals(getResponse(MessageType.ReleaseCellResponse, data, false)));
+    }
+
 
     ////////////////////////////////  Server Performance Tests //////////////////////////////////
 

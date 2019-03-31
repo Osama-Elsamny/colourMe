@@ -38,6 +38,10 @@ public class NetworkingTestBase {
         return data;
     }
 
+    protected JsonObject getCellData(int size) {
+        return getCellData(size, size, 0, 0);
+    }
+
     public Message getDefaultConnectMessage(String id) {
         JsonObject data = new JsonObject();
         data.addProperty("playerIP", LOCALHOST_IP);
@@ -54,29 +58,20 @@ public class NetworkingTestBase {
         return new Message(MessageType.ConnectResponse, gson.toJsonTree(config), DEFAULT_ID);
     }
 
-    protected JsonObject getFirstCellData() {
-        return getCellData(0, 0, 0, 0);
-    }
-
-    protected JsonObject getLastCellData() {
-        return getCellData(DEFAULT_BOARD_SIZE - 1, DEFAULT_BOARD_SIZE - 1, 0, 0);
-    }
-
-    protected JsonObject getCellUpdateFirstCellData() {
+    protected JsonObject getCellUpdateData(int rowAndCol) {
         List<Coordinate> coordinates = new ArrayList<>();
         coordinates.add(new Coordinate(0.1, 0.1));
-        JsonObject data = getCellData(0, 0);
+        JsonObject data = getCellData(rowAndCol, rowAndCol);
         data.addProperty("coordinates", gson.toJson(coordinates));
         return data;
     }
 
-    protected JsonObject getCellUpdateLastCellData() {
-        List<Coordinate> coordinates = new ArrayList<>();
-        coordinates.add(new Coordinate(0, 0));
-        JsonObject data = getCellData(DEFAULT_BOARD_SIZE - 1, DEFAULT_BOARD_SIZE - 1);
-        data.addProperty("coordinates", gson.toJson(coordinates));
+    protected JsonObject getReleaseCellData(boolean hasColoured, int rowAndCol) {
+        JsonObject data = getCellData(rowAndCol, rowAndCol, 0, 0);
+        data.addProperty("hasColoured", hasColoured);
         return data;
     }
+
 
     protected JsonObject getFaultyCellData(String faultyField, int value) {
         JsonObject data = new JsonObject();
