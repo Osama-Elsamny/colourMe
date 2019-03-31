@@ -1,4 +1,5 @@
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class GameServerEndpointTest extends NetworkingTestBase {
-    TestClient client;
+    private TestClient client;
 
     @Before
     public void init() {
@@ -39,29 +40,32 @@ public class GameServerEndpointTest extends NetworkingTestBase {
          assert (response.equals(getExpectedConnectResponse()));
     }
 
-    @Test
-    public void verifySingleMessageDelay() {
-        long delay = System.currentTimeMillis();
-        Message response = client.sendMessage(getDefaultConnectMessage());
-        delay = System.currentTimeMillis() - delay;
-        System.out.println("Delay for response: " +  delay);
-        assert (delay < DELAY_THRESHOLD) || response == null;
-    }
+
+
+    //////////////////////////////// Get Cell Response Tests //////////////////////////////////
 
     @Test
     public void verifyGetCellActionFirstCell() {
         JsonObject data = getFirstCellData();
         client.sendMessage(getDefaultConnectMessage());
-        Message response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, true)));
+        Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, true)));
     }
 
     @Test
     public void verifyGetCellActionLastCell() {
         JsonObject data = getLastCellData();
         client.sendMessage(getDefaultConnectMessage());
-        Message response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, true)));
+        Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, true)));
+    }
+
+    @Test
+    public void verifyEmptyDataGetCellActionResponse() {
+        JsonObject data = new JsonObject();
+        client.sendMessage(getDefaultConnectMessage());
+        Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
     }
 
     @Test
@@ -69,12 +73,12 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         String faultyField = "row";
         JsonObject data = getFaultyCellData(faultyField, -1);
         client.sendMessage(getDefaultConnectMessage());
-        Message response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, false)));
+        Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
 
         data = getFaultyCellData("row", 5);
-        response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, false)));
+        response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
     }
 
     @Test
@@ -82,12 +86,61 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         String faultyField = "col";
         JsonObject data = getFaultyCellData(faultyField, -1);
         client.sendMessage(getDefaultConnectMessage());
-        Message response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, false)));
+        Message response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
 
         data = getFaultyCellData(faultyField, 5);
-        response = client.sendMessage(getGetCellRequest(data));
-        assert (response.equals(getCellResponse(data, false)));
+        response = client.sendMessage(getRequest(MessageType.GetCellRequest, data));
+        assert (response.equals(getResponse(MessageType.GetCellResponse, data, false)));
+    }
+
+    @Test
+    public void verifyCellUpdateResponseFirstCell() {
+        JsonObject data = getCellUpdateFirstCellData();
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
+        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
+    }
+
+    //////////////////////////////// Cell Update Response Tests //////////////////////////////////
+
+    @Test
+    public void verifyCellUpdateResponseLastCell() {
+        JsonObject data = getCellUpdateLastCellData();
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getLastCellData()));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
+        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
+    }
+
+    @Test
+    public void verifyInvalidCellUpdateResponse() {
+        JsonObject data = getCellUpdateLastCellData();
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
+        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
+    }
+
+    @Test
+    public void verifyEmptyDataCellUpdateResponse() {
+        JsonObject data = new JsonObject();
+        client.sendMessage(getDefaultConnectMessage());
+        client.sendMessage(getRequest(MessageType.GetCellRequest, getFirstCellData()));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
+        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
+    }
+
+    ////////////////////////////////  Server Performance Tests //////////////////////////////////
+
+    @Test
+    public void verifySingleMessageDelay() {
+        long delay = System.currentTimeMillis();
+        Message response = client.sendMessage(getDefaultConnectMessage());
+        delay = System.currentTimeMillis() - delay;
+        System.out.println("Delay for response: " +  delay);
+        assert (delay < DELAY_THRESHOLD) || response == null;
     }
 
     @Test

@@ -1,3 +1,4 @@
+import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
@@ -6,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkingTestBase {
     protected Gson gson;
@@ -22,12 +24,24 @@ public class NetworkingTestBase {
         return new GameConfig(DEFAULT_BOARD_SIZE, (float) 0.9, 10);
     }
 
+    protected JsonObject getCellData(int row, int col) {
+        JsonObject data = new JsonObject();
+        data.addProperty("row", row);
+        data.addProperty("col", col);
+        return data;
+    }
+
+    protected JsonObject getCellData(int row, int col, double x, double y) {
+        JsonObject data = getCellData(row, col);
+        data.addProperty("x", x);
+        data.addProperty("y", y);
+        return data;
+    }
+
     public Message getDefaultConnectMessage(String id) {
-        Message message = new Message(MessageType.ConnectRequest, null, id);
         JsonObject data = new JsonObject();
         data.addProperty("playerIP", LOCALHOST_IP);
-        message.setData(data);
-        return message;
+        return new Message(MessageType.ConnectRequest, data, id);
     }
 
     protected Message getDefaultConnectMessage() {
@@ -37,26 +51,30 @@ public class NetworkingTestBase {
     protected Message getExpectedConnectResponse() {
         GameConfig config = getDefaultGameConfig();
         config.addplayerConfig(DEFAULT_ID, LOCALHOST_IP);
-        Message response = new Message(MessageType.ConnectResponse, null, DEFAULT_ID);
-        response.setData(gson.toJsonTree(config));
-        return response;
+        return new Message(MessageType.ConnectResponse, gson.toJsonTree(config), DEFAULT_ID);
     }
 
     protected JsonObject getFirstCellData() {
-        JsonObject data = new JsonObject();
-        data.addProperty("row", 0);
-        data.addProperty("col", 0);
-        data.addProperty("x", 0);
-        data.addProperty("y", 0);
-        return data;
+        return getCellData(0, 0, 0, 0);
     }
 
     protected JsonObject getLastCellData() {
-        JsonObject data = new JsonObject();
-        data.addProperty("row", DEFAULT_BOARD_SIZE - 1);
-        data.addProperty("col", DEFAULT_BOARD_SIZE - 1);
-        data.addProperty("x", 0);
-        data.addProperty("y", 0);
+        return getCellData(DEFAULT_BOARD_SIZE - 1, DEFAULT_BOARD_SIZE - 1, 0, 0);
+    }
+
+    protected JsonObject getCellUpdateFirstCellData() {
+        List<Coordinate> coordinates = new ArrayList<>();
+        coordinates.add(new Coordinate(0.1, 0.1));
+        JsonObject data = getCellData(0, 0);
+        data.addProperty("coordinates", gson.toJson(coordinates));
+        return data;
+    }
+
+    protected JsonObject getCellUpdateLastCellData() {
+        List<Coordinate> coordinates = new ArrayList<>();
+        coordinates.add(new Coordinate(0, 0));
+        JsonObject data = getCellData(DEFAULT_BOARD_SIZE - 1, DEFAULT_BOARD_SIZE - 1);
+        data.addProperty("coordinates", gson.toJson(coordinates));
         return data;
     }
 
@@ -71,18 +89,23 @@ public class NetworkingTestBase {
         return data;
     }
 
-    protected Message getFaultyGetCellRequest(String faultyField, int value) {
-        return new Message(MessageType.GetCellRequest, getFaultyCellData(faultyField, value), DEFAULT_ID);
+    protected JsonObject getFaultyCellData(String faultyField, int value, String[] fields) {
+        JsonObject data = new JsonObject();
+        for (String field:fields) {
+            if (faultyField.equals(field))
+                data.addProperty(field, value);
+            else data.addProperty(field, 0);
+        }
+        return data;
     }
 
-    protected Message getGetCellRequest(JsonObject data) {
-
-        return new Message(MessageType.GetCellRequest, data, DEFAULT_ID);
-    }
-
-    protected Message getCellResponse(JsonObject data, boolean successful) {
+    protected Message getResponse(MessageType type, JsonObject data, boolean successful) {
         data.addProperty("successful", successful);
-        return new Message(MessageType.GetCellResponse, data, DEFAULT_ID);
+        return new Message(type, data, DEFAULT_ID);
+    }
+
+    protected Message getRequest(MessageType type, JsonObject data) {
+        return new Message(type, data, DEFAULT_ID);
     }
 
     // HELPER Functions

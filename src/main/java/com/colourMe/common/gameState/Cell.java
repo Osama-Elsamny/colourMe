@@ -3,7 +3,7 @@ package com.colourMe.common.gameState;
 public class Cell {
     private CellState state = CellState.AVAILABLE;
 
-    private String playerID;
+    private String playerID = "";
 
     public Cell() {}
 
