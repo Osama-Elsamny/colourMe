@@ -1,7 +1,4 @@
-
-import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -11,7 +8,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.*;
 
 public class GameServerEndpointTest extends NetworkingTestBase {
@@ -24,7 +20,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         server.start();
 
         // Give some time for server to start
-        try {Thread.sleep(100); } catch (Exception ex) {}
+        waitTillServerRuns();
         server.initGameService(getDefaultGameConfig());
 
         this.client = new TestClient(serverAddress);
@@ -34,17 +30,17 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     public void end() {
         this.client.disconnect();
         this.server.finish();
-        try { Thread.sleep(1000); } catch(Exception ex) {}
+        waitTillServerFinishes();
     }
 
     @Test
-    public void verifyConnectActionResponse(){
+    public void verifyConnectActionResponse() {
          Message response = client.sendMessage(getDefaultConnectMessage());
          assert (response.equals(getExpectedConnectResponse()));
     }
 
     @Test
-    public void verifyConnectActionDelay(){
+    public void verifySingleMessageDelay() {
         long delay = System.currentTimeMillis();
         Message response = client.sendMessage(getDefaultConnectMessage());
         delay = System.currentTimeMillis() - delay;
@@ -53,7 +49,49 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     }
 
     @Test
-    public void verifyMultiClientDelay(){
+    public void verifyGetCellActionFirstCell() {
+        JsonObject data = getFirstCellData();
+        client.sendMessage(getDefaultConnectMessage());
+        Message response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, true)));
+    }
+
+    @Test
+    public void verifyGetCellActionLastCell() {
+        JsonObject data = getLastCellData();
+        client.sendMessage(getDefaultConnectMessage());
+        Message response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, true)));
+    }
+
+    @Test
+    public void verifyGetCellActionFaultyRowField() {
+        String faultyField = "row";
+        JsonObject data = getFaultyCellData(faultyField, -1);
+        client.sendMessage(getDefaultConnectMessage());
+        Message response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, false)));
+
+        data = getFaultyCellData("row", 5);
+        response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, false)));
+    }
+
+    @Test
+    public void verifyGetCellActionFaultyColField() {
+        String faultyField = "col";
+        JsonObject data = getFaultyCellData(faultyField, -1);
+        client.sendMessage(getDefaultConnectMessage());
+        Message response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, false)));
+
+        data = getFaultyCellData(faultyField, 5);
+        response = client.sendMessage(getGetCellRequest(data));
+        assert (response.equals(getCellResponse(data, false)));
+    }
+
+    @Test
+    public void verifyMultiClientDelay() {
         long value;
         double avg;
         double sum = 0;
@@ -63,6 +101,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         try {
             ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
             List<Callable<Long>> tasks = new ArrayList<>(NUM_TASKS);
+
             for (int i=0; i< NUM_TASKS; i++)
                 tasks.add(this::simulateClientWorkFlow);
             List<Future<Long>> futures = service.invokeAll(tasks);
@@ -71,6 +110,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
                 value = future.get();
                 sum += value;
             }
+
             avg = sum/NUM_TASKS;
             System.out.println("Average delay of requests : " + avg);
             assert (avg < MULTI_DELAY_THRESHOLD);
@@ -93,10 +133,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
 
     private TestClient generateRandomClient() {
         // Used to generate unique user id
-        Random random = new Random();
-        long x = random.nextLong();
-        long y = random.nextLong();
-        String id = "" + x + y;
+        String id = "" + System.currentTimeMillis();
         return new TestClient(this.baseAddress, id);
     }
 
