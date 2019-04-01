@@ -119,4 +119,18 @@ public class GameServiceTest {
         String testId = "nonExistentPlayerId";
         gameService.getPlayerScore(testId);
     }
+
+    @Test
+    public void verifyKillPlayer() {
+        boolean didAcquire = gameService.acquireCell(1, 1, 0.0, 0.0, playerId);
+        assertTrue (didAcquire);
+
+        Cell acquiredCell = gameService.getCell(1, 1);
+        assertEquals (acquiredCell.getPlayerID(), playerId);
+        assertEquals (acquiredCell.getState(), CellState.LOCKED);
+
+        gameService.killPlayer(playerId);
+        assertEquals (acquiredCell.getPlayerID(), "");
+        assertEquals (acquiredCell.getState(), CellState.AVAILABLE);
+    }
 }

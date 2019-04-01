@@ -99,7 +99,18 @@ public class GameService {
 
     // Remove a player
     public void killPlayer(String playerID) {
-        //TODO: Release any locks acquired by the player.
+        // Release locks
+        for(Cell[] cellRow : cells) {
+            for(Cell cell : cellRow) {
+                if(cell.getPlayerID().equals(playerID)
+                    && cell.getState().equals(CellState.LOCKED)) {
+                    cell.setPlayerID("");
+                    cell.setState(CellState.AVAILABLE);
+                }
+            }
+        }
+
+        // Remove player
         players.remove(playerID);
         gameConfig.removePlayerConfig(playerID);
     }
