@@ -11,7 +11,7 @@ public class GameService {
 
     private GameConfig gameConfig;
 
-    private Cell cells[][];
+    private Cell[][] cells;
 
     private Map<String, Player> players;
 
@@ -24,8 +24,8 @@ public class GameService {
     public void init(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
         this.cells = new Cell[gameConfig.getSize()][gameConfig.getSize()];
-        for (int i=0; i < cells.length; i++) {
-            for (int j=0; j < cells.length; j++) {
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells.length; j++) {
                 cells[i][j] = new Cell();
             }
         }
