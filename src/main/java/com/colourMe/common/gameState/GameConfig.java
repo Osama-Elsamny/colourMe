@@ -54,7 +54,14 @@ public class GameConfig {
         this.ipAddresses.add(new Pair<>(playerId, ip));
     }
 
-    public void removeIP(String ip){ this.ipAddresses.remove(ip); }
+    public void removePlayerConfig(String playerID) {
+        for(Pair<String, String> entry : ipAddresses) {
+            if(entry.getKey().equals(playerID)) {
+                ipAddresses.remove(entry);
+                break;
+            }
+        }
+    }
 
     public String getLastIP() {
         return ipAddresses.get(size -  1).getValue();

@@ -56,11 +56,13 @@ public class GameService {
             if(hasColoured) {
                 this.cells[row][col].setState(CellState.COLOURED);
                 players.get(playerID).incrementScore();
-            }else{
+            } else {
                 this.cells[row][col].setState(CellState.AVAILABLE);
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -80,6 +82,10 @@ public class GameService {
         return this.gson;
     }
 
+    public Cell getCell(int row, int col) {
+        return this.cells[row][col];
+    }
+
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         players.put(playerId, new Player(ip));
@@ -89,14 +95,8 @@ public class GameService {
     // Remove a player
     public void killPlayer(String playerID) {
         //TODO: Release any locks acquired by the player.
-        String playerIP = players.get(playerID).getIpAddress();
         players.remove(playerID);
-        gameConfig.removeIP(playerIP);
-    }
-
-    // Checks whether a given cell is available for colouring
-    private boolean isCellAvailable(int row, int col) {
-        return this.cells[row][col].getState() == CellState.AVAILABLE;
+        gameConfig.removePlayerConfig(playerID);
     }
 
     public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }
@@ -122,5 +122,10 @@ public class GameService {
         }
 
         throw new IllegalStateException("Player not found!");
+    }
+
+    // Checks whether a given cell is available for colouring
+    private boolean isCellAvailable(int row, int col) {
+        return this.cells[row][col].getState() == CellState.AVAILABLE;
     }
 }
