@@ -19,6 +19,7 @@ public class GameServiceTest {
         gameService = new GameService();
         gameConfig = new GameConfig(5, (float) 0.90, 10);
         gameService.init(gameConfig);
+        gameService.spawnPlayer(playerId, playerIp);
     }
 
     @Test
@@ -49,5 +50,31 @@ public class GameServiceTest {
         Cell failedAcquisitionCell = gameService.getCell(0, 0);
         assert (failedAcquisitionCell.getPlayerID().equals(playerId));
         assert (failedAcquisitionCell.getState().equals(CellState.LOCKED));
+    }
+
+    @Test
+    public void verifyValidCellOwnerWithColouring() {
+        boolean didAcquire = gameService.acquireCell(0, 1, 0.0, 0.0, playerId);
+        assert (didAcquire);
+
+        assert(gameService.validCellOwner(0, 1, playerId));
+
+        boolean didRelease = gameService.releaseCell(0, 1, playerId, false);
+        assert (didRelease);
+
+        assert (!gameService.validCellOwner(0, 1, playerId));
+    }
+
+    @Test
+    public void verifyValidCellOwnerWithoutColouring() {
+        boolean didAcquire = gameService.acquireCell(0, 1, 0.0, 0.0, playerId);
+        assert (didAcquire);
+
+        assert(gameService.validCellOwner(0, 1, playerId));
+
+        boolean didRelease = gameService.releaseCell(0, 1, playerId, true);
+        assert (didRelease);
+
+        assert (gameService.validCellOwner(0, 1, playerId));
     }
 }

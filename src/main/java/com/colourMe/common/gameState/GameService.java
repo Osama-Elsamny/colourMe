@@ -57,6 +57,7 @@ public class GameService {
                 this.cells[row][col].setState(CellState.COLOURED);
                 players.get(playerID).incrementScore();
             } else {
+                this.cells[row][col].setPlayerID("");
                 this.cells[row][col].setState(CellState.AVAILABLE);
             }
 
@@ -84,6 +85,10 @@ public class GameService {
 
     public Cell getCell(int row, int col) {
         return this.cells[row][col];
+    }
+
+    public Player getPlayerByID(String playerID) {
+        return players.get(playerID);
     }
 
     // Spawns a new player in the game when connect
