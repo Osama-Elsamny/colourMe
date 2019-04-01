@@ -130,6 +130,20 @@ public class GameAPITest {
         assertEquals(gameConfig, gameAPI.getGameConfig());
     }
 
+    @Test
+    public void verifyGetCellResponseAction() {
+        gameAPI.sendGetCellRequest(playerID, row, col, coordinate);
+
+        assertEquals(sendQueue.size(), 1);
+        Message response = messageExecutor.processMessage(sendQueue.poll());
+
+        receivedQueue.put(response);
+        assertTrue(gameAPI.hasResponse());
+        Message processedResponse = gameAPI.processResponse();
+
+        assertEquals(processedResponse, cellResponseMessage(true));
+    }
+
     private Message connectRequestMessage() {
         JsonObject data = new JsonObject();
         data.addProperty("playerIP", playerIP);
@@ -164,6 +178,12 @@ public class GameAPITest {
     private Message connectResponseMessage() {
         JsonElement data = gson.toJsonTree(gameConfig);
         return new Message(MessageType.ConnectResponse, data, playerID);
+    }
+
+    private Message cellResponseMessage(boolean success) {
+        Message message = getCellRequestMessage();
+        message.getData().getAsJsonObject().addProperty("Successful", success);
+        return message;
     }
 
     private void initializeCoordinates() {
