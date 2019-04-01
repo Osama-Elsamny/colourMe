@@ -3,8 +3,7 @@ package com.colourMe.common.messages;
 public enum MessageType {
     ConnectRequest,
     GetCell,
-    CellUpdateRequest,
-    CellUpdateResponse,
+    CellUpdate,
     ConnectResponse,
     Disconnect,
     ReleaseCell,

@@ -100,8 +100,8 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getCellUpdateData(rowAndCol);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
-        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
+        assert (response.equals(getResponse(MessageType.CellUpdate, data, true)));
     }
 
     @Test
@@ -110,8 +110,8 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getCellUpdateData(rowAndCol);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
-        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, true)));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
+        assert (response.equals(getResponse(MessageType.CellUpdate, data, true)));
     }
 
     @Test
@@ -120,8 +120,8 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getCellUpdateData(0);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
-        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
+        assert (response.equals(getResponse(MessageType.CellUpdate, data, false)));
     }
 
     @Test
@@ -130,8 +130,8 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = new JsonObject();
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        Message response = client.sendMessage(getRequest(MessageType.CellUpdateRequest, data));
-        assert (response.equals(getResponse(MessageType.CellUpdateResponse, data, false)));
+        Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
+        assert (response.equals(getResponse(MessageType.CellUpdate, data, false)));
     }
 
     //////////////////////////////// Release Cell Response Tests //////////////////////////////////
@@ -141,7 +141,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getReleaseCellData(true, rowAndCol);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(rowAndCol)));
+        client.sendMessage(getRequest(MessageType.CellUpdate, getCellUpdateData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.ReleaseCell, data));
         assert (response.equals(getResponse(MessageType.ReleaseCell, data, true)));
     }
@@ -152,7 +152,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getReleaseCellData(true, rowAndCol);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(rowAndCol)));
+        client.sendMessage(getRequest(MessageType.CellUpdate, getCellUpdateData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.ReleaseCell, data));
         assert (response.equals(getResponse(MessageType.ReleaseCell, data, true)));
     }
@@ -163,7 +163,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = new JsonObject();
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(rowAndCol)));
+        client.sendMessage(getRequest(MessageType.CellUpdate, getCellUpdateData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.ReleaseCell, data));
         assert (response.equals(getResponse(MessageType.DefaultType, data, false)));
     }
@@ -174,7 +174,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         JsonObject data = getReleaseCellData(true, 0);
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
-        client.sendMessage(getRequest(MessageType.CellUpdateRequest, getCellUpdateData(rowAndCol)));
+        client.sendMessage(getRequest(MessageType.CellUpdate, getCellUpdateData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.ReleaseCell, data));
         assert (response.equals(getResponse(MessageType.DefaultType, data, false)));
     }

@@ -70,7 +70,7 @@ public class GameAPI {
             data.addProperty("row", row);
             data.addProperty("col", col);
             data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
-            Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
+            Message cellUpdateRequest = new Message(MessageType.CellUpdate, data, playerID);
             sendQueue.add(cellUpdateRequest);
         });
     }

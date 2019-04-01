@@ -150,7 +150,7 @@ public class GameAPITest {
         data.addProperty("row", row);
         data.addProperty("col", col);
         data.addProperty("coordinates", gson.toJson(coordinates));
-        return new Message(MessageType.CellUpdateRequest, data, playerID);
+        return new Message(MessageType.CellUpdate, data, playerID);
     }
 
     private Message cellReleaseRequestMessage() {
