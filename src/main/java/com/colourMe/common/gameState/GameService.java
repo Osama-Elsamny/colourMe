@@ -24,6 +24,11 @@ public class GameService {
     public void init(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
         this.cells = new Cell[gameConfig.getSize()][gameConfig.getSize()];
+        for (int i=0; i < cells.length; i++) {
+            for (int j=0; j < cells.length; j++) {
+                cells[i][j] = new Cell();
+            }
+        }
     }
 
     // Returns GameConfig as Json
