@@ -17,10 +17,9 @@ public class GameService {
             this.COLOR = color;
             this.COLOR_CODE = colorCode;
         }
-
     }
 
-    private static ColorPair[] COLOR_PAIRS =  {
+    private static ColorPair[] COLOR_PAIRS = {
             new ColorPair(Color.BLUE, -16776961),
             new ColorPair(Color.RED, -65536),
             new ColorPair(Color.GREEN, -16744448),
@@ -33,7 +32,7 @@ public class GameService {
 
     private Cell[][] cells;
 
-    public Map<String, Player> players;
+    private Map<String, Player> players;
 
     // Constructor
     public GameService() {
@@ -114,10 +113,20 @@ public class GameService {
     // TODO: Add bolean parameter to check if it is server or not
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
-        if (! players.containsKey(playerId)) {
+        if(!playerExists(playerId)) {
             ColorPair pair = COLOR_PAIRS[players.size()];
             players.put(playerId, new Player(ip, pair.COLOR, pair.COLOR_CODE));
             this.gameConfig.addplayerConfig(playerId, ip);
+        }
+    }
+
+    // Spawns from players from game config
+    public void spawnPlayersFromConfig() {
+        for(Pair<String, String> entry : gameConfig.getIpAddresses()) {
+            if(!playerExists(entry.getKey())) {
+                ColorPair pair = COLOR_PAIRS[players.size()];
+                players.put(entry.getKey(), new Player(entry.getValue(), pair.COLOR, pair.COLOR_CODE));
+            }
         }
     }
 
@@ -173,5 +182,9 @@ public class GameService {
     // Checks whether a given cell is available for colouring
     private boolean isCellAvailable(int row, int col) {
         return this.cells[row][col].getState() == CellState.AVAILABLE;
+    }
+
+    private boolean playerExists(String playerID) {
+        return players.containsKey(playerID);
     }
 }

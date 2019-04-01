@@ -115,6 +115,8 @@ public class GameAPI {
         return gameService.getNumOfPlayers();
     }
 
+    public GameConfig getGameConfig() { return gameService.getGameConfig(); }
+
     public List<String> getPlayerIds() {
         return gameService.getPlayerIds();
     }

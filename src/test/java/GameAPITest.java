@@ -1,8 +1,12 @@
 import com.colourMe.common.gameState.Coordinate;
+import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.gui.GameAPI;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +23,12 @@ public class GameAPITest {
     private PriorityBlockingQueue<Message> sendQueue;
 
     private PriorityBlockingQueue<Message> receivedQueue;
+
+    private GameService gameService;
+
+    private GameConfig gameConfig = new GameConfig(10, (float) 0.90, 10);
+
+    private MessageExecutor messageExecutor;
 
     private GameAPI gameAPI;
 
@@ -45,6 +55,10 @@ public class GameAPITest {
         sendQueue = new PriorityBlockingQueue<>(10, Message.messageComparator);
         receivedQueue = new PriorityBlockingQueue<>(10, Message.messageComparator);
         gameAPI = new GameAPI(sendQueue, receivedQueue);
+        gameService = new GameService();
+        messageExecutor = new MessageExecutor(gameService);
+        messageExecutor.initGameConfig(gameConfig);
+        messageExecutor.buildServerActions();
         this.initializeCoordinates();
     }
 
@@ -100,6 +114,22 @@ public class GameAPITest {
         assertEquals(cellReleaseRequestMessage(), request);
     }
 
+    // Workflow tests, sending a request and expecting valid response from gameAPI processResponse
+    @Test
+    public void verifyConnectResponseAction() {
+        gameAPI.sendConnectRequest(playerID, playerIP);
+
+        assertEquals(sendQueue.size(), 1);
+        Message response = messageExecutor.processMessage(sendQueue.poll());
+
+        receivedQueue.put(response);
+        assertTrue(gameAPI.hasResponse());
+        Message processedResponse = gameAPI.processResponse();
+
+        assertEquals(processedResponse, connectResponseMessage());
+        assertEquals(gameConfig, gameAPI.getGameConfig());
+    }
+
     private Message connectRequestMessage() {
         JsonObject data = new JsonObject();
         data.addProperty("playerIP", playerIP);
@@ -129,6 +159,11 @@ public class GameAPITest {
         data.addProperty("col", col);
         data.addProperty("hasColoured", hasColoured);
         return new Message(MessageType.ReleaseCellRequest, data, playerID);
+    }
+
+    private Message connectResponseMessage() {
+        JsonElement data = gson.toJsonTree(gameConfig);
+        return new Message(MessageType.ConnectResponse, data, playerID);
     }
 
     private void initializeCoordinates() {
