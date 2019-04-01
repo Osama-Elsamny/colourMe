@@ -5,11 +5,12 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 
-public class ReleaseCellRequestAction extends ActionBase {
+public class ReleaseCellAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
         String playerID = message.getPlayerID();
+
         if(isDataValid(data, playerID)) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
@@ -17,6 +18,7 @@ public class ReleaseCellRequestAction extends ActionBase {
 
             if(gameService.releaseCell(row, col, playerID, hasColoured)) { return successResponse(data, playerID); }
         }
+
         return failureResponse(data, playerID);
     }
 
@@ -27,11 +29,11 @@ public class ReleaseCellRequestAction extends ActionBase {
 
     private Message successResponse(JsonObject data, String clientId) {
         data.addProperty("successful", true);
-        return new Message(MessageType.ReleaseCellResponse, data, clientId);
+        return new Message(MessageType.ReleaseCell, data, clientId);
     }
 
     private Message failureResponse(JsonObject data, String clientId) {
         data.addProperty("successful", false);
-        return new Message(MessageType.ReleaseCellResponse, data, clientId);
+        return new Message(MessageType.DefaultType, data, clientId);
     }
 }

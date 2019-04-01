@@ -142,7 +142,7 @@ public class GameAPITest {
         data.addProperty("col", col);
         data.addProperty("x", x);
         data.addProperty("y", y);
-        return new Message(MessageType.GetCellRequest, data, playerID);
+        return new Message(MessageType.GetCell, data, playerID);
     }
 
     private Message cellUpdateRequestMessage() {
@@ -158,7 +158,7 @@ public class GameAPITest {
         data.addProperty("row", row);
         data.addProperty("col", col);
         data.addProperty("hasColoured", hasColoured);
-        return new Message(MessageType.ReleaseCellRequest, data, playerID);
+        return new Message(MessageType.ReleaseCell, data, playerID);
     }
 
     private Message connectResponseMessage() {
