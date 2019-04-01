@@ -3,7 +3,6 @@ import com.colourMe.common.gameState.CellState;
 import com.colourMe.common.gameState.GameConfig;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 import com.colourMe.common.gameState.GameService;
 
 import static org.junit.Assert.*;
@@ -111,7 +110,7 @@ public class GameServiceTest {
         boolean didRelease = gameService.releaseCell(0, 1, playerId, true);
         assertTrue (didRelease);
 
-        assertTrue (gameService.validCellOwner(0, 1, playerId));
+        assertFalse (gameService.validCellOwner(0, 1, playerId));
     }
 
     @Test (expected = IllegalStateException.class)
