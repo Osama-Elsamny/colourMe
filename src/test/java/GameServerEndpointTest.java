@@ -34,13 +34,12 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         waitTillServerFinishes();
     }
 
+    //////////////////////////////// Get Cell Response Tests //////////////////////////////////
     @Test
     public void verifyConnectActionResponse() {
          Message response = client.sendMessage(getDefaultConnectMessage());
          assert (response.equals(getExpectedConnectResponse()));
     }
-
-    //////////////////////////////// Get Cell Response Tests //////////////////////////////////
 
     @Test
     public void verifyGetCellActionFirstCell() {
@@ -95,7 +94,6 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     }
 
     //////////////////////////////// Cell Update Response Tests //////////////////////////////////
-
     @Test
     public void verifyCellUpdateResponseFirstCell() {
         int rowAndCol = 0;
@@ -137,7 +135,6 @@ public class GameServerEndpointTest extends NetworkingTestBase {
     }
 
     //////////////////////////////// Release Cell Response Tests //////////////////////////////////
-
     @Test
     public void verifyReleaseCellResponseFirstCell() {
         int rowAndCol = 0;
@@ -184,7 +181,6 @@ public class GameServerEndpointTest extends NetworkingTestBase {
 
 
     ////////////////////////////////  Server Performance Tests //////////////////////////////////
-
     @Test
     public void verifySingleMessageDelay() {
         long delay = System.currentTimeMillis();

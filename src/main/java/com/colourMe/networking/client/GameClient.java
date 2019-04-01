@@ -16,14 +16,18 @@ import com.colourMe.common.messages.MessageType;
 public class GameClient extends Thread {
 
     private static final int maxTries = 3;
+
     private int connectionAttempt = 0;
 
     private String serverAddr;
-    private String playerID;
-    public final PriorityBlockingQueue<Message> receivedQueue;
-    public final PriorityBlockingQueue<Message> sendQueue;
 
-    public GameClient (PriorityBlockingQueue<Message> receive,  PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
+    private String playerID;
+
+    private final PriorityBlockingQueue<Message> receivedQueue;
+
+    private final PriorityBlockingQueue<Message> sendQueue;
+
+    public GameClient (PriorityBlockingQueue<Message> receive, PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
 
         // Parameter Check
         if(receive == null)
@@ -38,7 +42,7 @@ public class GameClient extends Thread {
         receivedQueue = receive;
         sendQueue = send;
         serverAddr = serverAddress;
-        playerID = playerID;
+        this.playerID = playerID;
 
     }
 
