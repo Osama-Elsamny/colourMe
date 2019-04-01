@@ -26,7 +26,7 @@ public class GameServiceTest {
 
     @Test
     public void verifyGameConfigInit() {
-        assert (gameService.getGameConfig().equals(gameConfig));
+        assertEquals (gameService.getGameConfig(), gameConfig);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void verfiyAcquireCellFailure() {
+    public void verifyAcquireCellFailure() {
         // Acquire a cell
         boolean didAcquire = gameService.acquireCell(0, 0, 0.0, 0.0, playerId);
         assertTrue (didAcquire);
