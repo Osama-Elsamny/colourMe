@@ -132,6 +132,7 @@ public class GameAPITest {
 
     @Test
     public void verifyGetCellResponseAction() {
+        connect();
         gameAPI.sendGetCellRequest(playerID, row, col, coordinate);
 
         assertEquals(sendQueue.size(), 1);
@@ -141,7 +142,39 @@ public class GameAPITest {
         assertTrue(gameAPI.hasResponse());
         Message processedResponse = gameAPI.processResponse();
 
-        assertEquals(processedResponse, cellResponseMessage(true));
+        assertTrue(gameAPI.playerOwnsCell(row, col, playerID));
+        assertEquals(processedResponse, cellResponseMessage(getCellRequestMessage(), true));
+    }
+
+    @Test
+    public void verifyCellUpdateResponseAction() {
+        acquireCell();
+        gameAPI.sendCellUpdateRequest(playerID, row, col, coordinates);
+
+        assertEquals(sendQueue.size(), 1);
+        Message response = messageExecutor.processMessage(sendQueue.poll());
+
+        receivedQueue.put(response);
+        assertTrue(gameAPI.hasResponse());
+        Message processedResponse = gameAPI.processResponse();
+
+        assertEquals(processedResponse, cellResponseMessage(cellUpdateRequestMessage(), true));
+    }
+
+    @Test
+    public void verifyCellReleaseResponseAction() {
+        acquireCell();
+        gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
+
+        assertEquals(sendQueue.size(), 1);
+        Message response = messageExecutor.processMessage(sendQueue.poll());
+
+        receivedQueue.put(response);
+        assertTrue(gameAPI.hasResponse());
+        Message processedResponse = gameAPI.processResponse();
+
+        assertFalse(gameAPI.playerOwnsCell(row, col, playerID));
+        assertEquals(processedResponse, cellResponseMessage(cellReleaseRequestMessage(), true));
     }
 
     private Message connectRequestMessage() {
@@ -180,9 +213,8 @@ public class GameAPITest {
         return new Message(MessageType.ConnectResponse, data, playerID);
     }
 
-    private Message cellResponseMessage(boolean success) {
-        Message message = getCellRequestMessage();
-        message.getData().getAsJsonObject().addProperty("Successful", success);
+    private Message cellResponseMessage(Message message, boolean success) {
+        message.getData().getAsJsonObject().addProperty("successful", success);
         return message;
     }
 
@@ -192,5 +224,17 @@ public class GameAPITest {
                 coordinates.add(new Coordinate(i, j));
             }
         }
+    }
+
+    private void connect() {
+        messageExecutor.processMessage(connectRequestMessage());
+        receivedQueue.put(connectResponseMessage());
+        gameAPI.processResponse();
+    }
+
+    private void acquireCell() {
+        messageExecutor.processMessage(getCellRequestMessage());
+        receivedQueue.put(getCellRequestMessage());
+        gameAPI.processResponse();
     }
 }
