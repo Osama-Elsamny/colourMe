@@ -55,7 +55,16 @@ public class Message {
     }
 
 
-    public boolean equals(Message message){
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof Message)) {
+            return false;
+        }
+
+        Message message = (Message) obj;
         boolean equal = true;
         equal = equal && this.getPlayerID().equals(message.getPlayerID());
         equal = equal && this.getData().toString().equals(message.getData().toString());
