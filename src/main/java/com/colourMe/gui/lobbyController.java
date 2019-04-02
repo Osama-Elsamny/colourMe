@@ -438,7 +438,6 @@ public class lobbyController {
         if (success && (! userID.equals(this.playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            //TODO: we get an error from the following line
             JsonParser parser = new JsonParser();
 //            String arr = parser.parse(data.get("coordinates").toString()).getAsJsonArray();
             String string = data.get("coordinates").toString();
