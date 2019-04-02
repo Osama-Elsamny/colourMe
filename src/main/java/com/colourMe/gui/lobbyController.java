@@ -69,7 +69,7 @@ public class lobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 1;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -98,14 +98,13 @@ public class lobbyController {
         }
         gameServer.initGameService(gameConfig);
         String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
-        this.playerID = playerID;
-        this.playerIP = networkIP;
-
         // Start Client
         initClientMachine(serverAddress, playerID, networkIP);
     }
 
     public void initClientMachine(String serverAddress, String playerID, String playerIP) {
+        this.playerID = playerID;
+        this.playerIP = playerIP;
         createQueues();
         gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
         gameClient.start();
