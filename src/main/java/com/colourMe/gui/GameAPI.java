@@ -135,8 +135,8 @@ public class GameAPI {
         return gameService.validCellOwner(row, col, playerID);
     }
 
-    public boolean isCellAvailable(int row, int col){
-        return gameService.isCellAvailable(row, col);
+    public boolean isCellLocked(int row, int col) {
+        return gameService.isCellLocked(row, col);
     }
 
     public int getBoardSize() {

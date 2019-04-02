@@ -119,8 +119,12 @@ public class GameService {
     }
 
     // Checks whether a given cell is available for colouring
-    public boolean isCellAvailable(int row, int col) {
+    private boolean isCellAvailable(int row, int col) {
         return this.cells[row][col].getState().equals(CellState.AVAILABLE);
+    }
+
+    public boolean isCellLocked(int row, int col){
+        return this.cells[row][col].getState().equals(CellState.LOCKED);
     }
 
     public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }

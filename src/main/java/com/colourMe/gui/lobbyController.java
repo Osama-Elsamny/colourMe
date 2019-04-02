@@ -172,7 +172,7 @@ public class lobbyController {
     private void onRelease(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
         Coordinate coordinate = new Coordinate(event.getX(), event.getY());
         renderStroke(graphicsContext, coordinate, playerID, row, col);
-        if(! gameAPI.isCellAvailable(row, col)) {
+        if(gameAPI.isCellLocked(row, col)) {
             boolean hasColoured = colourCellIfConquered(graphicsContext);
             gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
         }
