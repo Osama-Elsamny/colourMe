@@ -40,27 +40,30 @@ public class serverGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
-        getUserName();
-        getPenSize();
-        getBoardSize();
-        getCoverage();
+        String playerID = getPlayerID();
+        int thickness = getThickness();
+        int boardSize = getBoardSize();
+        float ratio = getRatio();
+//        FXMLLoader loader = new FXMLLoader(getClass().getResource("lobby.fxml"));
+//        lobbyController controller = (lobbyController)loader.getController();
+//        controller.helloWorld(69);
         startScene(event, "lobby");
     }
     @FXML
     void goToMainScreen(ActionEvent event) throws IOException {
         startScene(event, "mainPage");
     }
-    private void getUserName() {
-        System.out.println(nameTF.getText());
+    private String getPlayerID() {
+        return nameTF.getText();
     }
-    private void getPenSize() {
-        System.out.println(penSizeTF.getText());
+    private int getThickness() {
+        return Integer.parseInt(penSizeTF.getText());
     }
-    private void getBoardSize() {
-        System.out.println(boardSizeTF.getText());
+    private int getBoardSize() {
+        return Integer.parseInt(boardSizeTF.getText());
     }
-    private void getCoverage() {
-        System.out.println(coverageTF.getText());
+    private float getRatio() {
+        return Float.parseFloat(coverageTF.getText());
     }
     private void startScene(ActionEvent event, String fileName) throws  IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
