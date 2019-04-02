@@ -4,6 +4,8 @@ import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.client.GameClient;
+import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,6 +40,7 @@ import javafx.util.Pair;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -63,6 +66,7 @@ public class lobbyController {
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
     private String playerIP;
+    private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
     private int expectedPlayers = 3;
@@ -70,6 +74,53 @@ public class lobbyController {
     private Scene scene;
     Color userColor = Color.BLUE;
     long userColorCode = -16776961;
+    private GameServer gameServer;
+    private GameClient gameClient;
+
+    public PriorityBlockingQueue<Message> receiveQueue;
+    public PriorityBlockingQueue<Message> sendQueue;
+
+
+    private void createQueues() {
+        // Create Queues
+        Comparator<Message> messageComparator = (m1, m2) -> (int) (m1.getTimestamp() - m2.getTimestamp());
+
+        receiveQueue = new PriorityBlockingQueue<>(100, messageComparator);
+        sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
+    }
+
+    private void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
+        // Start Server
+        gameServer = new GameServer();
+        gameServer.start();
+        while (!gameServer.isRunning()){
+            // Wait for server to start
+        }
+        gameServer.initGameService(gameConfig);
+
+        // Start Client
+        initClientMachine();
+    }
+
+    private void initClientMachine() {
+        createQueues();
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+        gameClient.start();
+
+        JsonObject data = new JsonObject();
+        data.addProperty("playerIP", playerIP);
+
+        Message connectMessage = new Message(MessageType.ConnectRequest, data ,playerID);
+        sendQueue.put(connectMessage);
+
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+            }
+        };
+        timer.start();
+    }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
@@ -320,14 +371,7 @@ public class lobbyController {
         root.setRight(leftAnchorPane);
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                update();
-            }
-        };
-        timer.start();
-        Scene scene = new Scene(root, 600, 600);
+        scene = new Scene(root, 600, 600);
         scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
