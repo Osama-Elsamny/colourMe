@@ -3,17 +3,37 @@ package com.colourMe.common.gameState;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 import java.util.*;
 
 public class GameService {
+
+    public static class ColorPair {
+        public Color COLOR;
+        public int COLOR_CODE;
+
+        public ColorPair(Color color, int colorCode){
+            this.COLOR = color;
+            this.COLOR_CODE = colorCode;
+        }
+
+    }
+
+    private static ColorPair[] COLOR_PAIRS =  {
+            new ColorPair(Color.BLUE, -16776961),
+            new ColorPair(Color.RED, -65536),
+            new ColorPair(Color.GREEN, -16744448),
+            new ColorPair(Color.BLACK, -16777216)
+    };
+
     private Gson gson = new Gson();
 
     private GameConfig gameConfig;
 
     private Cell cells[][];
 
-    private Map<String, Player> players;
+    public Map<String, Player> players;
 
     // Constructor
     public GameService() {
@@ -80,10 +100,14 @@ public class GameService {
         return this.gson;
     }
 
+    // TODO: Add bolean parameter to check if it is server or not
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
-        players.put(playerId, new Player(ip));
-        this.gameConfig.addplayerConfig(playerId, ip);
+        if (! players.containsKey(playerId)) {
+            ColorPair pair = COLOR_PAIRS[players.size()];
+            players.put(playerId, new Player(ip, pair.COLOR, pair.COLOR_CODE));
+            this.gameConfig.addplayerConfig(playerId, ip);
+        }
     }
 
     // Remove a player
@@ -96,7 +120,11 @@ public class GameService {
 
     // Checks whether a given cell is available for colouring
     private boolean isCellAvailable(int row, int col) {
-        return this.cells[row][col].getState() == CellState.AVAILABLE;
+        return this.cells[row][col].getState().equals(CellState.AVAILABLE);
+    }
+
+    public boolean isCellLocked(int row, int col){
+        return this.cells[row][col].getState().equals(CellState.LOCKED);
     }
 
     public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }
@@ -110,10 +138,12 @@ public class GameService {
     }
 
     public int getPlayerColourCode(String playerID) {
-        return 0;
+        return players.get(playerID).getColorCode();
     }
 
-    public Color getPlayerColour(String playerID) {return null;}
+    public Color getPlayerColour(String playerID) {
+        return players.get(playerID).getColor();
+    }
 
     public int getPlayerScore(String playerID) {
         Player player = players.get(playerID);
