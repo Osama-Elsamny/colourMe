@@ -8,6 +8,25 @@ import javafx.util.Pair;
 import java.util.*;
 
 public class GameService {
+
+    public static class ColorPair {
+        public Color COLOR;
+        public int COLOR_CODE;
+
+        public ColorPair(Color color, int colorCode){
+            this.COLOR = color;
+            this.COLOR_CODE = colorCode;
+        }
+
+    }
+
+    private static ColorPair[] COLOR_PAIRS =  {
+            new ColorPair(Color.BLUE, -16776961),
+            new ColorPair(Color.RED, -65536),
+            new ColorPair(Color.GREEN, -16744448),
+            new ColorPair(Color.BLACK, -16777216)
+    };
+
     private Gson gson = new Gson();
 
     private GameConfig gameConfig;
@@ -81,10 +100,12 @@ public class GameService {
         return this.gson;
     }
 
+    // TODO: Add bolean parameter to check if it is server or not
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         if (! players.containsKey(playerId)) {
-            players.put(playerId, new Player(ip));
+            ColorPair pair = COLOR_PAIRS[players.size()];
+            players.put(playerId, new Player(ip, pair.COLOR, pair.COLOR_CODE));
             this.gameConfig.addplayerConfig(playerId, ip);
         }
     }
@@ -113,10 +134,12 @@ public class GameService {
     }
 
     public int getPlayerColourCode(String playerID) {
-        return 0;
+        return players.get(playerID).getColorCode();
     }
 
-    public Color getPlayerColour(String playerID) {return null;}
+    public Color getPlayerColour(String playerID) {
+        return players.get(playerID).getColor();
+    }
 
     public int getPlayerScore(String playerID) {
         Player player = players.get(playerID);

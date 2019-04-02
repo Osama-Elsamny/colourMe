@@ -35,7 +35,7 @@ public class clientGameConfigController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();
         lobbyController controller = loader.getController();
-        controller.initClientMachine(serverIP, playerID, "127.0.0.1");
+        controller.initClientMachine(serverIP, playerID, "209.87.56.67");
         startScene(event, "lobby");
     }
     @FXML

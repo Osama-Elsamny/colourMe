@@ -69,11 +69,11 @@ public class lobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 2;
+    private int expectedPlayers = 1;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
-    Color userColor = Color.BLUE;
-    long userColorCode = -16776961;
+    Color userColor;
+    long userColorCode;
     private GameServer gameServer;
     private GameClient gameClient;
 
@@ -181,8 +181,8 @@ public class lobbyController {
     }
 
     private boolean colourCellIfConquered(GraphicsContext graphicsContext) {
-        double totalPixels = 0;
-        double colorCount = 0;
+        double totalPixels;
+        double colorCount;
         float ratio = gameAPI.getRatio();
         double canvasWidth = graphicsContext.getCanvas().getWidth();
         double canvasHeight = graphicsContext.getCanvas().getHeight();
@@ -205,9 +205,9 @@ public class lobbyController {
         double canvasHeight = graphicsContext.getCanvas().getHeight();
 
         WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
-        for(int i = 0; i < canvasWidth; i++){
-            for(int j = 0; j < canvasHeight; j++){
-                if(snap.getPixelReader().getArgb(i,j) == userColorCode){
+        for (int i = 0; i < canvasWidth; i++) {
+            for (int j = 0; j < canvasHeight; j++) {
+                if (snap.getPixelReader().getArgb(i,j) == userColorCode){
                     colorCount++;
                 }
             }
@@ -305,6 +305,9 @@ public class lobbyController {
 
     @FXML
     private void displayBoard() {
+        this.userColor = gameAPI.getPlayerColour(playerID);
+        this.userColorCode = gameAPI.getPlayerColourCode(playerID);
+
         int numCols = gameAPI.getBoardSize();
         int numRows = gameAPI.getBoardSize();
         BorderPane root = new BorderPane();
