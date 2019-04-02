@@ -376,8 +376,6 @@ public class lobbyController {
         primaryStage.show();
     }
     private void update(){
-        //TODO: add get Request and Process Request functions
-        // Check if hasResponse()
         if(gameAPI.hasResponse()) {
             // processResponse()
             Message response = gameAPI.processResponse();
@@ -439,7 +437,6 @@ public class lobbyController {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             JsonParser parser = new JsonParser();
-//            String arr = parser.parse(data.get("coordinates").toString()).getAsJsonArray();
             String string = data.get("coordinates").toString();
             string = string.replaceAll("\\\\\"(\\w+)\\\\\"(:)", "$1$2");
             string = string.substring(1, string.length()-1);

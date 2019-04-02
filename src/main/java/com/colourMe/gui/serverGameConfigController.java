@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class serverGameConfigController {
     @FXML
@@ -39,6 +40,7 @@ public class serverGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
+        String serverIP = InetAddress.getLocalHost().getHostAddress();
         String playerID = getPlayerID();
         int thickness = getThickness();
         int boardSize = getBoardSize();
@@ -47,7 +49,7 @@ public class serverGameConfigController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();
         lobbyController controller = loader.getController();
-        controller.initServerMachine(gameConfig, "127.0.0.1", playerID);
+        controller.initServerMachine(gameConfig, InetAddress.getLocalHost().getHostAddress(), playerID);
         startScene(event, "lobby");
     }
 
