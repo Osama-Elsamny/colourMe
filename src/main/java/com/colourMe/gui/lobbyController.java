@@ -6,9 +6,7 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.BooleanExpression;
 import javafx.event.ActionEvent;
@@ -39,9 +37,8 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -442,12 +439,14 @@ public class lobbyController {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             //TODO: we get an error from the following line
-            Coordinate[] coordinatesArr = gson.fromJson(data.get("coordinates").toString(), Coordinate[].class);
-
+            JsonParser parser = new JsonParser();
+//            String arr = parser.parse(data.get("coordinates").toString()).getAsJsonArray();
+            String string = data.get("coordinates").toString();
+            string = string.replaceAll("\\\\\"(\\w+)\\\\\"(:)", "$1$2");
+            string = string.substring(1, string.length()-1);
+            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(string, Coordinate[].class));
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
-            for (int i=0; i<coordinatesArr.length; i++){
-                renderStroke(cellGraphicsContext, coordinatesArr[i], userID, row, col);
-            }
+            coordinates.forEach(x -> renderStroke(cellGraphicsContext, x, userID, row, col));
         }
     }
 
