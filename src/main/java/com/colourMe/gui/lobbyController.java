@@ -137,7 +137,7 @@ public class lobbyController {
         cellCanvas.widthProperty().bind(cell.widthProperty());
         cellCanvas.heightProperty().bind(cell.heightProperty());
         final GraphicsContext graphicsContext = cellCanvas.getGraphicsContext2D();
-        initDraw(graphicsContext);
+        initDraw(graphicsContext, this.playerID);
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
@@ -225,12 +225,13 @@ public class lobbyController {
         double height = graphicsContext.getCanvas().getHeight();
         double width = graphicsContext.getCanvas().getWidth();
         graphicsContext.clearRect(0,0, width, height);
-        initDraw(graphicsContext);
+        initDraw(graphicsContext, playerID);
     }
 
     private void renderStroke(GraphicsContext graphicsContext, Coordinate coordinate,
                                String playerID, int row, int col) {
         if (gameAPI.playerOwnsCell(row, col, playerID)) {
+            initDraw(graphicsContext, playerID);
             graphicsContext.beginPath();
             graphicsContext.moveTo(coordinate.x, coordinate.y);
             graphicsContext.lineTo(coordinate.x, coordinate.y);
@@ -270,9 +271,9 @@ public class lobbyController {
         return grid;
     }
 
-    private void initDraw(GraphicsContext gc){
+    private void initDraw(GraphicsContext gc, String playerID){
         int thickness = gameAPI.getThickness();
-        gc.setStroke(userColor);
+        gc.setStroke(gameAPI.getPlayerColour(playerID));
         gc.setLineWidth(thickness);
     }
 
@@ -445,7 +446,7 @@ public class lobbyController {
 
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
             for (int i=0; i<coordinatesArr.length; i++){
-                renderStroke(cellGraphicsContext, coordinatesArr[i], playerID, row, col);
+                renderStroke(cellGraphicsContext, coordinatesArr[i], userID, row, col);
             }
         }
     }
@@ -454,11 +455,11 @@ public class lobbyController {
         // Color the cell or make it empty based on hasColoured property for the cell.
         Boolean success = data.get("successful").getAsBoolean();
 
-        if (success && (userID != playerID)){
+        if (success && (! userID.equals(playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
-            Color otherUserColor = gameAPI.getPlayerColour(playerID);
+            Color otherUserColor = gameAPI.getPlayerColour(userID);
 
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
 
