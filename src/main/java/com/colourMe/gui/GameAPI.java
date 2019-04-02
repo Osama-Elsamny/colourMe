@@ -134,4 +134,16 @@ public class GameAPI {
     public boolean playerOwnsCell(int row, int col, String playerID) {
         return gameService.validCellOwner(row, col, playerID);
     }
+
+    public int getBoardSize() {
+        return gameService.getGameConfig().getSize();
+    }
+
+    public int getThickness() {
+        return gameService.getGameConfig().getThickness();
+    }
+
+    public float getRatio() {
+        return gameService.getGameConfig().getRatio();
+    }
 }

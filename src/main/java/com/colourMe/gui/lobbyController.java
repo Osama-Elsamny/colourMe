@@ -69,7 +69,7 @@ public class lobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 3;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor = Color.BLUE;
@@ -77,8 +77,8 @@ public class lobbyController {
     private GameServer gameServer;
     private GameClient gameClient;
 
-    public PriorityBlockingQueue<Message> receiveQueue;
-    public PriorityBlockingQueue<Message> sendQueue;
+    public static PriorityBlockingQueue<Message> receiveQueue;
+    public static PriorityBlockingQueue<Message> sendQueue;
 
 
     private void createQueues() {
@@ -89,7 +89,7 @@ public class lobbyController {
         sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
     }
 
-    private void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
+    public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
         // Start Server
         gameServer = new GameServer();
         gameServer.start();
@@ -97,16 +97,19 @@ public class lobbyController {
             // Wait for server to start
         }
         gameServer.initGameService(gameConfig);
+        String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
+        this.playerID = playerID;
+        this.playerIP = networkIP;
 
         // Start Client
-        initClientMachine();
+        initClientMachine(serverAddress, playerID, networkIP);
     }
 
-    private void initClientMachine() {
+    public void initClientMachine(String serverAddress, String playerID, String playerIP) {
         createQueues();
         gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
         gameClient.start();
-
+        setGameAPI(sendQueue, receiveQueue);
         JsonObject data = new JsonObject();
         data.addProperty("playerIP", playerIP);
 
@@ -180,13 +183,14 @@ public class lobbyController {
     private boolean colourCellIfConquered(GraphicsContext graphicsContext) {
         double totalPixels = 0;
         double colorCount = 0;
+        float ratio = gameAPI.getRatio();
         double canvasWidth = graphicsContext.getCanvas().getWidth();
         double canvasHeight = graphicsContext.getCanvas().getHeight();
 
         totalPixels = canvasHeight * canvasWidth;
         colorCount = computePixelsColoured(graphicsContext);
 
-        boolean hasColoured = colorCount/totalPixels > 0.95;
+        boolean hasColoured = colorCount/totalPixels > ratio;
         if (hasColoured) {
             colourCell(graphicsContext, userColor);
         } else {
@@ -268,13 +272,9 @@ public class lobbyController {
     }
 
     private void initDraw(GraphicsContext gc){
-//        double canvasWidth = gc.getCanvas().getWidth();
-//        double canvasHeight = gc.getCanvas().getHeight();
-//        gc.setStroke(Color.BLACK);
-//        gc.setLineWidth(5);
-//        gc.strokeRect(0, 0, canvasWidth, canvasHeight);
+        int thickness = gameAPI.getThickness();
         gc.setStroke(userColor);
-        gc.setLineWidth(10);
+        gc.setLineWidth(thickness);
     }
 
     // Called in Mouse OnClick
@@ -303,12 +303,10 @@ public class lobbyController {
         }
     }
 
-    private
-
     @FXML
-    void displayBoard() {
-        int numCols = 5 ;
-        int numRows = 5 ;
+    private void displayBoard() {
+        int numCols = gameAPI.getBoardSize();
+        int numRows = gameAPI.getBoardSize();
         BorderPane root = new BorderPane();
         Label welcomeLabel = new Label("ColourMe");
         AnchorPane player1AnchorPane = new AnchorPane();
@@ -437,10 +435,11 @@ public class lobbyController {
         Gson gson = new Gson();
         Boolean success = data.get("successful").getAsBoolean();
 
-        if (success && (userID != this.playerID)){
+        if (success && (! userID.equals(this.playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            Coordinate[] coordinatesArr = gson.fromJson("coordinates", Coordinate[].class);
+            //TODO: we get an error from the following line
+            Coordinate[] coordinatesArr = gson.fromJson(data.get("coordinates").toString(), Coordinate[].class);
 
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
             for (int i=0; i<coordinatesArr.length; i++){

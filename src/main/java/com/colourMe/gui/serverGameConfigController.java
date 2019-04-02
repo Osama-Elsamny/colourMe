@@ -1,10 +1,9 @@
 package com.colourMe.gui;
 
-import com.colourMe.gui.mainPageController;
+import com.colourMe.common.gameState.GameConfig;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -44,11 +43,14 @@ public class serverGameConfigController {
         int thickness = getThickness();
         int boardSize = getBoardSize();
         float ratio = getRatio();
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("lobby.fxml"));
-//        lobbyController controller = (lobbyController)loader.getController();
-//        controller.helloWorld(69);
+        GameConfig gameConfig = new GameConfig(boardSize, ratio, thickness);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
+        Parent root = (Parent) loader.load();
+        lobbyController controller = loader.getController();
+        controller.initServerMachine(gameConfig, "127.0.0.1", playerID);
         startScene(event, "lobby");
     }
+
     @FXML
     void goToMainScreen(ActionEvent event) throws IOException {
         startScene(event, "mainPage");
@@ -65,7 +67,7 @@ public class serverGameConfigController {
     private float getRatio() {
         return Float.parseFloat(coverageTF.getText());
     }
-    private void startScene(ActionEvent event, String fileName) throws  IOException {
+    private void startScene(ActionEvent event, String fileName) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
