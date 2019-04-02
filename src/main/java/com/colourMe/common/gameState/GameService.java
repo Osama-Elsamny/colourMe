@@ -82,8 +82,10 @@ public class GameService {
 
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
-        players.put(playerId, new Player(ip));
-        this.gameConfig.addplayerConfig(playerId, ip);
+        if (! players.containsKey(playerId)) {
+            players.put(playerId, new Player(ip));
+            this.gameConfig.addplayerConfig(playerId, ip);
+        }
     }
 
     // Remove a player

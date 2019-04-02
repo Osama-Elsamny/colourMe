@@ -11,6 +11,6 @@ public class Coordinate {
 
     @Override
     public String toString() {
-        return String.format("Coordinate: ({0},{1})", x , y);
+        return String.format("Coordinate: (%.3f,%.3f)", x , y);
     }
 }

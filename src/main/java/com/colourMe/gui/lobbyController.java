@@ -418,7 +418,7 @@ public class lobbyController {
         Boolean successful = data.get("successful").getAsBoolean();
         int numPlayers = gameAPI.getNumOfPlayers();
 
-        if (!successful && (userID == this.playerID)) {
+        if (!successful && (userID.equals(this.playerID))) {
             // Resend connection request.
             gameAPI.sendConnectRequest(this.playerID, this.playerIP);
         } else if (successful && (numPlayers == expectedPlayers)) {

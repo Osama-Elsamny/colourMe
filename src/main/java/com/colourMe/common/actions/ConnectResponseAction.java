@@ -15,7 +15,7 @@ public class ConnectResponseAction extends ActionBase {
 
         if (data != null){
             gameService.init(gameConfig);
-            gameService.spawnPlayer(message.getPlayerID(), gameConfig.getLastIP());
+            gameConfig.getIpAddresses().forEach(x -> gameService.spawnPlayer(x.getKey(), x.getValue()));
             return successResponse(data, message.getPlayerID());
         }
 
