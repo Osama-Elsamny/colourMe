@@ -5,6 +5,10 @@ import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
+import javafx.util.Pair;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class ConnectResponseAction extends ActionBase {
     //TODO: verify that everyone ends up with the same IP address list
@@ -15,7 +19,8 @@ public class ConnectResponseAction extends ActionBase {
 
         if (data != null){
             gameService.init(gameConfig);
-            gameConfig.getIpAddresses().forEach(x -> gameService.spawnPlayer(x.getKey(), x.getValue()));
+            gameService.getGson().fromJson(message.getData(), GameConfig.class).getIpAddresses()
+                    .forEach(x -> gameService.spawnPlayer(x.getKey(), x.getValue()));
             return successResponse(data, message.getPlayerID());
         }
 

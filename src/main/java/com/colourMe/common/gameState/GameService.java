@@ -3,6 +3,7 @@ package com.colourMe.common.gameState;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class GameService {
 
     private Cell cells[][];
 
-    private Map<String, Player> players;
+    public Map<String, Player> players;
 
     // Constructor
     public GameService() {
