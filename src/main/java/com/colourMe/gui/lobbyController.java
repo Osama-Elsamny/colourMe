@@ -1,10 +1,14 @@
 package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
+import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.animation.AnimationTimer;
+import javafx.beans.binding.BooleanExpression;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -29,8 +33,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Pair;
+
+import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class lobbyController {
@@ -53,8 +62,10 @@ public class lobbyController {
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
+    private String playerIP;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
+    private int expectedPlayers = 3;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor = Color.BLUE;
@@ -241,8 +252,10 @@ public class lobbyController {
         }
     }
 
+    private
+
     @FXML
-    void displayBoard(ActionEvent event) throws IOException {
+    void displayBoard() {
         int numCols = 5 ;
         int numRows = 5 ;
         BorderPane root = new BorderPane();
@@ -260,7 +273,8 @@ public class lobbyController {
         Label player4NameLabel = new Label("Player4");
         Label player4ScoreLabel = new Label("score4");
         VBox vbox = new VBox();
-        Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Stage primaryStage = mainPageController.getPrimaryStage();
         BooleanProperty[][] switches = new BooleanProperty[numCols][numRows];
         for (int x = 0 ; x < numCols ; x++) {
             for (int y = 0 ; y < numRows ; y++) {
@@ -335,7 +349,7 @@ public class lobbyController {
         JsonObject data = response.getData().getAsJsonObject();
         switch(response.getMessageType()) {
             case ConnectResponse:
-                handleConnect(data);
+                handleConnect(data, response.getPlayerID());
                 break;
             case GetCellResponse:
                 break;
@@ -343,7 +357,7 @@ public class lobbyController {
                 handleCellUpdate(data, response.getPlayerID());
                 break;
             case ReleaseCellResponse:
-                handleCellRelease(data);
+                handleCellRelease(data, response.getPlayerID());
                 break;
             case ClientDisconnectResponse:
                 handleClientDisconnect(data);
@@ -357,17 +371,58 @@ public class lobbyController {
         }
     }
 
-    private void handleConnect(JsonObject data) {
-        // Check the number of players
-        // If there are four players startGame() a.k.a displayBoard();
+    private void handleConnect(JsonObject data, String userID) {
+
+        Boolean successful = data.get("successful").getAsBoolean();
+        int numPlayers = gameAPI.getNumOfPlayers();
+
+        if (!successful && (userID == this.playerID)) {
+            // Resend connection request.
+            gameAPI.sendConnectRequest(this.playerID, this.playerIP);
+        } else if (successful && (numPlayers == expectedPlayers)) {
+            displayBoard();
+        } else {
+            // Not enough players to begin.
+            // Do Nothing.
+        }
     }
 
-    private void handleCellUpdate(JsonObject data, String playerID) {
+
+    private void handleCellUpdate(JsonObject data, String userID) {
         // Render other clients' coordinates
+        Gson gson = new Gson();
+        Boolean success = data.get("successful").getAsBoolean();
+
+        if (success && (userID != this.playerID)){
+            int row = data.get("row").getAsInt();
+            int col = data.get("col").getAsInt();
+            Coordinate[] coordinatesArr = gson.fromJson("coordinates", Coordinate[].class);
+
+            GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
+            for (int i=0; i<coordinatesArr.length; i++){
+                renderStroke(cellGraphicsContext, coordinatesArr[i], playerID, row, col);
+            }
+        }
     }
 
-    private void handleCellRelease(JsonObject data) {
+    private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
+        Boolean success = data.get("successful").getAsBoolean();
+
+        if (success && (userID != playerID)){
+            int row = data.get("row").getAsInt();
+            int col = data.get("col").getAsInt();
+            boolean hasColoured = data.get("hasColoured").getAsBoolean();
+            Color otherUserColor = gameAPI.getPlayerColour(playerID);
+
+            GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
+
+            if (hasColoured) {
+                colourCell(cellGraphicsContext, otherUserColor);
+            } else {
+                clearCell(cellGraphicsContext);
+            }
+        }
     }
 
     private void handleDisconnect(JsonObject data) {
@@ -423,6 +478,11 @@ public class lobbyController {
     }
     private Node lookup(String id){
         return scene.lookup("#" + id);
+    }
+
+    private GraphicsContext getGraphicsContext(String canvasID){
+        Canvas canvas = (Canvas) lookup(canvasID);
+        return canvas.getGraphicsContext2D();
     }
     private void setXandYforLabels(Label player1NameLabel, Label player1ScoreLabel, Label player2NameLabel, Label player2ScoreLabel, Label player3NameLabel, Label player3ScoreLabel, Label player4NameLabel, Label player4ScoreLabel) {
         player1NameLabel.setLayoutX(14);

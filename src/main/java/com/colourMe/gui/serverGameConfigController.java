@@ -1,5 +1,6 @@
 package com.colourMe.gui;
 
+import com.colourMe.gui.mainPageController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -65,7 +66,7 @@ public class serverGameConfigController {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
-        Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage primaryStage = mainPageController.getPrimaryStage();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
