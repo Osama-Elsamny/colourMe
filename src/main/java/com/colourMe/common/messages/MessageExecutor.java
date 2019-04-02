@@ -36,7 +36,7 @@ public class MessageExecutor {
 
     public void buildClientActions() {
         actionMap.put(MessageType.Disconnect, new DisconnectAction());
-        actionMap.put(MessageType.GetCellRequest, new GetCellResponseAction());
+        actionMap.put(MessageType.GetCellResponse, new GetCellResponseAction());
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
         actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());
         actionMap.put(MessageType.ConnectResponse, new ConnectResponseAction());
