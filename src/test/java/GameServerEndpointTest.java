@@ -121,7 +121,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
-        assert (response.equals(getResponse(MessageType.CellUpdate, data, false)));
+        assert (response.equals(getResponse(MessageType.DefaultType, data, false)));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class GameServerEndpointTest extends NetworkingTestBase {
         client.sendMessage(getDefaultConnectMessage());
         client.sendMessage(getRequest(MessageType.GetCell, getCellData(rowAndCol)));
         Message response = client.sendMessage(getRequest(MessageType.CellUpdate, data));
-        assert (response.equals(getResponse(MessageType.CellUpdate, data, false)));
+        assert (response.equals(getResponse(MessageType.DefaultType, data, false)));
     }
 
     //////////////////////////////// Release Cell Response Tests //////////////////////////////////

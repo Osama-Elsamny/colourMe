@@ -148,6 +148,7 @@ public class GameAPITest {
 
     @Test
     public void verifyCellUpdateResponseAction() {
+        connect();
         acquireCell();
         gameAPI.sendCellUpdateRequest(playerID, row, col, coordinates);
 
@@ -163,6 +164,7 @@ public class GameAPITest {
 
     @Test
     public void verifyCellReleaseResponseAction() {
+        connect();
         acquireCell();
         gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
 
