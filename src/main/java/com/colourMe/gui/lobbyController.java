@@ -1,10 +1,14 @@
 package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
+import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
-import com.google.gson.JsonObject;
+import com.colourMe.networking.client.GameClient;
+import com.colourMe.networking.server.GameServer;
+import com.google.gson.*;
 import javafx.animation.AnimationTimer;
+import javafx.beans.binding.BooleanExpression;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -29,8 +33,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Pair;
+
+import java.awt.*;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class lobbyController {
@@ -53,12 +62,64 @@ public class lobbyController {
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
+    private String playerIP;
+    private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
-    Color userColor = Color.BLUE;
-    long userColorCode = -16776961;
+    Color userColor;
+    long userColorCode;
+    private GameServer gameServer;
+    private GameClient gameClient;
+
+    public static PriorityBlockingQueue<Message> receiveQueue;
+    public static PriorityBlockingQueue<Message> sendQueue;
+
+
+    private void createQueues() {
+        // Create Queues
+        Comparator<Message> messageComparator = (m1, m2) -> (int) (m1.getTimestamp() - m2.getTimestamp());
+
+        receiveQueue = new PriorityBlockingQueue<>(100, messageComparator);
+        sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
+    }
+
+    public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
+        // Start Server
+        gameServer = new GameServer();
+        gameServer.start();
+        while (!gameServer.isRunning()){
+            // Wait for server to start
+        }
+        gameServer.initGameService(gameConfig);
+        String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
+        // Start Client
+        initClientMachine(serverAddress, playerID, networkIP);
+    }
+
+    public void initClientMachine(String serverAddress, String playerID, String playerIP) {
+        this.playerID = playerID;
+        this.playerIP = playerIP;
+        createQueues();
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+        gameClient.start();
+        setGameAPI(sendQueue, receiveQueue);
+        JsonObject data = new JsonObject();
+        data.addProperty("playerIP", playerIP);
+
+        Message connectMessage = new Message(MessageType.ConnectRequest, data ,playerID);
+        sendQueue.put(connectMessage);
+
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+            }
+        };
+        timer.start();
+    }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
@@ -73,7 +134,7 @@ public class lobbyController {
         cellCanvas.widthProperty().bind(cell.widthProperty());
         cellCanvas.heightProperty().bind(cell.heightProperty());
         final GraphicsContext graphicsContext = cellCanvas.getGraphicsContext2D();
-        initDraw(graphicsContext);
+        initDraw(graphicsContext, this.playerID);
         cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
@@ -111,20 +172,23 @@ public class lobbyController {
     private void onRelease(GraphicsContext graphicsContext, MouseEvent event, int row, int col){
         Coordinate coordinate = new Coordinate(event.getX(), event.getY());
         renderStroke(graphicsContext, coordinate, playerID, row, col);
-        boolean hasColoured = colourCellIfConquered(graphicsContext);
-        gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
+        if(gameAPI.isCellLocked(row, col)) {
+            boolean hasColoured = colourCellIfConquered(graphicsContext);
+            gameAPI.sendReleaseCellRequest(playerID, row, col, hasColoured);
+        }
     }
 
     private boolean colourCellIfConquered(GraphicsContext graphicsContext) {
-        double totalPixels = 0;
-        double colorCount = 0;
+        double totalPixels;
+        double colorCount;
+        float ratio = gameAPI.getRatio();
         double canvasWidth = graphicsContext.getCanvas().getWidth();
         double canvasHeight = graphicsContext.getCanvas().getHeight();
 
         totalPixels = canvasHeight * canvasWidth;
         colorCount = computePixelsColoured(graphicsContext);
 
-        boolean hasColoured = colorCount/totalPixels > 0.95;
+        boolean hasColoured = colorCount/totalPixels > ratio;
         if (hasColoured) {
             colourCell(graphicsContext, userColor);
         } else {
@@ -139,9 +203,9 @@ public class lobbyController {
         double canvasHeight = graphicsContext.getCanvas().getHeight();
 
         WritableImage snap = graphicsContext.getCanvas().snapshot(null, null);
-        for(int i = 0; i < canvasWidth; i++){
-            for(int j = 0; j < canvasHeight; j++){
-                if(snap.getPixelReader().getArgb(i,j) == userColorCode){
+        for (int i = 0; i < canvasWidth; i++) {
+            for (int j = 0; j < canvasHeight; j++) {
+                if (snap.getPixelReader().getArgb(i,j) == userColorCode){
                     colorCount++;
                 }
             }
@@ -160,12 +224,13 @@ public class lobbyController {
         double height = graphicsContext.getCanvas().getHeight();
         double width = graphicsContext.getCanvas().getWidth();
         graphicsContext.clearRect(0,0, width, height);
-        initDraw(graphicsContext);
+        initDraw(graphicsContext, playerID);
     }
 
     private void renderStroke(GraphicsContext graphicsContext, Coordinate coordinate,
                                String playerID, int row, int col) {
         if (gameAPI.playerOwnsCell(row, col, playerID)) {
+            initDraw(graphicsContext, playerID);
             graphicsContext.beginPath();
             graphicsContext.moveTo(coordinate.x, coordinate.y);
             graphicsContext.lineTo(coordinate.x, coordinate.y);
@@ -205,14 +270,10 @@ public class lobbyController {
         return grid;
     }
 
-    private void initDraw(GraphicsContext gc){
-//        double canvasWidth = gc.getCanvas().getWidth();
-//        double canvasHeight = gc.getCanvas().getHeight();
-//        gc.setStroke(Color.BLACK);
-//        gc.setLineWidth(5);
-//        gc.strokeRect(0, 0, canvasWidth, canvasHeight);
-        gc.setStroke(userColor);
-        gc.setLineWidth(10);
+    private void initDraw(GraphicsContext gc, String playerID){
+        int thickness = gameAPI.getThickness();
+        gc.setStroke(gameAPI.getPlayerColour(playerID));
+        gc.setLineWidth(thickness);
     }
 
     // Called in Mouse OnClick
@@ -242,9 +303,12 @@ public class lobbyController {
     }
 
     @FXML
-    void displayBoard(ActionEvent event) throws IOException {
-        int numCols = 5 ;
-        int numRows = 5 ;
+    private void displayBoard() {
+        this.userColor = gameAPI.getPlayerColour(playerID);
+        this.userColorCode = gameAPI.getPlayerColourCode(playerID);
+
+        int numCols = gameAPI.getBoardSize();
+        int numRows = gameAPI.getBoardSize();
         BorderPane root = new BorderPane();
         Label welcomeLabel = new Label("ColourMe");
         AnchorPane player1AnchorPane = new AnchorPane();
@@ -260,7 +324,8 @@ public class lobbyController {
         Label player4NameLabel = new Label("Player4");
         Label player4ScoreLabel = new Label("score4");
         VBox vbox = new VBox();
-        Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Stage primaryStage = mainPageController.getPrimaryStage();
         BooleanProperty[][] switches = new BooleanProperty[numCols][numRows];
         for (int x = 0 ; x < numCols ; x++) {
             for (int y = 0 ; y < numRows ; y++) {
@@ -306,22 +371,13 @@ public class lobbyController {
         root.setRight(leftAnchorPane);
         BorderPane.setAlignment(topAnchorPane, Pos.CENTER);
         BorderPane.setAlignment(leftAnchorPane, Pos.CENTER);
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                update();
-            }
-        };
-        timer.start();
-        Scene scene = new Scene(root, 600, 600);
+        scene = new Scene(root, 600, 600);
         scene.getStylesheets().add(getClass().getResource("/grid.css").toExternalForm());
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     private void update(){
-        //TODO: add get Request and Process Request functions
-        // Check if hasResponse()
         if(gameAPI.hasResponse()) {
             // processResponse()
             Message response = gameAPI.processResponse();
@@ -335,7 +391,7 @@ public class lobbyController {
         JsonObject data = response.getData().getAsJsonObject();
         switch(response.getMessageType()) {
             case ConnectResponse:
-                handleConnect(data);
+                handleConnect(data, response.getPlayerID());
                 break;
             case GetCellResponse:
                 break;
@@ -343,7 +399,7 @@ public class lobbyController {
                 handleCellUpdate(data, response.getPlayerID());
                 break;
             case ReleaseCellResponse:
-                handleCellRelease(data);
+                handleCellRelease(data, response.getPlayerID());
                 break;
             case ClientDisconnectResponse:
                 handleClientDisconnect(data);
@@ -357,17 +413,59 @@ public class lobbyController {
         }
     }
 
-    private void handleConnect(JsonObject data) {
-        // Check the number of players
-        // If there are four players startGame() a.k.a displayBoard();
+    private void handleConnect(JsonObject data, String userID) {
+
+        Boolean successful = data.get("successful").getAsBoolean();
+        int numPlayers = gameAPI.getNumOfPlayers();
+
+        if (!successful && (userID.equals(this.playerID))) {
+            // Resend connection request.
+            gameAPI.sendConnectRequest(this.playerID, this.playerIP);
+        } else if (successful && (numPlayers == expectedPlayers)) {
+            displayBoard();
+        } else {
+            // Not enough players to begin.
+            // Do Nothing.
+        }
     }
 
-    private void handleCellUpdate(JsonObject data, String playerID) {
+
+    private void handleCellUpdate(JsonObject data, String userID) {
         // Render other clients' coordinates
+        Gson gson = new Gson();
+        Boolean success = data.get("successful").getAsBoolean();
+
+        if (success && (! userID.equals(this.playerID))){
+            int row = data.get("row").getAsInt();
+            int col = data.get("col").getAsInt();
+            JsonParser parser = new JsonParser();
+            String string = data.get("coordinates").toString();
+            string = string.replaceAll("\\\\\"(\\w+)\\\\\"(:)", "$1$2");
+            string = string.substring(1, string.length()-1);
+            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(string, Coordinate[].class));
+            GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
+            coordinates.forEach(x -> renderStroke(cellGraphicsContext, x, userID, row, col));
+        }
     }
 
-    private void handleCellRelease(JsonObject data) {
+    private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
+        Boolean success = data.get("successful").getAsBoolean();
+
+        if (success && (! userID.equals(playerID))){
+            int row = data.get("row").getAsInt();
+            int col = data.get("col").getAsInt();
+            boolean hasColoured = data.get("hasColoured").getAsBoolean();
+            Color otherUserColor = gameAPI.getPlayerColour(userID);
+
+            GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
+
+            if (hasColoured) {
+                colourCell(cellGraphicsContext, otherUserColor);
+            } else {
+                clearCell(cellGraphicsContext);
+            }
+        }
     }
 
     private void handleDisconnect(JsonObject data) {
@@ -423,6 +521,11 @@ public class lobbyController {
     }
     private Node lookup(String id){
         return scene.lookup("#" + id);
+    }
+
+    private GraphicsContext getGraphicsContext(String canvasID){
+        Canvas canvas = (Canvas) lookup(canvasID);
+        return canvas.getGraphicsContext2D();
     }
     private void setXandYforLabels(Label player1NameLabel, Label player1ScoreLabel, Label player2NameLabel, Label player2ScoreLabel, Label player3NameLabel, Label player3ScoreLabel, Label player4NameLabel, Label player4ScoreLabel) {
         player1NameLabel.setLayoutX(14);

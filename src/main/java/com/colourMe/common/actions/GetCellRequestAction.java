@@ -10,7 +10,7 @@ public class GetCellRequestAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         // TODO: Check if data is null
         JsonObject data = message.getData().getAsJsonObject();
-        String clientId = message.getPlayerID();
+        String playerID = message.getPlayerID();
         int boardSize = gameService.getBoardSize();
         if(isDataValid(data)) {
             int row = data.get("row").getAsInt();
@@ -19,12 +19,12 @@ public class GetCellRequestAction extends ActionBase {
             double Y = data.get("y").getAsDouble();
 
             if(isRowAndColInBounds(row, col, boardSize) &&
-                    gameService.acquireCell(row, col, X, Y, clientId)) {
-                return successResponse(data, clientId);
+                    gameService.acquireCell(row, col, X, Y, playerID)) {
+                return successResponse(data, playerID);
             }
         }
 
-        return failureResponse(data, clientId);
+        return failureResponse(data, playerID);
     }
 
     private boolean isRowAndColInBounds(int row, int col, int size) {

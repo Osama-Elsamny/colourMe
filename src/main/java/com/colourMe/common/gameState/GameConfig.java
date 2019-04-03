@@ -64,7 +64,7 @@ public class GameConfig {
     }
 
     public String getLastIP() {
-        return ipAddresses.get(size -  1).getValue();
+        return ipAddresses.get(ipAddresses.size() -  1).getValue();
     }
 
     public String getNextIP(){

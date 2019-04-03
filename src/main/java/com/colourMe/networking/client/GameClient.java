@@ -23,7 +23,7 @@ public class GameClient extends Thread {
     public final PriorityBlockingQueue<Message> receivedQueue;
     public final PriorityBlockingQueue<Message> sendQueue;
 
-    GameClient (PriorityBlockingQueue<Message> receive,  PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
+    public GameClient (PriorityBlockingQueue<Message> receive,  PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
 
         // Parameter Check
         if(receive == null)
