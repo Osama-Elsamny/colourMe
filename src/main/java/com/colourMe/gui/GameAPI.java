@@ -59,7 +59,7 @@ public class GameAPI {
             data.addProperty("col", col);
             data.addProperty("x", coordinate.x);
             data.addProperty("y", coordinate.y);
-            Message getCellRequest = new Message(MessageType.GetCell, data, playerID);
+            Message getCellRequest = new Message(MessageType.GetCellRequest, data, playerID);
             sendQueue.add(getCellRequest);
         });
     }
@@ -70,7 +70,7 @@ public class GameAPI {
             data.addProperty("row", row);
             data.addProperty("col", col);
             data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
-            Message cellUpdateRequest = new Message(MessageType.CellUpdate, data, playerID);
+            Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
             sendQueue.add(cellUpdateRequest);
         });
     }
@@ -81,7 +81,7 @@ public class GameAPI {
             data.addProperty("row", row);
             data.addProperty("col", col);
             data.addProperty("hasColoured", hasColoured);
-            Message releaseCellRequest = new Message(MessageType.ReleaseCell, data, playerID);
+            Message releaseCellRequest = new Message(MessageType.ReleaseCellRequest, data, playerID);
             sendQueue.add(releaseCellRequest);
         });
     }

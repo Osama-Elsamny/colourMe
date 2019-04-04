@@ -2,11 +2,14 @@ package com.colourMe.common.messages;
 
 public enum MessageType {
     ConnectRequest,
-    GetCell,
-    CellUpdate,
+    GetCellRequest,
+    GetCellResponse,
+    CellUpdateRequest,
+    CellUpdateResponse,
     ConnectResponse,
     Disconnect,
-    ReleaseCell,
+    ReleaseCellRequest,
+    ReleaseCellResponse,
     ClientDisconnectRequest,
     ClientDisconnectResponse,
     DefaultType

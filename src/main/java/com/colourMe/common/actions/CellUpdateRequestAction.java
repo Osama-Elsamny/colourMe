@@ -5,7 +5,7 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 
-public class CellUpdateAction extends ActionBase {
+public class CellUpdateRequestAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
         String playerID = message.getPlayerID();
@@ -21,18 +21,18 @@ public class CellUpdateAction extends ActionBase {
     }
 
     private boolean isDataValid(JsonObject data, String playerID) {
-        return data.has("row") && data.has("col")
-                && data.has("coordinates");
+        return data.has("row") && data.has("col") &&
+                data.has("coordinates");
     }
 
     private Message successResponse(JsonObject data, String playerID) {
         data.addProperty("successful", true);
-        return new Message(MessageType.CellUpdate, data, playerID);
+        return new Message(MessageType.CellUpdateResponse, data, playerID);
     }
 
     private Message failureResponse(JsonObject data, String playerID) {
         data.addProperty("successful", false);
-        return new Message(MessageType.DefaultType, data, playerID);
+        return new Message(MessageType.CellUpdateResponse, data, playerID);
     }
 
 

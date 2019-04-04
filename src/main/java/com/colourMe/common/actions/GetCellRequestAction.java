@@ -5,7 +5,7 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
 
-public class GetCellAction extends ActionBase {
+public class GetCellRequestAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
         // TODO: Check if data is null
@@ -38,11 +38,11 @@ public class GetCellAction extends ActionBase {
 
     private Message successResponse(JsonObject data, String clientId) {
         data.addProperty("successful", true);
-        return new Message(MessageType.GetCell, data, clientId);
+        return new Message(MessageType.GetCellResponse, data, clientId);
     }
 
     private Message failureResponse(JsonObject data, String clientId) {
         data.addProperty("successful", false);
-        return new Message(MessageType.GetCell, data, clientId);
+        return new Message(MessageType.GetCellResponse, data, clientId);
     }
 }

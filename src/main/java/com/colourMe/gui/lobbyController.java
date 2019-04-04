@@ -395,7 +395,7 @@ public class lobbyController {
                 break;
             case GetCellResponse:
                 break;
-            case CellUpdate:
+            case CellUpdateResponse:
                 handleCellUpdate(data, response.getPlayerID());
                 break;
             case ReleaseCellResponse:
