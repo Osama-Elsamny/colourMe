@@ -13,14 +13,13 @@ public class ConnectResponseAction extends ActionBase {
         JsonObject data = message.getData().getAsJsonObject();
         GameConfig gameConfig = gameService.getGson().fromJson(message.getData(), GameConfig.class);
 
-        if (data != null){
+        if (data != null) {
             gameService.init(gameConfig);
-            gameService.getGson().fromJson(message.getData(), GameConfig.class).getIpAddresses()
-                    .forEach(x -> gameService.spawnPlayer(x.getKey(), x.getValue()));
+            gameService.spawnPlayersFromConfig();
             return successResponse(data, message.getPlayerID());
         }
 
-        return failureResponse(data, message.getPlayerID());
+        return failureResponse(message.getPlayerID());
     }
 
     private Message successResponse(JsonObject data, String playerID) {
@@ -28,7 +27,8 @@ public class ConnectResponseAction extends ActionBase {
         return new Message(MessageType.ConnectResponse, data, playerID);
     }
 
-    private Message failureResponse(JsonObject data, String playerID) {
+    private Message failureResponse(String playerID) {
+        JsonObject data = new JsonObject();
         data.addProperty("successful", false);
         return new Message(MessageType.ConnectResponse, data, playerID);
     }

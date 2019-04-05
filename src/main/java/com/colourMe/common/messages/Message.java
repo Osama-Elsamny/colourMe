@@ -2,6 +2,8 @@ package com.colourMe.common.messages;
 
 import com.google.gson.JsonElement;
 
+import java.util.Comparator;
+
 public class Message {
     private long timestamp;
     private MessageType messageType;
@@ -9,6 +11,9 @@ public class Message {
     private JsonElement data;
 
     private String playerID;
+
+    public static Comparator<Message> messageComparator = (m1, m2) ->
+            (int) (m1.getTimestamp() - m2.getTimestamp());
 
     public Message(MessageType messageType, JsonElement data, String playerID) {
         this.messageType = messageType;
@@ -50,7 +55,16 @@ public class Message {
     }
 
 
-    public boolean equals(Message message){
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof Message)) {
+            return false;
+        }
+
+        Message message = (Message) obj;
         boolean equal = true;
         equal = equal && this.getPlayerID().equals(message.getPlayerID());
         equal = equal && this.getData().toString().equals(message.getData().toString());

@@ -17,6 +17,7 @@ public class GetCellResponseAction extends ActionBase {
 
             gameService.acquireCell(row, col, x, y, playerID);
         }
+
         return message;
     }
 }
