@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
+import java.beans.Transient;
 import java.util.*;
 
 public class GameService implements Cloneable {
@@ -26,7 +27,7 @@ public class GameService implements Cloneable {
             new ColorPair(Color.BLACK, -16777216)
     };
 
-    private Gson gson = new Gson();
+    public transient Gson gson = new Gson();
 
     private GameConfig gameConfig;
 
