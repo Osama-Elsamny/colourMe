@@ -36,21 +36,6 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class lobbyController {
-    @FXML
-    private Label welcomeStatment;
-    @FXML
-    private Button startGame;
-    @FXML
-    private Label promptLabel;
-    @FXML
-    private Label player1Label;
-    @FXML
-    private Label player2Label;
-    @FXML
-    private Label player3Label;
-    @FXML
-    private Label player4Label;
-
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
@@ -485,22 +470,6 @@ public class lobbyController {
 
     private void handleClientDisconnect(JsonObject data) {
         // Show disconnected label on the gui
-    }
-
-    void setPlayer1LabelAsJoined(String name){
-        player1Label.setText(name + " joined");
-    }
-
-    void setPlayer2LabelAsJoined(String name){
-        player2Label.setText(name + " joined");
-    }
-
-    void setPlayer3LabelAsJoined(String name){
-        player3Label.setText(name + " joined");
-    }
-
-    void setPlayer4LabelAsJoined(String name){
-        player4Label.setText(name + " joined");
     }
 
     private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane playersAnchorPane[]) {
