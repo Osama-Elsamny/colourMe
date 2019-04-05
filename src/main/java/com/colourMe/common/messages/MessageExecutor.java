@@ -32,6 +32,7 @@ public class MessageExecutor {
         actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
         actionMap.put(MessageType.ReleaseCellRequest, new ReleaseCellRequestAction());
         actionMap.put(MessageType.ClientDisconnectRequest, new ClientDisconnectRequestAction());
+        actionMap.put(MessageType.ReconnectRequest, new ReconnectRequestAction());
     }
 
     public void buildClientActions() {
