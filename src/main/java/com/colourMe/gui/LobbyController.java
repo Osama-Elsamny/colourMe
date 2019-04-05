@@ -10,6 +10,7 @@ import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -454,7 +455,7 @@ public class LobbyController {
                 handleDisconnect(data);
                 break;
             case ReconnectResponse:
-                handleReconnect();
+                handleReconnect(data);
                 break;
             case ClockSyncResponse:
                 handleClockSync(data);
@@ -498,7 +499,7 @@ public class LobbyController {
 
     private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
-        Boolean success = data.get("successful").getAsBoolean();
+        boolean success = data.get("successful").getAsBoolean();
         if (success && (! userID.equals(playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
@@ -531,9 +532,11 @@ public class LobbyController {
         }
     }
 
-    private void handleReconnect() {
-        restoreCellStates();
-        // updatesScores()
+    private void handleReconnect(JsonObject data) {
+        if (data.get("successful").getAsBoolean()) {
+            restoreCellStates();
+            updateScores();
+        }
     }
 
     private void restoreCellStates() {
@@ -541,8 +544,7 @@ public class LobbyController {
         for (int r=0; r < cells.length; r++) {
             for (int c=0; c < cells.length; c++) {
                 if (cells[r][c].getState().equals(CellState.AVAILABLE)) {
-                    Canvas canvas = (Canvas) lookup(String.format("canvas-%s-%s", r, c));
-                    GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+                    GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
                     clearCell(graphicsContext);
                 }
             }
@@ -550,7 +552,7 @@ public class LobbyController {
     }
 
     private void updateScores() {
-
+        gameAPI.getPlayerIds().forEach(this::updatePlayersScore);
     }
 
     private void handleClientDisconnect(JsonObject data) {

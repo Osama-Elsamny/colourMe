@@ -72,7 +72,7 @@ public class GameAPI {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
             data.addProperty("col", col);
-            data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
+            data.add("coordinates", gameService.getGson().toJsonTree(coordinates));
             Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
             sendQueue.add(cellUpdateRequest);
         });

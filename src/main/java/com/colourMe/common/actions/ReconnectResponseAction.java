@@ -19,13 +19,13 @@ public class ReconnectResponseAction extends ActionBase {
 
     private Message successResponse() {
         JsonObject data = new JsonObject();
-        data.addProperty("success", true);
+        data.addProperty("successful", true);
         return new Message(MessageType.ReconnectResponse, data, null);
     }
 
     private Message failureResponse() {
         JsonObject data = new JsonObject();
-        data.addProperty("success", false);
+        data.addProperty("successful", false);
         return new Message(MessageType.ReconnectResponse, data, null);
     }
 }
