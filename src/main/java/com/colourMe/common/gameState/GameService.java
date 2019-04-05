@@ -190,6 +190,7 @@ public class GameService implements Cloneable {
 
     private boolean playerExists(String playerID) {
         return players.containsKey(playerID);
+    }
 
     @Override
     public GameService clone() throws CloneNotSupportedException {
