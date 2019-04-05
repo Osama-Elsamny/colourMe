@@ -233,6 +233,7 @@ public class GameAPITest {
 
     private Message connectResponseMessage() {
         JsonElement data = gson.toJsonTree(gameConfig);
+        data.getAsJsonObject().addProperty("successful", true);
         return new Message(MessageType.ConnectResponse, data, playerID);
     }
 

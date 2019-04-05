@@ -16,9 +16,20 @@ public class ConnectResponseAction extends ActionBase {
         if (data != null) {
             gameService.init(gameConfig);
             gameService.spawnPlayersFromConfig();
-            return message;
+            return successResponse(data, message.getPlayerID());
         }
 
-        return new Message(MessageType.ConnectResponse, null, message.getPlayerID());
+        return failureResponse(message.getPlayerID());
+    }
+
+    private Message successResponse(JsonObject data, String playerID) {
+        data.addProperty("successful", true);
+        return new Message(MessageType.ConnectResponse, data, playerID);
+    }
+
+    private Message failureResponse(String playerID) {
+        JsonObject data = new JsonObject();
+        data.addProperty("successful", false);
+        return new Message(MessageType.ConnectResponse, data, playerID);
     }
 }
