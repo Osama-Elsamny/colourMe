@@ -71,9 +71,10 @@ public class GameConfig implements Cloneable {
         return ipAddresses.get(ipAddresses.size() -  1).getValue();
     }
 
-    public String getNextIP(){
+    public String getNextIP() {
         if (ipAddresses.isEmpty()) return null;
-        return ipAddresses.remove(0).getValue();
+        ipAddresses.remove(0);
+        return ipAddresses.get(0).getValue();
     }
 
     public boolean equals(Object obj) {

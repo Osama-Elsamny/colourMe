@@ -114,6 +114,19 @@ public class GameServer extends Thread {
         return successful;
     }
 
+    public boolean initGameService(GameService gameService){
+        boolean successful;
+        try {
+            this.messageExecutor = new MessageExecutor(gameService);
+            successful = true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+            successful = false;
+        }
+        return successful;
+    }
+
     public void finish(){
         this.finished = true;
     }
