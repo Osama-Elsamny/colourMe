@@ -11,7 +11,7 @@ public class GameConfig implements Cloneable {
 
     private int thickness;
 
-    private List<Pair<String, String>> ipAddresses;
+    private ArrayList<Pair<String, String>> ipAddresses;
 
     public GameConfig(int size, float ratio, int thickness) {
         this.size = size;
@@ -44,11 +44,11 @@ public class GameConfig implements Cloneable {
         this.thickness = thickness;
     }
 
-    public List<Pair<String, String>> getIpAddresses() {
+    public ArrayList<Pair<String, String>> getIpAddresses() {
         return ipAddresses;
     }
 
-    public void setIpAddresses(List<Pair<String, String>> ipAddresses) { this.ipAddresses = ipAddresses; }
+    public void setIpAddresses(ArrayList<Pair<String, String>> ipAddresses) { this.ipAddresses = ipAddresses; }
 
     public void addplayerConfig(String playerId, String ip) {
         this.ipAddresses.add(new Pair<>(playerId, ip));
@@ -76,6 +76,22 @@ public class GameConfig implements Cloneable {
         return ipAddresses.remove(0).getValue();
     }
 
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof GameConfig)) {
+            return false;
+        }
+
+        GameConfig gameConfig = (GameConfig) obj;
+        return gameConfig.getIpAddresses().equals(this.ipAddresses)
+                && gameConfig.getSize() == this.size
+                && gameConfig.getRatio() == this.ratio
+                && gameConfig.getThickness() == this.thickness;
+    }
+    
     public GameConfig clone() throws CloneNotSupportedException {
         this.removeAllIPs();
         return (GameConfig) super.clone();

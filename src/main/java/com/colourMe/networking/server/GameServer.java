@@ -13,14 +13,12 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class GameServer extends Thread {
     private MessageExecutor messageExecutor;
     private GameService gameService;
+    private boolean reconnectState = false;
     private volatile boolean running = false;
     private volatile boolean finished = false;
 
-    private static Comparator<Message> messageComparator = (m1, m2) ->
-            (int) (m1.getTimestamp() - m2.getTimestamp());
-
     private static final PriorityBlockingQueue<Message> incoming =
-            new PriorityBlockingQueue<>(10, messageComparator);
+            new PriorityBlockingQueue<>(10, Message.messageComparator);
 
     @Override
     public void run() {
@@ -37,6 +35,7 @@ public class GameServer extends Thread {
             System.out.println("GameServer has started!");
 
             while(!finished) {
+                resetServerIfDisconnected();
                 processIncoming();
                 Thread.sleep(1);
             }
@@ -49,7 +48,7 @@ public class GameServer extends Thread {
         }
     }
 
-    private void processIncoming(){
+    private void processIncoming() {
 
         // Read each message from Incoming
         synchronized (incoming) {
@@ -71,7 +70,17 @@ public class GameServer extends Thread {
         }
     }
 
-    static boolean addToIncoming(Message m){
+    private void resetServerIfDisconnected() {
+        if(reconnectState && allClientsConnected()) {
+
+        }
+    }
+
+    private boolean allClientsConnected() {
+        return GameServerEndpoint.numberOfSessions() == gameService.getNumberOfClientIPs();
+    }
+
+    static boolean addToIncoming(Message m) {
         boolean successful;
         try {
             synchronized (incoming) {
@@ -86,7 +95,7 @@ public class GameServer extends Thread {
         return successful;
     }
 
-    public boolean initGameService(GameConfig config){
+    public boolean initGameService(GameConfig config) {
         boolean successful;
         try {
             System.out.println("Config: " + config);
