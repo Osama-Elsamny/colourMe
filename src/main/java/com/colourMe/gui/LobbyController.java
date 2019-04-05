@@ -1,16 +1,12 @@
 package com.colourMe.gui;
 
-import com.colourMe.common.gameState.Coordinate;
-import com.colourMe.common.gameState.GameConfig;
-import com.colourMe.common.gameState.GameService;
+import com.colourMe.common.gameState.*;
 import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
 import javafx.animation.AnimationTimer;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -122,17 +118,34 @@ public class LobbyController {
             startServer(serverClock);
             this.gameServer.initGameService(serverGameService);
 
+            String serverAddress = String.format("ws://%s:8080/connect/%s", "127.0.0.1", playerID);
+            gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+            gameClient.start();
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
+
+
     }
 
-    private void connectToNextServer(String nextIP) {
+    private void waitForNextServer(String nextIP) {
+        int NUM_TRIES = 10;
+        int connectTry = 0;
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
-        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
-        gameClient.start();
+        while (connectTry < NUM_TRIES) {
+            try {
+                gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+                connectTry++;
+                Thread.sleep(500);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
     }
+
+
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
@@ -440,6 +453,9 @@ public class LobbyController {
             case Disconnect:
                 handleDisconnect(data);
                 break;
+            case ReconnectResponse:
+                handleReconnect();
+                break;
             case ClockSyncResponse:
                 handleClockSync(data);
                 break;
@@ -474,11 +490,7 @@ public class LobbyController {
         if (success && (! userID.equals(this.playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            JsonParser parser = new JsonParser();
-            String string = data.get("coordinates").toString();
-            string = string.replaceAll("\\\\\"(\\w+)\\\\\"(:)", "$1$2");
-            string = string.substring(1, string.length()-1);
-            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(string, Coordinate[].class));
+            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(data.get("coordinates"), Coordinate[].class));
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
             coordinates.forEach(x -> renderStroke(cellGraphicsContext, x, userID, row, col));
         }
@@ -510,14 +522,35 @@ public class LobbyController {
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
                 startNextServer();
-                connectToNextServer("127.0.0.1");
             } else {
-                connectToNextServer(nextIP);
+                waitForNextServer(nextIP);
             }
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private void handleReconnect() {
+        restoreCellStates();
+        // updatesScores()
+    }
+
+    private void restoreCellStates() {
+        Cell[][] cells = gameAPI.getGameService().getCells();
+        for (int r=0; r < cells.length; r++) {
+            for (int c=0; c < cells.length; c++) {
+                if (cells[r][c].getState().equals(CellState.AVAILABLE)) {
+                    Canvas canvas = (Canvas) lookup(String.format("canvas-%s-%s", r, c));
+                    GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+                    clearCell(graphicsContext);
+                }
+            }
+        }
+    }
+
+    private void updateScores() {
+
     }
 
     private void handleClientDisconnect(JsonObject data) {

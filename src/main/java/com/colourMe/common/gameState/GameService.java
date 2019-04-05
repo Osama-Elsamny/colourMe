@@ -7,6 +7,8 @@ import javafx.util.Pair;
 
 import java.beans.Transient;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class GameService implements Cloneable {
 
@@ -58,6 +60,10 @@ public class GameService implements Cloneable {
 
     // Return GameConfig
     public GameConfig getGameConfig() { return gameConfig; }
+
+    public Cell[][] getCells() {
+        return cells;
+    }
 
     // Acquire a cell
     public boolean acquireCell(int row, int col, double x, double y, String playerID) {
@@ -134,16 +140,9 @@ public class GameService implements Cloneable {
     // Remove a player
     public void killPlayer(String playerID) {
         // Release locks
-        for(Cell[] cellRow : cells) {
-            for(Cell cell : cellRow) {
-                if(cell.getPlayerID().equals(playerID)
-                    && cell.getState().equals(CellState.LOCKED)) {
-                    cell.setPlayerID("");
-                    cell.setState(CellState.AVAILABLE);
-                }
-            }
-        }
-
+        releaseAllAcquiredLocks(
+                x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
+        );
         // Remove player
         players.remove(playerID);
         gameConfig.removePlayerConfig(playerID);
@@ -193,8 +192,20 @@ public class GameService implements Cloneable {
         return players.containsKey(playerID);
     }
 
+    private void releaseAllAcquiredLocks(Function<Cell, Boolean> predicate) {
+        for (Cell[] row : cells) {
+            for (Cell cell : row) {
+                if (predicate.apply(cell)) {
+                    cell.setState(CellState.AVAILABLE);
+                    cell.setPlayerID("");
+                }
+            }
+        }
+    }
+
     @Override
     public GameService clone() throws CloneNotSupportedException {
+        releaseAllAcquiredLocks(x -> x.getState().equals(CellState.LOCKED));
         return (GameService) super.clone();
     }
 

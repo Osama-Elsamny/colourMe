@@ -1,5 +1,6 @@
 package com.colourMe.gui;
 
+import com.colourMe.common.gameState.Cell;
 import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
@@ -158,4 +159,6 @@ public class GameAPI {
     public float getRatio() {
         return gameService.getGameConfig().getRatio();
     }
+
+    public Cell[][] getCells() {return gameService.getCells();}
 }
