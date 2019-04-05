@@ -148,6 +148,10 @@ public class GameService {
         gameConfig.removePlayerConfig(playerID);
     }
 
+    public int getNumberOfClientIPs() {
+        return gameConfig.getIpAddresses().size();
+    }
+
     public boolean isCellLocked(int row, int col){
         return this.cells[row][col].getState().equals(CellState.LOCKED);
     }

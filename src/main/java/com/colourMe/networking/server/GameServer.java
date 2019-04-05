@@ -13,6 +13,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class GameServer extends Thread {
     private MessageExecutor messageExecutor;
     private GameService gameService;
+    private boolean reconnectState = false;
     private volatile boolean running = false;
     private volatile boolean finished = false;
 
@@ -34,6 +35,7 @@ public class GameServer extends Thread {
             System.out.println("GameServer has started!");
 
             while(!finished) {
+                resetServerIfDisconnected();
                 processIncoming();
                 Thread.sleep(1);
             }
@@ -66,6 +68,16 @@ public class GameServer extends Thread {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private void resetServerIfDisconnected() {
+        if(reconnectState && allClientsConnected()) {
+
+        }
+    }
+
+    private boolean allClientsConnected() {
+        return GameServerEndpoint.numberOfSessions() == gameService.getNumberOfClientIPs();
     }
 
     static boolean addToIncoming(Message m) {
