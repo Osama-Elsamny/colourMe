@@ -8,9 +8,6 @@ import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
 import javafx.animation.AnimationTimer;
-import javafx.beans.binding.BooleanExpression;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -33,31 +30,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.util.Pair;
 
-import java.awt.*;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class lobbyController {
-    @FXML
-    private Label welcomeStatment;
-    @FXML
-    private Button startGame;
-    @FXML
-    private Label promptLabel;
-    @FXML
-    private Label player1Label;
-    @FXML
-    private Label player2Label;
-    @FXML
-    private Label player3Label;
-    @FXML
-    private Label player4Label;
-
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
@@ -306,25 +284,18 @@ public class lobbyController {
     private void displayBoard() {
         this.userColor = gameAPI.getPlayerColour(playerID);
         this.userColorCode = gameAPI.getPlayerColourCode(playerID);
-
         int numCols = gameAPI.getBoardSize();
         int numRows = gameAPI.getBoardSize();
         BorderPane root = new BorderPane();
         Label welcomeLabel = new Label("ColourMe");
-        AnchorPane player1AnchorPane = new AnchorPane();
-        Label player1NameLabel = new Label("Player1");
-        Label player1ScoreLabel = new Label("score");
-        AnchorPane player2AnchorPane = new AnchorPane();
-        Label player2NameLabel = new Label("Player2");
-        Label player2ScoreLabel = new Label("score2");
-        AnchorPane player3AnchorPane = new AnchorPane();
-        Label player3NameLabel = new Label("Player3");
-        Label player3ScoreLabel = new Label("score3");
-        AnchorPane player4AnchorPane = new AnchorPane();
-        Label player4NameLabel = new Label("Player4");
-        Label player4ScoreLabel = new Label("score4");
+        Label playersNameLabel[] = new Label[4];
+        Label playersScoreLabel[] = new Label[4];
+        AnchorPane playersAnchorPane[] = new AnchorPane[4];
+        inilizeAnchorPaneArray(playersAnchorPane);
+        inilizeLabelArrays(playersNameLabel);
+        inilizeLabelArrays(playersScoreLabel);
+        displayPlayerNamesAndScores(playersNameLabel, playersScoreLabel);
         VBox vbox = new VBox();
-
         Stage primaryStage = mainPageController.getPrimaryStage();
         BooleanProperty[][] switches = new BooleanProperty[numCols][numRows];
         for (int x = 0 ; x < numCols ; x++) {
@@ -345,23 +316,13 @@ public class lobbyController {
         AnchorPane.setLeftAnchor(vbox, 0.0);
         AnchorPane.setRightAnchor(vbox, 0.0);
         AnchorPane.setBottomAnchor(vbox, 0.0);
-        addToCssFile(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, player1AnchorPane, player2AnchorPane, player3AnchorPane, player4AnchorPane);
-        setComponentHeightAndWidth(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, player1AnchorPane, player2AnchorPane, player3AnchorPane, player4AnchorPane);
+        addToCssFile(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, playersAnchorPane);
+        setComponentHeightAndWidth(welcomeLabel, leftAnchorPane, topAnchorPane, vbox, playersAnchorPane);
         //adding Label in the AnchorPanes so we can display the scores and the player names
-        player1AnchorPane.getChildren().add(player1NameLabel);
-        player2AnchorPane.getChildren().add(player2NameLabel);
-        player3AnchorPane.getChildren().add(player3NameLabel);
-        player4AnchorPane.getChildren().add(player4NameLabel);
-        player1AnchorPane.getChildren().add(player1ScoreLabel);
-        player2AnchorPane.getChildren().add(player2ScoreLabel);
-        player3AnchorPane.getChildren().add(player3ScoreLabel);
-        player4AnchorPane.getChildren().add(player4ScoreLabel);
-        setXandYforLabels(player1NameLabel, player1ScoreLabel, player2NameLabel, player2ScoreLabel, player3NameLabel, player3ScoreLabel, player4NameLabel, player4ScoreLabel);
+        setAnchorPaneChilderen(playersAnchorPane, playersNameLabel, playersScoreLabel);
+        setXandYforLabels(playersNameLabel, playersScoreLabel);
         // adding AnchorPanes to Vbox
-        vbox.getChildren().add(player1AnchorPane);
-        vbox.getChildren().add(player2AnchorPane);
-        vbox.getChildren().add(player3AnchorPane);
-        vbox.getChildren().add(player4AnchorPane);
+        setVerticalBoxChildren(vbox, playersAnchorPane);
         //adding labels to AnchorPane
         topAnchorPane.getChildren().add(welcomeLabel);
         leftAnchorPane.getChildren().add(vbox);
@@ -377,6 +338,42 @@ public class lobbyController {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    private void setVerticalBoxChildren(VBox vBox, AnchorPane playersAnchorPane[]) {
+        for (int i = 0; i < 4; i++) {
+            vBox.getChildren().add(playersAnchorPane[i]);
+        }
+    }
+
+    private void setAnchorPaneChilderen(AnchorPane playersAnchorPane[], Label playersNameLabel[], Label playersScoreLabel[]) {
+        for (int i = 0; i < 4; i++) {
+            playersAnchorPane[i].getChildren().add(playersNameLabel[i]);
+            playersAnchorPane[i].getChildren().add(playersScoreLabel[i]);
+        }
+    }
+
+    private void inilizeAnchorPaneArray(AnchorPane arr[]) {
+        for (int i = 0; i < 4; i++) {
+            arr[i] = new AnchorPane();
+        }
+    }
+
+    private void inilizeLabelArrays(Label arr[]) {
+        for (int i = 0; i < 4; i++) {
+            arr[i] = new Label();
+        }
+    }
+
+    private void displayPlayerNamesAndScores(Label playersNameLabel[], Label playersScoreLabel[]) {
+        int size = gameAPI.getPlayerIds().size();
+        for (int i = 0; i < size; i++) {
+            String playerID = gameAPI.getPlayerIds().get(i);
+            playersNameLabel[i].setText(playerID);
+            playersScoreLabel[i].setText("0");
+            playersScoreLabel[i].setId("score-" + playerID);
+        }
+    }
+
     private void update(){
         if(gameAPI.hasResponse()) {
             // processResponse()
@@ -429,7 +426,6 @@ public class lobbyController {
         }
     }
 
-
     private void handleCellUpdate(JsonObject data, String userID) {
         // Render other clients' coordinates
         Gson gson = new Gson();
@@ -451,7 +447,6 @@ public class lobbyController {
     private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
         Boolean success = data.get("successful").getAsBoolean();
-
         if (success && (! userID.equals(playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
@@ -466,6 +461,7 @@ public class lobbyController {
                 clearCell(cellGraphicsContext);
             }
         }
+        updatePlayersScore(userID);
     }
 
     private void handleDisconnect(JsonObject data) {
@@ -476,30 +472,15 @@ public class lobbyController {
         // Show disconnected label on the gui
     }
 
-    void setPlayer1LabelAsJoined(String name){
-        player1Label.setText(name + " joined");
-    }
-    void setPlayer2LabelAsJoined(String name){
-        player2Label.setText(name + " joined");
-    }
-    void setPlayer3LabelAsJoined(String name){
-        player3Label.setText(name + " joined");
-    }
-    void setPlayer4LabelAsJoined(String name){
-        player4Label.setText(name + " joined");
-    }
-    private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane player1AnchorPane, AnchorPane player2AnchorPane, AnchorPane player3AnchorPane, AnchorPane player4AnchorPane) {
+    private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane playersAnchorPane[]) {
         //add id for the css file
         vbox.getStyleClass().add("vbox");
-        player1AnchorPane.getStyleClass().add("player1AnchorPane");
-        player2AnchorPane.getStyleClass().add("player2AnchorPane");
-        player3AnchorPane.getStyleClass().add("player3AnchorPane");
-        player4AnchorPane.getStyleClass().add("player4AnchorPane");
         welcomeLabel.getStyleClass().add("welcomeLabel");
         leftAnchorPane.getStyleClass().add("LeftAnchorPane");
         topAnchorPane.getStyleClass().add("topAnchorPane");
     }
-    private void setComponentHeightAndWidth(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane,VBox vbox, AnchorPane player1AnchorPane, AnchorPane player2AnchorPane, AnchorPane player3AnchorPane, AnchorPane player4AnchorPane) {
+
+    private void setComponentHeightAndWidth(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane,VBox vbox, AnchorPane playersAnchorPane[]) {
         //Height and width for welcome label
         welcomeLabel.setPrefHeight(55);
         welcomeLabel.setPrefWidth(602);
@@ -510,15 +491,12 @@ public class lobbyController {
         topAnchorPane.setPrefWidth(600);
         topAnchorPane.setPrefHeight(64);
         //Height and width for each player Anchor Pane
-        player1AnchorPane.setPrefWidth(200);
-        player1AnchorPane.setPrefHeight(200);
-        player2AnchorPane.setPrefWidth(200);
-        player2AnchorPane.setPrefHeight(200);
-        player3AnchorPane.setPrefWidth(200);
-        player3AnchorPane.setPrefHeight(200);
-        player4AnchorPane.setPrefWidth(200);
-        player4AnchorPane.setPrefHeight(200);
+        for (int i = 0; i < 4; i++) {
+            playersAnchorPane[i].setPrefHeight(200);
+            playersAnchorPane[i].setPrefWidth(200);
+        }
     }
+
     private Node lookup(String id){
         return scene.lookup("#" + id);
     }
@@ -527,22 +505,19 @@ public class lobbyController {
         Canvas canvas = (Canvas) lookup(canvasID);
         return canvas.getGraphicsContext2D();
     }
-    private void setXandYforLabels(Label player1NameLabel, Label player1ScoreLabel, Label player2NameLabel, Label player2ScoreLabel, Label player3NameLabel, Label player3ScoreLabel, Label player4NameLabel, Label player4ScoreLabel) {
-        player1NameLabel.setLayoutX(14);
-        player1NameLabel.setLayoutY(24);
-        player1ScoreLabel.setLayoutX(56);
-        player1ScoreLabel.setLayoutY(24);
-        player2NameLabel.setLayoutX(14);
-        player2NameLabel.setLayoutY(24);
-        player2ScoreLabel.setLayoutX(56);
-        player2ScoreLabel.setLayoutY(24);
-        player3NameLabel.setLayoutX(14);
-        player3NameLabel.setLayoutY(24);
-        player3ScoreLabel.setLayoutX(56);
-        player3ScoreLabel.setLayoutY(24);
-        player4NameLabel.setLayoutX(14);
-        player4NameLabel.setLayoutY(24);
-        player4ScoreLabel.setLayoutX(56);
-        player4ScoreLabel.setLayoutY(24);
+
+    private void setXandYforLabels(Label playersNameLabel[], Label playersScoreLabel[]) {
+        for (int i = 0; i < 4; i++) {
+            playersNameLabel[i].setLayoutX(14);
+            playersNameLabel[i].setLayoutY(24);
+            playersScoreLabel[i].setLayoutX(56);
+            playersScoreLabel[i].setLayoutY(24);
+        }
+    }
+
+    private void updatePlayersScore(String userID) {
+        int score = gameAPI.getPlayerScore(userID);
+        Label scoreToUpdate = (Label) lookup("score-" + userID);
+        scoreToUpdate.setText(Integer.toString(score));
     }
 }
