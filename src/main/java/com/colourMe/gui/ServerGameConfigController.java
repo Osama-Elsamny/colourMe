@@ -49,7 +49,7 @@ public class ServerGameConfigController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();
         LobbyController controller = loader.getController();
-        controller.initServerMachine(gameConfig, "127.0.0.1", playerID);
+        controller.initServerMachine(gameConfig, serverIP, playerID);
         startScene(event, "lobby");
     }
 
