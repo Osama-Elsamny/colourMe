@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class mainPageController{
+public class MainPageController {
 
     private static Stage primaryStage;
     @FXML

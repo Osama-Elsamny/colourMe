@@ -4,15 +4,14 @@ import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -32,11 +31,12 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class lobbyController {
+public class LobbyController {
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
 
@@ -135,8 +135,6 @@ public class lobbyController {
         }
     }
 
-
-
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
         this.gameAPI = new GameAPI(sendQueue, receivedQueue);
@@ -173,6 +171,7 @@ public class lobbyController {
         cell.getStyleClass().add("cell");
         return cell;
     }
+
     private void onClick(MouseEvent event, int row, int col){
         initCounters();
         Coordinate coordinate = new Coordinate(event.getX(), event.getY());
@@ -334,7 +333,7 @@ public class lobbyController {
         inilizeLabelArrays(playersScoreLabel);
         displayPlayerNamesAndScores(playersNameLabel, playersScoreLabel);
         VBox vbox = new VBox();
-        Stage primaryStage = mainPageController.getPrimaryStage();
+        Stage primaryStage = MainPageController.getPrimaryStage();
         BooleanProperty[][] switches = new BooleanProperty[numCols][numRows];
         for (int x = 0 ; x < numCols ; x++) {
             for (int y = 0 ; y < numRows ; y++) {
@@ -516,8 +515,6 @@ public class lobbyController {
             ex.printStackTrace();
         }
     }
-
-
 
     private void handleClientDisconnect(JsonObject data) {
         // Show disconnected label on the gui
