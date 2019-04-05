@@ -141,7 +141,7 @@ public class GameService implements Cloneable {
     public void killPlayer(String playerID) {
         // Release locks
         releaseAllAcquiredLocks(
-                x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
+            x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
         );
         // Remove player
         players.remove(playerID);

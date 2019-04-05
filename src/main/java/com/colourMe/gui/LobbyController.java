@@ -126,27 +126,12 @@ public class LobbyController {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
-
-
     }
 
     private void waitForNextServer(String nextIP) {
-        int NUM_TRIES = 10;
-        int connectTry = 0;
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
-        while (connectTry < NUM_TRIES) {
-            try {
-                gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
-                connectTry++;
-                Thread.sleep(500);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
+        this.gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
     }
-
-
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
@@ -525,7 +510,9 @@ public class LobbyController {
             if (startServer) {
                 startNextServer();
             } else {
+                // TODO: display Popup
                 waitForNextServer(nextIP);
+                // TODO: close Popup
             }
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
@@ -535,6 +522,8 @@ public class LobbyController {
 
     private void handleReconnect(JsonObject data) {
         if (data.get("successful").getAsBoolean()) {
+            Gson gson = gameAPI.getGameService().gson;
+            gameAPI.setGameService(gson.fromJson(data, GameService.class));
             restoreCellStates();
             updateScores();
         }

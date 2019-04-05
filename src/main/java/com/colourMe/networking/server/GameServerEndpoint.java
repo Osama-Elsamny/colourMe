@@ -3,7 +3,6 @@ package com.colourMe.networking.server;
 import com.colourMe.common.marshalling.MessageDecoder;
 import com.colourMe.common.marshalling.MessageEncoder;
 import com.colourMe.common.messages.Message;
-import com.google.gson.JsonElement;
 
 import javax.websocket.*;
 import javax.websocket.server.*;
@@ -19,14 +18,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 )
 public class GameServerEndpoint {
     private Session session;
-    private static Set<GameServerEndpoint> servers = new CopyOnWriteArraySet<>();
+    private static Set<GameServerEndpoint> endPointSessions = new CopyOnWriteArraySet<>();
     private static HashMap<String, String> users = new HashMap<>();
 
     @OnOpen
     public void onOpen(Session session,
                        @PathParam("username") String username) throws IOException {
         this.session = session;
-        servers.add(this);
+        endPointSessions.add(this);
         users.put(session.getId(), username);
     }
 
@@ -39,7 +38,8 @@ public class GameServerEndpoint {
 
     @OnClose
     public void onClose(Session session) throws IOException {
-        servers.remove(this);
+        users.remove(session.getId());
+        endPointSessions.remove(this);
     }
 
     @OnError
@@ -48,11 +48,11 @@ public class GameServerEndpoint {
     }
 
     public static int numberOfSessions() {
-        return users.size();
+        return endPointSessions.size();
     }
 
     public static void broadcast(final Message message) {
-        servers.forEach(x -> {
+        endPointSessions.forEach(x -> {
             synchronized (x) {
                 try {
                     x.session.getAsyncRemote().sendObject(message);

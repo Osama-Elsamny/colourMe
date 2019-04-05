@@ -160,5 +160,8 @@ public class GameAPI {
         return gameService.getGameConfig().getRatio();
     }
 
-    public Cell[][] getCells() {return gameService.getCells();}
+    public void setGameService(GameService gameService) {
+        this.messageExecutor = new MessageExecutor(gameService);
+        messageExecutor.buildClientActions();
+    }
 }

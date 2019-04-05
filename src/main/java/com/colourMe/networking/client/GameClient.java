@@ -86,7 +86,7 @@ public class GameClient extends Thread {
                         }
                     }
                 }
-            } catch (URISyntaxException ex) {
+            } catch (Exception ex) {
                 if (connectionAttempt < maxTries){
                     connectionAttempt++;
                     try {
