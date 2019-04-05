@@ -14,5 +14,6 @@ public enum MessageType {
     ReleaseCellResponse,
     ClientDisconnectRequest,
     ClientDisconnectResponse,
+    ClockSyncResponse,
     DefaultType
 }

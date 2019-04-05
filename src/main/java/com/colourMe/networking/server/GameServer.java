@@ -6,7 +6,9 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.glassfish.tyrus.server.Server;
+import com.colourMe.networking.ClockSynchronization.Clock;
 
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -17,9 +19,12 @@ public class GameServer extends Thread {
     private boolean reconnectState = false;
     private volatile boolean running = false;
     private volatile boolean finished = false;
+    private Clock serverClock;
 
     private static final PriorityBlockingQueue<Message> incoming =
             new PriorityBlockingQueue<>(10, Message.messageComparator);
+
+    public GameServer(Clock serverClock) { this.serverClock = serverClock; }
 
     @Override
     public void run() {
@@ -37,6 +42,8 @@ public class GameServer extends Thread {
 
             while(!finished) {
                 processIncoming();
+                //TODO: Do this after fixed interval
+                GameServerEndpoint.broadcast(sendServerTime());
                 Thread.sleep(1);
             }
         } catch (Exception ex) {
@@ -126,6 +133,14 @@ public class GameServer extends Thread {
             successful = false;
         }
         return successful;
+    }
+
+    public Message sendServerTime(){
+        JsonObject data = new JsonObject();
+        data.addProperty("TimeStamp", serverClock.getTime());
+
+        Message message = new Message(MessageType.ClockSyncResponse, data, null );
+        return message;
     }
 
     public void finish(){

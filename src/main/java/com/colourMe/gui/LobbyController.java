@@ -4,6 +4,8 @@ import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
@@ -53,6 +55,9 @@ public class LobbyController {
     long userColorCode;
     private GameServer gameServer;
     private GameClient gameClient;
+    private Clock serverClock;
+    private Clock clientClock;
+
 
     public static PriorityBlockingQueue<Message> receiveQueue;
     public static PriorityBlockingQueue<Message> sendQueue;
@@ -66,8 +71,8 @@ public class LobbyController {
         sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
     }
 
-    public void startServer(){
-        gameServer = new GameServer();
+    public void startServer(Clock serverClock){
+        gameServer = new GameServer(serverClock);
         gameServer.start();
         while (!gameServer.isRunning()){
             // Wait for server to start
@@ -75,7 +80,9 @@ public class LobbyController {
     }
 
     public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
-        startServer();
+        serverClock = new Clock();
+        serverClock.start();
+        startServer(serverClock);
         gameServer.initGameService(gameConfig);
         String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
         initClientMachine(serverAddress, playerID, networkIP);
@@ -85,8 +92,13 @@ public class LobbyController {
         this.playerID = playerID;
         this.playerIP = playerIP;
         createQueues();
-        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+
+        clientClock = new Clock();
+        clientClock.start();
+
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
         gameClient.start();
+
         setGameAPI(sendQueue, receiveQueue);
         JsonObject data = new JsonObject();
         gameAPI.sendConnectRequest(playerID, playerIP);
@@ -441,6 +453,9 @@ public class LobbyController {
             case Disconnect:
                 handleDisconnect(data);
                 break;
+            case ClockSyncResponse:
+                handleClockSync(data);
+                break;
             case DefaultType:
                 // TODO: Handle errors if you have any
             default:
@@ -520,6 +535,11 @@ public class LobbyController {
         // Show disconnected label on the gui
     }
 
+    private void handleClockSync(JsonObject data) {
+        long serverTime = data.get("TimeStamp").getAsLong();
+        clientClock.setTime(serverTime);
+    }
+
     private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane playersAnchorPane[]) {
         //add id for the css file
         vbox.getStyleClass().add("vbox");
@@ -544,7 +564,7 @@ public class LobbyController {
             playersAnchorPane[i].setPrefWidth(200);
         }
     }
-  
+
     private Node lookup(String id) {
         return scene.lookup("#" + id);
     }

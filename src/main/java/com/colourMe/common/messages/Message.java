@@ -19,7 +19,6 @@ public class Message {
         this.messageType = messageType;
         this.data = data;
         this.playerID = playerID;
-        this.timestamp = System.currentTimeMillis();
     }
 
     public MessageType getMessageType() {

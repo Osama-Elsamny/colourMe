@@ -7,6 +7,7 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -21,13 +22,17 @@ public class GameAPI {
 
     private PriorityBlockingQueue<Message> receivedQueue;
 
+    private Clock clientClock;
+
+
     public GameAPI(PriorityBlockingQueue<Message> sendQueue,
-                   PriorityBlockingQueue<Message> receivedQueue) {
+                   PriorityBlockingQueue<Message> receivedQueue, Clock clientClock) {
         this.gameService = new GameService();
         this.messageExecutor = new MessageExecutor(gameService);
         this.messageExecutor.buildClientActions();
         this.sendQueue = sendQueue;
         this.receivedQueue = receivedQueue;
+        this.clientClock = clientClock;
     }
 
     //Requests
@@ -48,6 +53,7 @@ public class GameAPI {
             JsonObject data = new JsonObject();
             data.addProperty("playerIP", playerIP);
             Message connectRequest = new Message(MessageType.ConnectRequest, data, playerID);
+            connectRequest.setTimestamp(clientClock.getTime());
             sendQueue.add(connectRequest);
         });
     }
@@ -60,6 +66,7 @@ public class GameAPI {
             data.addProperty("x", coordinate.x);
             data.addProperty("y", coordinate.y);
             Message getCellRequest = new Message(MessageType.GetCellRequest, data, playerID);
+            getCellRequest.setTimestamp(clientClock.getTime());
             sendQueue.add(getCellRequest);
         });
     }
@@ -71,6 +78,7 @@ public class GameAPI {
             data.addProperty("col", col);
             data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
             Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
+            cellUpdateRequest.setTimestamp(clientClock.getTime());
             sendQueue.add(cellUpdateRequest);
         });
     }
@@ -82,6 +90,7 @@ public class GameAPI {
             data.addProperty("col", col);
             data.addProperty("hasColoured", hasColoured);
             Message releaseCellRequest = new Message(MessageType.ReleaseCellRequest, data, playerID);
+            releaseCellRequest.setTimestamp(clientClock.getTime());
             sendQueue.add(releaseCellRequest);
         });
     }
@@ -91,6 +100,7 @@ public class GameAPI {
             JsonObject data = new JsonObject();
             data.addProperty("reason", reason);
             Message disconnectRequest = new Message(null, data, playerID);
+            disconnectRequest.setTimestamp(clientClock.getTime());
         });
     }
 
