@@ -143,7 +143,7 @@ public class GameAPITest {
         Message processedResponse = gameAPI.processResponse();
 
         assertTrue(gameAPI.playerOwnsCell(row, col, playerID));
-        assertEquals(processedResponse, cellResponseMessage(getCellRequestMessage(), true));
+        assertEquals(processedResponse, getCellResponseMessage(getCellRequestMessage(), true));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class GameAPITest {
         assertTrue(gameAPI.hasResponse());
         Message processedResponse = gameAPI.processResponse();
 
-        assertEquals(processedResponse, cellResponseMessage(cellUpdateRequestMessage(), true));
+        assertEquals(processedResponse, cellUpdateResponseMessage(true));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class GameAPITest {
         Message processedResponse = gameAPI.processResponse();
 
         assertFalse(gameAPI.playerOwnsCell(row, col, playerID));
-        assertEquals(processedResponse, cellResponseMessage(cellReleaseRequestMessage(), true));
+        assertEquals(processedResponse, cellReleaseResponseMessage(true));
     }
 
     private Message connectRequestMessage() {
@@ -191,7 +191,14 @@ public class GameAPITest {
         data.addProperty("col", col);
         data.addProperty("x", x);
         data.addProperty("y", y);
-        return new Message(MessageType.GetCell, data, playerID);
+        return new Message(MessageType.GetCellRequest, data, playerID);
+    }
+
+    private Message getCellResponseMessage() {
+        Message responseMessage = getCellRequestMessage();
+        responseMessage.getData().getAsJsonObject().addProperty("successful", true);
+        responseMessage.setMessageType(MessageType.GetCellResponse);
+        return responseMessage;
     }
 
     private Message cellUpdateRequestMessage() {
@@ -199,7 +206,14 @@ public class GameAPITest {
         data.addProperty("row", row);
         data.addProperty("col", col);
         data.addProperty("coordinates", gson.toJson(coordinates));
-        return new Message(MessageType.CellUpdate, data, playerID);
+        return new Message(MessageType.CellUpdateRequest, data, playerID);
+    }
+
+    private Message cellUpdateResponseMessage(boolean success) {
+        Message responseMessage = cellUpdateRequestMessage();
+        responseMessage.setMessageType(MessageType.CellUpdateResponse);
+        responseMessage.getData().getAsJsonObject().addProperty("successful", success);
+        return responseMessage;
     }
 
     private Message cellReleaseRequestMessage() {
@@ -207,7 +221,14 @@ public class GameAPITest {
         data.addProperty("row", row);
         data.addProperty("col", col);
         data.addProperty("hasColoured", hasColoured);
-        return new Message(MessageType.ReleaseCell, data, playerID);
+        return new Message(MessageType.ReleaseCellRequest, data, playerID);
+    }
+
+    private Message cellReleaseResponseMessage(boolean success) {
+        Message responseMessage = cellReleaseRequestMessage();
+        responseMessage.setMessageType(MessageType.ReleaseCellResponse);
+        responseMessage.getData().getAsJsonObject().addProperty("successful", success);
+        return responseMessage;
     }
 
     private Message connectResponseMessage() {
@@ -215,8 +236,9 @@ public class GameAPITest {
         return new Message(MessageType.ConnectResponse, data, playerID);
     }
 
-    private Message cellResponseMessage(Message message, boolean success) {
+    private Message getCellResponseMessage(Message message, boolean success) {
         message.getData().getAsJsonObject().addProperty("successful", success);
+        message.setMessageType(MessageType.GetCellResponse);
         return message;
     }
 
@@ -236,7 +258,7 @@ public class GameAPITest {
 
     private void acquireCell() {
         messageExecutor.processMessage(getCellRequestMessage());
-        receivedQueue.put(getCellRequestMessage());
+        receivedQueue.put(getCellResponseMessage());
         gameAPI.processResponse();
     }
 }
