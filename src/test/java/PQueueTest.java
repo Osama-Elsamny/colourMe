@@ -15,16 +15,14 @@ public class PQueueTest {
     public void test() {
        PriorityBlockingQueue<Message> incoming = new PriorityBlockingQueue<>(10, messageComparator);
        Message message1 = new Message(MessageType.ConnectRequest, null, null);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Message message2 = new Message(MessageType.Disconnect, null, null);
+       message1.setTimestamp(10000);
 
-        incoming.add(message2);
-        incoming.add(message1);
-        assertEquals(MessageType.ConnectRequest, incoming.remove().getMessageType());
-        assertEquals(MessageType.Disconnect, incoming.remove().getMessageType());
+       Message message2 = new Message(MessageType.Disconnect, null, null);
+       message2.setTimestamp(20000);
+
+       incoming.add(message2);
+       incoming.add(message1);
+       assertEquals(MessageType.ConnectRequest, incoming.remove().getMessageType());
+       assertEquals(MessageType.Disconnect, incoming.remove().getMessageType());
     }
 }

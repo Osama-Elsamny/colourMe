@@ -1,3 +1,4 @@
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.server.GameServer;
 import org.junit.After;
 import org.junit.Before;
@@ -7,10 +8,11 @@ public class GameServerTest extends NetworkingTestBase{
     // Milliseconds
     private final long MAX_SERVER_START_TIME = 1000;
     private final long MAX_SERVER_SHUTDOWN_TIME = 1000;
+    private Clock dummyClock = new Clock();
 
     @Before
     public void init(){
-        this.server = new GameServer();
+        this.server = new GameServer(dummyClock);
     }
 
     @After

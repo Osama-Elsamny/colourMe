@@ -117,34 +117,21 @@ public class LobbyController {
             GameService gameService = gameAPI.getGameService();
             GameService serverGameService = gameService.clone();
 
-            startNextServer();
-            this.gameServer.initGameService(gameService);
+            serverClock = new Clock();
+            serverClock.start();
+            startServer(serverClock);
+            this.gameServer.initGameService(serverGameService);
 
-            String serverAddress = String.format("ws://%s:8080/connect/%s", "127.0.0.1", playerID);
-            gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
-            gameClient.start();
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
-
-
     }
 
-    private void waitForNextServer(String nextIP) {
-        int NUM_TRIES = 10;
-        int connectTry = 0;
+    private void connectToNextServer(String nextIP) {
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
-        while (connectTry < NUM_TRIES) {
-            try {
-                gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
-                connectTry++;
-                Thread.sleep(500);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+        gameClient.start();
     }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
@@ -523,8 +510,9 @@ public class LobbyController {
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
                 startNextServer();
+                connectToNextServer("127.0.0.1");
             } else {
-                waitForNextServer(nextIP);
+                connectToNextServer(nextIP);
             }
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
