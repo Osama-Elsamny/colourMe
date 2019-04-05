@@ -7,13 +7,13 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-public class GameService {
+public class GameService implements Cloneable {
 
     public static class ColorPair {
         public Color COLOR;
         public int COLOR_CODE;
 
-        public ColorPair(Color color, int colorCode){
+        public ColorPair(Color color, int colorCode) {
             this.COLOR = color;
             this.COLOR_CODE = colorCode;
         }
@@ -173,5 +173,24 @@ public class GameService {
     // Checks whether a given cell is available for colouring
     private boolean isCellAvailable(int row, int col) {
         return this.cells[row][col].getState() == CellState.AVAILABLE;
+    }
+
+    @Override
+    public GameService clone() throws CloneNotSupportedException {
+        return (GameService) super.clone();
+    }
+
+    public boolean equals(GameService service) {
+        boolean isEqual = this.cells.length == service.cells.length;
+
+        if (isEqual) {
+            for(int r=0; r < this.cells.length; r++) {
+                for(int c=0; c < this.cells.length; c++){
+                    isEqual = isEqual && cells[r][c].equals(service.cells[r][c]);
+                }
+            }
+        }
+
+        return false;
     }
 }

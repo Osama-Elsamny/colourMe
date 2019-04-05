@@ -2,6 +2,7 @@ package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.client.GameClient;
@@ -58,15 +59,15 @@ public class lobbyController {
     @FXML
     private Label player4Label;
 
-    private final int COORDINATE_BUFFER_MAX_SIZE = 6;
-    private final int COORDINATE_COUNTER_LIMIT = 3;
+    private final int COORDINATE_BUFFER_MAX_SIZE = 10;
+    private final int COORDINATE_COUNTER_LIMIT = 0;
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
     private String playerIP;
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 2;
+    private int expectedPlayers = 3;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -99,6 +100,13 @@ public class lobbyController {
         initClientMachine(serverAddress, playerID, networkIP);
     }
 
+    public void startNextServer() {
+        // Retrieve game service
+        // TODO: Add getter for GameService in GameAPI
+        // TODO: Create function for GameConfig to empty nextIP list
+        // Initiate Server using gameService
+    }
+
     public void initClientMachine(String serverAddress, String playerID, String playerIP) {
         this.playerID = playerID;
         this.playerIP = playerIP;
@@ -107,10 +115,7 @@ public class lobbyController {
         gameClient.start();
         setGameAPI(sendQueue, receiveQueue);
         JsonObject data = new JsonObject();
-        data.addProperty("playerIP", playerIP);
-
-        Message connectMessage = new Message(MessageType.ConnectRequest, data ,playerID);
-        sendQueue.put(connectMessage);
+        gameAPI.sendConnectRequest(playerID, playerIP);
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -469,7 +474,10 @@ public class lobbyController {
     }
 
     private void handleDisconnect(JsonObject data) {
-        // Show reconnecting
+        boolean startServer = data.get("startServer").getAsBoolean();
+        if (startServer) {
+
+        }
     }
 
     private void handleClientDisconnect(JsonObject data) {
@@ -519,7 +527,7 @@ public class lobbyController {
         player4AnchorPane.setPrefWidth(200);
         player4AnchorPane.setPrefHeight(200);
     }
-    private Node lookup(String id){
+    private Node lookup(String id) {
         return scene.lookup("#" + id);
     }
 
