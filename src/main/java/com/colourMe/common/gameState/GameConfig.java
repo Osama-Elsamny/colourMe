@@ -4,7 +4,7 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameConfig {
+public class GameConfig implements Cloneable {
     private int size;
 
     private float ratio;
@@ -63,6 +63,10 @@ public class GameConfig {
         }
     }
 
+    public void removeAllIPs() {
+        ipAddresses.clear();
+    }
+
     public String getLastIP() {
         return ipAddresses.get(ipAddresses.size() -  1).getValue();
     }
@@ -86,5 +90,9 @@ public class GameConfig {
                 && gameConfig.getSize() == this.size
                 && gameConfig.getRatio() == this.ratio
                 && gameConfig.getThickness() == this.thickness;
+
+    public GameConfig clone() throws CloneNotSupportedException {
+        this.removeAllIPs();
+        return (GameConfig) super.clone();
     }
 }
