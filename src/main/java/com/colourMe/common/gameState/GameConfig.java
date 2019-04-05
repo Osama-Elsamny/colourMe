@@ -90,7 +90,8 @@ public class GameConfig implements Cloneable {
                 && gameConfig.getSize() == this.size
                 && gameConfig.getRatio() == this.ratio
                 && gameConfig.getThickness() == this.thickness;
-
+    }
+    
     public GameConfig clone() throws CloneNotSupportedException {
         this.removeAllIPs();
         return (GameConfig) super.clone();
