@@ -184,13 +184,22 @@ public class GameService implements Cloneable {
         boolean isEqual = this.cells.length == service.cells.length;
 
         if (isEqual) {
-            for(int r=0; r < this.cells.length; r++) {
-                for(int c=0; c < this.cells.length; c++){
+            for (int r=0; r < this.cells.length; r++) {
+                for (int c=0; c < this.cells.length; c++)
                     isEqual = isEqual && cells[r][c].equals(service.cells[r][c]);
+            }
+        }
+
+        if (isEqual) {
+            for (String playerID: players.keySet()){
+                isEqual = isEqual && service.players.keySet().contains(playerID);
+                if(isEqual) {
+                    isEqual = this.players.get(playerID).equals(service.players.get(playerID));
                 }
             }
         }
 
-        return false;
+        isEqual = isEqual && this.gameConfig.equals(service.gameConfig);
+        return isEqual;
     }
 }
