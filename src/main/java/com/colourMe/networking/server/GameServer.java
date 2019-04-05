@@ -118,6 +118,7 @@ public class GameServer extends Thread {
         boolean successful;
         try {
             this.messageExecutor = new MessageExecutor(gameService);
+            reconnectState = true;
             successful = true;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
