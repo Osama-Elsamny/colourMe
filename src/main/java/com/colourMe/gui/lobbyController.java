@@ -2,6 +2,7 @@ package com.colourMe.gui;
 
 import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
+import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.client.GameClient;
@@ -38,13 +39,14 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class lobbyController {
     private final int COORDINATE_BUFFER_MAX_SIZE = 6;
     private final int COORDINATE_COUNTER_LIMIT = 3;
+
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
     private String playerIP;
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 1;
+    private int expectedPlayers = 3;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -64,16 +66,18 @@ public class lobbyController {
         sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
     }
 
-    public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
-        // Start Server
+    public void startServer(){
         gameServer = new GameServer();
         gameServer.start();
         while (!gameServer.isRunning()){
             // Wait for server to start
         }
+    }
+
+    public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
+        startServer();
         gameServer.initGameService(gameConfig);
         String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
-        // Start Client
         initClientMachine(serverAddress, playerID, networkIP);
     }
 
@@ -85,10 +89,7 @@ public class lobbyController {
         gameClient.start();
         setGameAPI(sendQueue, receiveQueue);
         JsonObject data = new JsonObject();
-        data.addProperty("playerIP", playerIP);
-
-        Message connectMessage = new Message(MessageType.ConnectRequest, data ,playerID);
-        sendQueue.put(connectMessage);
+        gameAPI.sendConnectRequest(playerID, playerIP);
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -98,6 +99,43 @@ public class lobbyController {
         };
         timer.start();
     }
+
+    public void startNextServer() {
+        try {
+            GameService gameService = gameAPI.getGameService();
+            GameService serverGameService = gameService.clone();
+
+            startNextServer();
+            this.gameServer.initGameService(gameService);
+
+            String serverAddress = String.format("ws://%s:8080/connect/%s", "127.0.0.1", playerID);
+            gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+            gameClient.start();
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+
+    }
+
+    private void waitForNextServer(String nextIP) {
+        int NUM_TRIES = 10;
+        int connectTry = 0;
+        String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
+        while (connectTry < NUM_TRIES) {
+            try {
+                gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+                connectTry++;
+                Thread.sleep(500);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
                             PriorityBlockingQueue<Message> receivedQueue) {
@@ -465,8 +503,21 @@ public class lobbyController {
     }
 
     private void handleDisconnect(JsonObject data) {
-        // Show reconnecting
+        try {
+            boolean startServer = data.get("startServer").getAsBoolean();
+            String nextIP = data.get("nextIP").getAsString();
+            if (startServer) {
+                startNextServer();
+            } else {
+                waitForNextServer(nextIP);
+            }
+        } catch(Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+        }
     }
+
+
 
     private void handleClientDisconnect(JsonObject data) {
         // Show disconnected label on the gui
@@ -496,8 +547,8 @@ public class lobbyController {
             playersAnchorPane[i].setPrefWidth(200);
         }
     }
-
-    private Node lookup(String id){
+  
+    private Node lookup(String id) {
         return scene.lookup("#" + id);
     }
 

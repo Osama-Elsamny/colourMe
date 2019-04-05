@@ -121,6 +121,10 @@ public class GameAPI {
         return gameService.getPlayerIds();
     }
 
+    public GameService getGameService(){
+        return this.gameService;
+    }
+
     public int getPlayerColourCode(String playerID) {
         return gameService.getPlayerColourCode(playerID);
     }

@@ -2,7 +2,7 @@ package com.colourMe.common.gameState;
 
 import javafx.scene.paint.Color;
 
-public class Player {
+public class Player implements Cloneable {
     private int score = 0;
 
     private String ipAddress;
@@ -48,5 +48,16 @@ public class Player {
 
     public void setColorCode(int colorCode) {
         this.colorCode = colorCode;
+    }
+
+    public Player clone() throws CloneNotSupportedException {
+        return (Player) super.clone();
+    }
+
+    public boolean equals(Player player) {
+        return this.colorCode == player.colorCode &&
+                this.score == player.score &&
+                this.color.equals(player.color) &&
+                this.ipAddress.equals(player.ipAddress);
     }
 }

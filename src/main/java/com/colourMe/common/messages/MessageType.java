@@ -7,6 +7,8 @@ public enum MessageType {
     CellUpdateRequest,
     CellUpdateResponse,
     ConnectResponse,
+    ReconnectRequest,
+    ReconnectResponse,
     Disconnect,
     ReleaseCellRequest,
     ReleaseCellResponse,

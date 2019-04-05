@@ -4,6 +4,7 @@ import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
+import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonElement;
 import org.glassfish.tyrus.server.Server;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class GameServer extends Thread {
     private MessageExecutor messageExecutor;
     private GameService gameService;
+    private boolean reconnectState = false;
     private volatile boolean running = false;
     private volatile boolean finished = false;
 
@@ -51,6 +53,7 @@ public class GameServer extends Thread {
         // Read each message from Incoming
         synchronized (incoming) {
             try {
+                resetServerIfDisconnected();
                 while (!incoming.isEmpty()) {
                     // Read message
                     Message m = incoming.take();
@@ -66,6 +69,19 @@ public class GameServer extends Thread {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private void resetServerIfDisconnected() {
+        if(reconnectState && allClientsConnected()) {
+            // Broadcast GameService to all clients
+            Message reconnectRequest = new Message(MessageType.ReconnectRequest, null, null);
+            incoming.put(reconnectRequest);
+            reconnectState = false;
+        }
+    }
+
+    private boolean allClientsConnected() {
+        return GameServerEndpoint.numberOfSessions() == gameService.getNumberOfClientIPs();
     }
 
     static boolean addToIncoming(Message m) {
@@ -88,6 +104,21 @@ public class GameServer extends Thread {
         try {
             System.out.println("Config: " + config);
             messageExecutor.initGameConfig(config);
+            successful = true;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+            successful = false;
+        }
+
+        return successful;
+    }
+
+    public boolean initGameService(GameService gameService){
+        boolean successful;
+        try {
+            this.messageExecutor = new MessageExecutor(gameService);
+            reconnectState = true;
             successful = true;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

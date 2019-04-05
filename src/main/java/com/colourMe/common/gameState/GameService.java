@@ -5,15 +5,16 @@ import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
+import java.beans.Transient;
 import java.util.*;
 
-public class GameService {
+public class GameService implements Cloneable {
 
     public static class ColorPair {
         public Color COLOR;
         public int COLOR_CODE;
 
-        public ColorPair(Color color, int colorCode){
+        public ColorPair(Color color, int colorCode) {
             this.COLOR = color;
             this.COLOR_CODE = colorCode;
         }
@@ -26,7 +27,7 @@ public class GameService {
             new ColorPair(Color.BLACK, -16777216)
     };
 
-    private Gson gson = new Gson();
+    public transient Gson gson = new Gson();
 
     private GameConfig gameConfig;
 
@@ -148,6 +149,10 @@ public class GameService {
         gameConfig.removePlayerConfig(playerID);
     }
 
+    public int getNumberOfClientIPs() {
+        return gameConfig.getIpAddresses().size();
+    }
+
     public boolean isCellLocked(int row, int col){
         return this.cells[row][col].getState().equals(CellState.LOCKED);
     }
@@ -186,5 +191,33 @@ public class GameService {
 
     private boolean playerExists(String playerID) {
         return players.containsKey(playerID);
+    }
+
+    @Override
+    public GameService clone() throws CloneNotSupportedException {
+        return (GameService) super.clone();
+    }
+
+    public boolean equals(GameService service) {
+        boolean isEqual = this.cells.length == service.cells.length;
+
+        // Verify all cells are equal
+        if (isEqual) {
+            for (int r=0; r < this.cells.length; r++) {
+                for (int c=0; c < this.cells.length; c++)
+                    isEqual = isEqual && cells[r][c].equals(service.cells[r][c]);
+            }
+        }
+
+        // Verify all players and their keys are equal
+        if (isEqual) {
+            for (String playerID: players.keySet()){
+                if(isEqual && service.players.keySet().contains(playerID))
+                    isEqual = this.players.get(playerID).equals(service.players.get(playerID));
+            }
+        }
+
+        isEqual = isEqual && this.gameConfig.equals(service.gameConfig);
+        return isEqual;
     }
 }
