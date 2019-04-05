@@ -491,7 +491,8 @@ public class LobbyController {
         if (success && (! userID.equals(this.playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(data.get("coordinates"), Coordinate[].class));
+            List<Coordinate> coordinates =
+                    Arrays.asList(gson.fromJson(data.get("coordinates"), Coordinate[].class));
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
             coordinates.forEach(x -> renderStroke(cellGraphicsContext, x, userID, row, col));
         }
