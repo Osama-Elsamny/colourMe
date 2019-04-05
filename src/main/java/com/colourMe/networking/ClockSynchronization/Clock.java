@@ -5,9 +5,11 @@ public class Clock extends Thread {
 
     public Clock() { this.clock = System.currentTimeMillis(); }
 
-    public long getTime() { return clock; }
+    public synchronized long getTime() { return clock; }
 
-    public void setTime (long time) { this.clock = time; }
+    public synchronized void setTime(long time) { this.clock = time; }
+
+    public synchronized void increment() { this.clock++; }
 
     @Override
     public void run(){
@@ -17,7 +19,7 @@ public class Clock extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            clock++;
+            increment();
         }
     }
 }

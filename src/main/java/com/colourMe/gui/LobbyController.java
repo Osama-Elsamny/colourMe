@@ -437,7 +437,7 @@ public class LobbyController {
         JsonObject data = response.getData().getAsJsonObject();
         switch(response.getMessageType()) {
             case ConnectResponse:
-                handleConnect(data, response.getPlayerID());
+                handleConnect(data, response.getPlayerID(), response.getTimestamp());
                 break;
             case GetCellResponse:
                 break;
@@ -462,7 +462,7 @@ public class LobbyController {
         }
     }
 
-    private void handleConnect(JsonObject data, String userID) {
+    private void handleConnect(JsonObject data, String userID, long TimeStamp) {
 
         Boolean successful = data.get("successful").getAsBoolean();
         int numPlayers = gameAPI.getNumOfPlayers();
@@ -471,6 +471,7 @@ public class LobbyController {
             // Resend connection request.
             gameAPI.sendConnectRequest(this.playerID, this.playerIP);
         } else if (successful && (numPlayers == expectedPlayers)) {
+            clientClock.setTime(TimeStamp);
             displayBoard();
         } else {
             // Not enough players to begin.

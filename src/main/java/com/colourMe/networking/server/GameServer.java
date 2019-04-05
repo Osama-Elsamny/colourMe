@@ -20,6 +20,7 @@ public class GameServer extends Thread {
     private volatile boolean running = false;
     private volatile boolean finished = false;
     private Clock serverClock;
+    private int clockSyncCounter = 0;
 
     private static final PriorityBlockingQueue<Message> incoming =
             new PriorityBlockingQueue<>(10, Message.messageComparator);
@@ -42,8 +43,12 @@ public class GameServer extends Thread {
 
             while(!finished) {
                 processIncoming();
-                //TODO: Do this after fixed interval
-                GameServerEndpoint.broadcast(sendServerTime());
+                // Broadcast server time after every 10 seconds.
+                if (clockSyncCounter == 10000){
+                    clockSyncCounter = 0;
+                    GameServerEndpoint.broadcast(sendServerTime());
+                }
+                clockSyncCounter++;
                 Thread.sleep(1);
             }
         } catch (Exception ex) {
@@ -67,6 +72,7 @@ public class GameServer extends Thread {
 
                     // Process message
                     Message response = messageExecutor.processMessage(m);
+                    response.setTimestamp (serverClock.getTime());
 
                     // Broadcast response to everyone
                     GameServerEndpoint.broadcast(response);
