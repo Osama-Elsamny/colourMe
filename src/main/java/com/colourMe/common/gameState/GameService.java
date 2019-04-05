@@ -183,6 +183,7 @@ public class GameService implements Cloneable {
     public boolean equals(GameService service) {
         boolean isEqual = this.cells.length == service.cells.length;
 
+        // Verify all cells are equal
         if (isEqual) {
             for (int r=0; r < this.cells.length; r++) {
                 for (int c=0; c < this.cells.length; c++)
@@ -190,12 +191,11 @@ public class GameService implements Cloneable {
             }
         }
 
+        // Verify all players and their keys are equal
         if (isEqual) {
             for (String playerID: players.keySet()){
-                isEqual = isEqual && service.players.keySet().contains(playerID);
-                if(isEqual) {
+                if(isEqual && service.players.keySet().contains(playerID))
                     isEqual = this.players.get(playerID).equals(service.players.get(playerID));
-                }
             }
         }
 

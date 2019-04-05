@@ -20,7 +20,6 @@ public class CloneTest {
 
         try { clonedService = service.clone(); } catch (Exception ex) {}
 
-        boolean isEqual = clonedService.equals(service);
-        System.out.println(isEqual);
+        assert(clonedService.equals(service));
     }
 }
