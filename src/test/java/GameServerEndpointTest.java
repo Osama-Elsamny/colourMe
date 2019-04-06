@@ -1,5 +1,6 @@
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -13,11 +14,12 @@ import java.util.concurrent.*;
 
 public class GameServerEndpointTest extends NetworkingTestBase {
     private TestClient client;
+    private Clock dummyClock = new Clock();
 
     @Before
     public void init() {
         this.gson = new Gson();
-        this.server = new GameServer();
+        this.server = new GameServer(dummyClock);
         server.start();
 
         // Give some time for server to start

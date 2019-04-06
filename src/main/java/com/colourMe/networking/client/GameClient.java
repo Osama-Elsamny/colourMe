@@ -7,6 +7,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.ClockSynchronization.Clock;
 
 /**
  * ColourMe Client
@@ -27,7 +28,9 @@ public class GameClient extends Thread {
 
     private final PriorityBlockingQueue<Message> sendQueue;
 
-    public GameClient (PriorityBlockingQueue<Message> receive, PriorityBlockingQueue<Message> send, String serverAddress, String playerID){
+    private Clock clientClock;
+
+    public GameClient (PriorityBlockingQueue<Message> receive, PriorityBlockingQueue<Message> send, String serverAddress, String playerID, Clock clientClock){
 
         // Parameter Check
         if(receive == null)
@@ -38,18 +41,21 @@ public class GameClient extends Thread {
             throw new IllegalArgumentException("Server Address cannot be null");
         if(playerID == null)
             throw new IllegalArgumentException("Player ID cannot be null");
+        if(clientClock == null)
+            throw new IllegalArgumentException("Client clock cannot be null");
 
-        receivedQueue = receive;
-        sendQueue = send;
-        serverAddr = serverAddress;
+        this.receivedQueue = receive;
+        this.sendQueue = send;
+        this.serverAddr = serverAddress;
         this.playerID = playerID;
-
+        this.clientClock = clientClock;
     }
 
     private void handleFailure(){
 
         // Construct message
         Message msg = new Message(MessageType.Disconnect, null, playerID);
+        msg.setTimestamp(clientClock.getTime());
 
         synchronized (sendQueue){
             sendQueue.clear();
@@ -75,6 +81,7 @@ public class GameClient extends Thread {
                     synchronized (sendQueue) {
                         Message msg = sendQueue.poll();
                         if (msg != null) {
+                            msg.setTimestamp(clientClock.getTime());
                             clientEndPoint.sendMessage(msg);
                         }
                     }
@@ -82,6 +89,11 @@ public class GameClient extends Thread {
             } catch (URISyntaxException ex) {
                 if (connectionAttempt < maxTries){
                     connectionAttempt++;
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     // Connection Failure
                     handleFailure();

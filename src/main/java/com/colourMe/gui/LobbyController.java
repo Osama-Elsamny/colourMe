@@ -4,6 +4,8 @@ import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.messages.MessageType;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
@@ -53,6 +55,9 @@ public class LobbyController {
     long userColorCode;
     private GameServer gameServer;
     private GameClient gameClient;
+    private Clock serverClock;
+    private Clock clientClock;
+
 
     public static PriorityBlockingQueue<Message> receiveQueue;
     public static PriorityBlockingQueue<Message> sendQueue;
@@ -66,8 +71,8 @@ public class LobbyController {
         sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
     }
 
-    public void startServer(){
-        gameServer = new GameServer();
+    public void startServer(Clock serverClock){
+        gameServer = new GameServer(serverClock);
         gameServer.start();
         while (!gameServer.isRunning()){
             // Wait for server to start
@@ -75,7 +80,9 @@ public class LobbyController {
     }
 
     public void initServerMachine(GameConfig gameConfig, String networkIP, String playerID) {
-        startServer();
+        serverClock = new Clock();
+        serverClock.start();
+        startServer(serverClock);
         gameServer.initGameService(gameConfig);
         String serverAddress = String.format("ws://%s:8080/connect/%s", networkIP, playerID);
         initClientMachine(serverAddress, playerID, networkIP);
@@ -85,8 +92,13 @@ public class LobbyController {
         this.playerID = playerID;
         this.playerIP = playerIP;
         createQueues();
-        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
+
+        clientClock = new Clock();
+        clientClock.start();
+
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
         gameClient.start();
+
         setGameAPI(sendQueue, receiveQueue);
         JsonObject data = new JsonObject();
         gameAPI.sendConnectRequest(playerID, playerIP);
@@ -105,34 +117,21 @@ public class LobbyController {
             GameService gameService = gameAPI.getGameService();
             GameService serverGameService = gameService.clone();
 
-            startNextServer();
-            this.gameServer.initGameService(gameService);
+            serverClock = new Clock();
+            serverClock.start();
+            startServer(serverClock);
+            this.gameServer.initGameService(serverGameService);
 
-            String serverAddress = String.format("ws://%s:8080/connect/%s", "127.0.0.1", playerID);
-            gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
-            gameClient.start();
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
-
-
     }
 
-    private void waitForNextServer(String nextIP) {
-        int NUM_TRIES = 10;
-        int connectTry = 0;
+    private void connectToNextServer(String nextIP) {
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
-        while (connectTry < NUM_TRIES) {
-            try {
-                gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID);
-                connectTry++;
-                Thread.sleep(500);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
+        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+        gameClient.start();
     }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
@@ -425,7 +424,7 @@ public class LobbyController {
         JsonObject data = response.getData().getAsJsonObject();
         switch(response.getMessageType()) {
             case ConnectResponse:
-                handleConnect(data, response.getPlayerID());
+                handleConnect(data, response.getPlayerID(), response.getTimestamp());
                 break;
             case GetCellResponse:
                 break;
@@ -441,13 +440,16 @@ public class LobbyController {
             case Disconnect:
                 handleDisconnect(data);
                 break;
+            case ClockSyncResponse:
+                handleClockSync(data);
+                break;
             case DefaultType:
                 // TODO: Handle errors if you have any
             default:
         }
     }
 
-    private void handleConnect(JsonObject data, String userID) {
+    private void handleConnect(JsonObject data, String userID, long TimeStamp) {
 
         Boolean successful = data.get("successful").getAsBoolean();
         int numPlayers = gameAPI.getNumOfPlayers();
@@ -456,6 +458,7 @@ public class LobbyController {
             // Resend connection request.
             gameAPI.sendConnectRequest(this.playerID, this.playerIP);
         } else if (successful && (numPlayers == expectedPlayers)) {
+            clientClock.setTime(TimeStamp);
             displayBoard();
         } else {
             // Not enough players to begin.
@@ -507,8 +510,9 @@ public class LobbyController {
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
                 startNextServer();
+                connectToNextServer("127.0.0.1");
             } else {
-                waitForNextServer(nextIP);
+                connectToNextServer(nextIP);
             }
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
@@ -518,6 +522,11 @@ public class LobbyController {
 
     private void handleClientDisconnect(JsonObject data) {
         // Show disconnected label on the gui
+    }
+
+    private void handleClockSync(JsonObject data) {
+        long serverTime = data.get("TimeStamp").getAsLong();
+        clientClock.setTime(serverTime);
     }
 
     private void addToCssFile(Label welcomeLabel, AnchorPane leftAnchorPane, AnchorPane topAnchorPane, VBox vbox, AnchorPane playersAnchorPane[]) {
@@ -544,7 +553,7 @@ public class LobbyController {
             playersAnchorPane[i].setPrefWidth(200);
         }
     }
-  
+
     private Node lookup(String id) {
         return scene.lookup("#" + id);
     }
