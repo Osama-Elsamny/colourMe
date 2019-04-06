@@ -161,6 +161,7 @@ public class GameAPI {
     }
 
     public void setGameService(GameService gameService) {
+        this.gameService = gameService;
         this.messageExecutor = new MessageExecutor(gameService);
         messageExecutor.buildClientActions();
     }

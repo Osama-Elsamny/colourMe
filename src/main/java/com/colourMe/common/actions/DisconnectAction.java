@@ -5,6 +5,7 @@ import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
+import javafx.util.Pair;
 
 public class DisconnectAction extends ActionBase {
     @Override
@@ -12,14 +13,14 @@ public class DisconnectAction extends ActionBase {
         GameConfig gameConfig = gameService.getGameConfig();
 
 
-        String nextIP = gameConfig.getNextIP();
-        String userIP = gameService.getPlayerIP(message.getPlayerID());
+        Pair<String, String> nextIPPair = gameConfig.getNextIP();
+        // String userIP = gameService.getPlayerIP(message.getPlayerID());
 
         JsonObject data = new JsonObject();
-        data.addProperty("nextIP", nextIP);
-        if (nextIP.equals(userIP)){
+        data.addProperty("nextIP", nextIPPair.getValue());
+        if (nextIPPair.getKey().equals(message.getPlayerID())) {
             data.addProperty("startServer", true);
-        }else{
+        } else {
             data.addProperty("startServer", false);
         }
 

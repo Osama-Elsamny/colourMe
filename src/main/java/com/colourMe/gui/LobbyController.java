@@ -130,7 +130,9 @@ public class LobbyController {
 
     private void waitForNextServer(String nextIP) {
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
+        System.out.println("Next IP: " + serverAddress);
         this.gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+        this.gameClient.start();
     }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,

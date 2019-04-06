@@ -16,7 +16,7 @@ import com.colourMe.networking.ClockSynchronization.Clock;
  */
 public class GameClient extends Thread {
 
-    private static final int maxTries = 3;
+    private static final int maxTries = 1000;
 
     private int connectionAttempt = 0;
 

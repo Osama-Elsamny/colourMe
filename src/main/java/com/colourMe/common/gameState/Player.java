@@ -7,13 +7,13 @@ public class Player implements Cloneable {
 
     private String ipAddress;
 
-    private Color color;
+    private int colorIndex;
     private int colorCode;
 
-    public Player(String ipAddress, Color color, int colorCode) {
+    public Player(String ipAddress, int colorIndex, int colorCode) {
 
         this.ipAddress = ipAddress;
-        this.color = color;
+        this.colorIndex = colorIndex;
         this.colorCode = colorCode;
     }
 
@@ -34,12 +34,13 @@ public class Player implements Cloneable {
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
+
     public Color getColor() {
-        return color;
+        return ColorPair.COLOR_PAIRS[colorIndex].COLOR;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColorIndex(int colorIndex) {
+        this.colorIndex = colorIndex;
     }
 
     public int getColorCode() {
@@ -57,7 +58,7 @@ public class Player implements Cloneable {
     public boolean equals(Player player) {
         return this.colorCode == player.colorCode &&
                 this.score == player.score &&
-                this.color.equals(player.color) &&
+                this.colorIndex  == player.colorIndex &&
                 this.ipAddress.equals(player.ipAddress);
     }
 }
