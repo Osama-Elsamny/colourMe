@@ -32,14 +32,17 @@ public class MessageExecutor {
         actionMap.put(MessageType.CellUpdateRequest, new CellUpdateRequestAction());
         actionMap.put(MessageType.ReleaseCellRequest, new ReleaseCellRequestAction());
         actionMap.put(MessageType.ClientDisconnectRequest, new ClientDisconnectRequestAction());
+        actionMap.put(MessageType.ReconnectRequest, new ReconnectRequestAction());
     }
 
     public void buildClientActions() {
         actionMap.put(MessageType.Disconnect, new DisconnectAction());
-        actionMap.put(MessageType.GetCellRequest, new GetCellResponseAction());
+        actionMap.put(MessageType.GetCellResponse, new GetCellResponseAction());
         actionMap.put(MessageType.CellUpdateResponse, new CellUpdateResponseAction());
         actionMap.put(MessageType.ReleaseCellResponse, new ReleaseCellResponseAction());
         actionMap.put(MessageType.ConnectResponse, new ConnectResponseAction());
         actionMap.put(MessageType.ClientDisconnectResponse, new ClientDisconnectResponseAction());
+        actionMap.put(MessageType.ReconnectResponse, new ReconnectResponseAction());
+        actionMap.put(MessageType.ClockSyncResponse, new ClockSyncResponseAction());
     }
 }

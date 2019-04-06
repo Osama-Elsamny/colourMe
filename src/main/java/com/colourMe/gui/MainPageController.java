@@ -10,7 +10,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class mainPageController{
+public class MainPageController {
+
+    private static Stage primaryStage;
     @FXML
     public void goToServerGameConfig(ActionEvent event) throws IOException{
         startScene(event, "serverGameConfig");
@@ -27,10 +29,13 @@ public class mainPageController{
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
-        Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

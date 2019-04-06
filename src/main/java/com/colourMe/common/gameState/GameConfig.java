@@ -4,14 +4,14 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameConfig {
+public class GameConfig implements Cloneable {
     private int size;
 
     private float ratio;
 
     private int thickness;
 
-    private List<Pair<String, String>> ipAddresses;
+    private ArrayList<Pair<String, String>> ipAddresses;
 
     public GameConfig(int size, float ratio, int thickness) {
         this.size = size;
@@ -44,24 +44,57 @@ public class GameConfig {
         this.thickness = thickness;
     }
 
-    public List<Pair<String, String>> getIpAddresses() {
+    public ArrayList<Pair<String, String>> getIpAddresses() {
         return ipAddresses;
     }
 
-    public void setIpAddresses(List<Pair<String, String>> ipAddresses) { this.ipAddresses = ipAddresses; }
+    public void setIpAddresses(ArrayList<Pair<String, String>> ipAddresses) { this.ipAddresses = ipAddresses; }
 
     public void addplayerConfig(String playerId, String ip) {
         this.ipAddresses.add(new Pair<>(playerId, ip));
     }
 
-    public void removeIP(String ip){ this.ipAddresses.remove(ip); }
-
-    public String getLastIP() {
-        return ipAddresses.get(size -  1).getValue();
+    public void removePlayerConfig(String playerID) {
+        for(Pair<String, String> entry : ipAddresses) {
+            if(entry.getKey().equals(playerID)) {
+                ipAddresses.remove(entry);
+                break;
+            }
+        }
     }
 
-    public String getNextIP(){
+    public void removeAllIPs() {
+        ipAddresses.clear();
+    }
+
+    public String getLastIP() {
+        return ipAddresses.get(ipAddresses.size() -  1).getValue();
+    }
+
+    public String getNextIP() {
         if (ipAddresses.isEmpty()) return null;
-        return ipAddresses.remove(0).getValue();
+        ipAddresses.remove(0);
+        return ipAddresses.get(0).getValue();
+    }
+
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof GameConfig)) {
+            return false;
+        }
+
+        GameConfig gameConfig = (GameConfig) obj;
+        return gameConfig.getIpAddresses().equals(this.ipAddresses)
+                && gameConfig.getSize() == this.size
+                && gameConfig.getRatio() == this.ratio
+                && gameConfig.getThickness() == this.thickness;
+    }
+    
+    public GameConfig clone() throws CloneNotSupportedException {
+        this.removeAllIPs();
+        return (GameConfig) super.clone();
     }
 }

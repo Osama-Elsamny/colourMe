@@ -1,9 +1,9 @@
 package com.colourMe.gui;
 
+import com.colourMe.common.gameState.GameConfig;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,8 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
-public class serverGameConfigController {
+public class ServerGameConfigController {
     @FXML
     private Label welcomeStatment;
     @FXML
@@ -39,33 +40,40 @@ public class serverGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
-        getUserName();
-        getPenSize();
-        getBoardSize();
-        getCoverage();
+        String serverIP = InetAddress.getLocalHost().getHostAddress();
+        String playerID = getPlayerID();
+        int thickness = getThickness();
+        int boardSize = getBoardSize();
+        float ratio = getRatio();
+        GameConfig gameConfig = new GameConfig(boardSize, ratio, thickness);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
+        Parent root = (Parent) loader.load();
+        LobbyController controller = loader.getController();
+        controller.initServerMachine(gameConfig, serverIP, playerID);
         startScene(event, "lobby");
     }
+
     @FXML
     void goToMainScreen(ActionEvent event) throws IOException {
         startScene(event, "mainPage");
     }
-    private void getUserName() {
-        System.out.println(nameTF.getText());
+    private String getPlayerID() {
+        return nameTF.getText();
     }
-    private void getPenSize() {
-        System.out.println(penSizeTF.getText());
+    private int getThickness() {
+        return Integer.parseInt(penSizeTF.getText());
     }
-    private void getBoardSize() {
-        System.out.println(boardSizeTF.getText());
+    private int getBoardSize() {
+        return Integer.parseInt(boardSizeTF.getText());
     }
-    private void getCoverage() {
-        System.out.println(coverageTF.getText());
+    private float getRatio() {
+        return Float.parseFloat(coverageTF.getText());
     }
-    private void startScene(ActionEvent event, String fileName) throws  IOException {
+    private void startScene(ActionEvent event, String fileName) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
-        Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage primaryStage = MainPageController.getPrimaryStage();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);

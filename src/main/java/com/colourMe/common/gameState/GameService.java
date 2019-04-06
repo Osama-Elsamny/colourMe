@@ -3,15 +3,35 @@ package com.colourMe.common.gameState;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
+import java.beans.Transient;
 import java.util.*;
 
-public class GameService {
-    private Gson gson = new Gson();
+public class GameService implements Cloneable {
+
+    public static class ColorPair {
+        public Color COLOR;
+        public int COLOR_CODE;
+
+        public ColorPair(Color color, int colorCode) {
+            this.COLOR = color;
+            this.COLOR_CODE = colorCode;
+        }
+    }
+
+    private static ColorPair[] COLOR_PAIRS = {
+            new ColorPair(Color.BLUE, -16776961),
+            new ColorPair(Color.RED, -65536),
+            new ColorPair(Color.GREEN, -16744448),
+            new ColorPair(Color.BLACK, -16777216)
+    };
+
+    public transient Gson gson = new Gson();
 
     private GameConfig gameConfig;
 
-    private Cell cells[][];
+    private Cell[][] cells;
 
     private Map<String, Player> players;
 
@@ -24,8 +44,8 @@ public class GameService {
     public void init(GameConfig gameConfig) {
         this.gameConfig = gameConfig;
         this.cells = new Cell[gameConfig.getSize()][gameConfig.getSize()];
-        for (int i=0; i < cells.length; i++) {
-            for (int j=0; j < cells.length; j++) {
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells.length; j++) {
                 cells[i][j] = new Cell();
             }
         }
@@ -56,11 +76,14 @@ public class GameService {
             if(hasColoured) {
                 this.cells[row][col].setState(CellState.COLOURED);
                 players.get(playerID).incrementScore();
-            }else{
+            } else {
+                this.cells[row][col].setPlayerID("");
                 this.cells[row][col].setState(CellState.AVAILABLE);
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -80,23 +103,58 @@ public class GameService {
         return this.gson;
     }
 
+    public Cell getCell(int row, int col) {
+        return this.cells[row][col];
+    }
+
+    public Player getPlayerByID(String playerID) {
+        return players.get(playerID);
+    }
+
+    // TODO: Add bolean parameter to check if it is server or not
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
-        players.put(playerId, new Player(ip));
-        this.gameConfig.addplayerConfig(playerId, ip);
+        if(!playerExists(playerId)) {
+            ColorPair pair = COLOR_PAIRS[players.size()];
+            players.put(playerId, new Player(ip, pair.COLOR, pair.COLOR_CODE));
+            this.gameConfig.addplayerConfig(playerId, ip);
+        }
+    }
+
+    // Spawns from players from game config
+    public void spawnPlayersFromConfig() {
+        for(Pair<String, String> entry : gameConfig.getIpAddresses()) {
+            if(!playerExists(entry.getKey())) {
+                ColorPair pair = COLOR_PAIRS[players.size()];
+                players.put(entry.getKey(), new Player(entry.getValue(), pair.COLOR, pair.COLOR_CODE));
+            }
+        }
     }
 
     // Remove a player
     public void killPlayer(String playerID) {
-        //TODO: Release any locks acquired by the player.
-        String playerIP = players.get(playerID).getIpAddress();
+        // Release locks
+        for(Cell[] cellRow : cells) {
+            for(Cell cell : cellRow) {
+                if(cell.getPlayerID().equals(playerID)
+                    && cell.getState().equals(CellState.LOCKED)) {
+                    cell.setPlayerID("");
+                    cell.setState(CellState.AVAILABLE);
+                }
+            }
+        }
+
+        // Remove player
         players.remove(playerID);
-        gameConfig.removeIP(playerIP);
+        gameConfig.removePlayerConfig(playerID);
     }
 
-    // Checks whether a given cell is available for colouring
-    private boolean isCellAvailable(int row, int col) {
-        return this.cells[row][col].getState() == CellState.AVAILABLE;
+    public int getNumberOfClientIPs() {
+        return gameConfig.getIpAddresses().size();
+    }
+
+    public boolean isCellLocked(int row, int col){
+        return this.cells[row][col].getState().equals(CellState.LOCKED);
     }
 
     public String getPlayerIP(String playerID) { return players.get(playerID).getIpAddress(); }
@@ -110,10 +168,12 @@ public class GameService {
     }
 
     public int getPlayerColourCode(String playerID) {
-        return 0;
+        return players.get(playerID).getColorCode();
     }
 
-    public Color getPlayerColour(String playerID) {return null;}
+    public Color getPlayerColour(String playerID) {
+        return players.get(playerID).getColor();
+    }
 
     public int getPlayerScore(String playerID) {
         Player player = players.get(playerID);
@@ -122,5 +182,42 @@ public class GameService {
         }
 
         throw new IllegalStateException("Player not found!");
+    }
+
+    // Checks whether a given cell is available for colouring
+    private boolean isCellAvailable(int row, int col) {
+        return this.cells[row][col].getState() == CellState.AVAILABLE;
+    }
+
+    private boolean playerExists(String playerID) {
+        return players.containsKey(playerID);
+    }
+
+    @Override
+    public GameService clone() throws CloneNotSupportedException {
+        return (GameService) super.clone();
+    }
+
+    public boolean equals(GameService service) {
+        boolean isEqual = this.cells.length == service.cells.length;
+
+        // Verify all cells are equal
+        if (isEqual) {
+            for (int r=0; r < this.cells.length; r++) {
+                for (int c=0; c < this.cells.length; c++)
+                    isEqual = isEqual && cells[r][c].equals(service.cells[r][c]);
+            }
+        }
+
+        // Verify all players and their keys are equal
+        if (isEqual) {
+            for (String playerID: players.keySet()){
+                if(isEqual && service.players.keySet().contains(playerID))
+                    isEqual = this.players.get(playerID).equals(service.players.get(playerID));
+            }
+        }
+
+        isEqual = isEqual && this.gameConfig.equals(service.gameConfig);
+        return isEqual;
     }
 }

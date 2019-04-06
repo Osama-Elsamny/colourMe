@@ -47,6 +47,10 @@ public class GameServerEndpoint {
 
     }
 
+    public static int numberOfSessions() {
+        return users.size();
+    }
+
     public static void broadcast(final Message message) {
         servers.forEach(x -> {
             synchronized (x) {

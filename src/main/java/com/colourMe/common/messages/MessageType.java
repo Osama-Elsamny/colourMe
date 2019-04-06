@@ -7,10 +7,13 @@ public enum MessageType {
     CellUpdateRequest,
     CellUpdateResponse,
     ConnectResponse,
+    ReconnectRequest,
+    ReconnectResponse,
     Disconnect,
     ReleaseCellRequest,
     ReleaseCellResponse,
     ClientDisconnectRequest,
     ClientDisconnectResponse,
+    ClockSyncResponse,
     DefaultType
 }
