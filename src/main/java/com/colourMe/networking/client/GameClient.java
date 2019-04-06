@@ -16,6 +16,8 @@ import com.colourMe.networking.ClockSynchronization.Clock;
  */
 public class GameClient extends Thread {
 
+    private boolean connected = false;
+
     private static final int maxTries = 1000;
 
     private int connectionAttempt = 0;
@@ -72,6 +74,8 @@ public class GameClient extends Thread {
             try {
                 // Open WebSocket.
                 final GameClientEndpoint clientEndPoint = new GameClientEndpoint(new URI(serverAddr));
+                this.connectionAttempt = 0;
+                this.connected = true;
 
                 // Add receiveQueue.
                 clientEndPoint.addReceiveQueue(receivedQueue);
@@ -87,7 +91,7 @@ public class GameClient extends Thread {
                     }
                 }
             } catch (Exception ex) {
-                if (connectionAttempt < maxTries){
+                if (connectionAttempt < maxTries && !connected){
                     connectionAttempt++;
                     try {
                         Thread.sleep(500);
@@ -96,7 +100,10 @@ public class GameClient extends Thread {
                     }
                 } else {
                     // Connection Failure
-                    handleFailure();
+                    if (connected) {
+                        handleFailure();
+                        connected = false;
+                    }
                     break;
                 }
             }
