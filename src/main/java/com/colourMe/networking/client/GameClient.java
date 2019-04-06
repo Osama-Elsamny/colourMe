@@ -18,7 +18,7 @@ public class GameClient extends Thread {
 
     private boolean connected = false;
 
-    private static final int maxTries = 1000;
+    private static final int maxTries = 3;
 
     private int connectionAttempt = 0;
 
@@ -86,23 +86,22 @@ public class GameClient extends Thread {
                         Message msg = sendQueue.poll();
                         if (msg != null) {
                             msg.setTimestamp(clientClock.getTime());
+                            System.out.println("Sending message to server, with MessageType: " + msg.getMessageType().name());
                             clientEndPoint.sendMessage(msg);
                         }
                     }
                 }
             } catch (Exception ex) {
-                if (connectionAttempt < maxTries && !connected){
+                if (connectionAttempt < maxTries) {
+                    System.out.println("Failed to connect to server, trying again.");
                     connectionAttempt++;
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 } else {
                     // Connection Failure
                     if (connected) {
                         handleFailure();
                         connected = false;
+                    } else {
+                        System.out.println("Killing Client thread");
                     }
                     break;
                 }

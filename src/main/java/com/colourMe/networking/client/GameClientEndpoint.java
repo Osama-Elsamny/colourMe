@@ -55,6 +55,7 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, Message update) {
+        System.out.println("Received message with MessageType: " + update.getMessageType().name());
         receivedQueue.put(update);
     }
 
