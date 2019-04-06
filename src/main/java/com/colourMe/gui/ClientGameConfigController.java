@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.InetAddress;
 
-public class clientGameConfigController {
+public class ClientGameConfigController {
 
     @FXML
     private Label welcomeStatment;
@@ -36,7 +36,7 @@ public class clientGameConfigController {
         String serverIP = String.format("ws://%s:8080/connect/%s", getIPAddress(), playerID);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();
-        lobbyController controller = loader.getController();
+        LobbyController controller = loader.getController();
         controller.initClientMachine(serverIP, playerID, clientIP);
         startScene(event, "lobby");
     }
@@ -54,7 +54,7 @@ public class clientGameConfigController {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/" + fileName + ".css").toExternalForm());
-        Stage primaryStage = mainPageController.getPrimaryStage();
+        Stage primaryStage = MainPageController.getPrimaryStage();
         //primaryStage.hide(); might be needed
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
