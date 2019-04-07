@@ -518,7 +518,6 @@ public class LobbyController {
             } else {
                 waitForNextServer(nextIP);
             }
-            Thread.sleep(30000);
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
