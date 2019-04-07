@@ -1,6 +1,5 @@
 package com.colourMe.gui;
 
-import com.colourMe.common.gameState.Cell;
 import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
@@ -8,7 +7,6 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
 import com.google.gson.JsonObject;
-import com.colourMe.networking.ClockSynchronization.Clock;
 import javafx.scene.paint.Color;
 
 import java.util.List;

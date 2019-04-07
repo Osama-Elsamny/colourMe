@@ -1,15 +1,14 @@
 package com.colourMe.networking.client;
 
-import java.net.URI;
-
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Logger;
-
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.common.util.Log;
 import com.colourMe.common.util.U;
 import com.colourMe.networking.ClockSynchronization.Clock;
+
+import java.net.URI;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * ColourMe Client

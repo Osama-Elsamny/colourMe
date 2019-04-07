@@ -1,15 +1,15 @@
 package com.colourMe.networking.client;
 
-import java.net.URI;
-
+import com.colourMe.common.marshalling.MessageDecoder;
+import com.colourMe.common.marshalling.MessageEncoder;
 import com.colourMe.common.messages.Message;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Logger;
-import javax.websocket.*;
-
-import com.colourMe.common.marshalling.*;
 import com.colourMe.common.util.Log;
 import com.colourMe.common.util.U;
+
+import javax.websocket.*;
+import java.net.URI;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * ColourMe ClientEndPoint

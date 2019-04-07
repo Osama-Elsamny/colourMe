@@ -2,6 +2,7 @@ package com.colourMe.common.marshalling;
 
 import com.colourMe.common.messages.Message;
 import com.google.gson.Gson;
+
 import javax.websocket.EndpointConfig;
 
 public class MessageEncoder implements javax.websocket.Encoder.Text<Message> {

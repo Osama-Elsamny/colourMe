@@ -1,12 +1,12 @@
 package com.colourMe;
+
 import com.colourMe.common.util.Log;
-import com.colourMe.networking.server.GameServerEndpoint;
-import org.glassfish.tyrus.server.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.logging.Level;
 

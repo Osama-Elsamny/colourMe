@@ -7,12 +7,10 @@ import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
 import com.colourMe.common.util.Log;
 import com.colourMe.common.util.U;
-import com.google.gson.JsonElement;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.google.gson.JsonObject;
 import org.glassfish.tyrus.server.Server;
-import com.colourMe.networking.ClockSynchronization.Clock;
 
-import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Logger;
 
