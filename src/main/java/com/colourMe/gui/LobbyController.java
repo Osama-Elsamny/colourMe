@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class LobbyController {
-    private final int COORDINATE_BUFFER_MAX_SIZE = 6;
-    private final int COORDINATE_COUNTER_LIMIT = 3;
+    private final int COORDINATE_BUFFER_MAX_SIZE = 8;
+    private final int COORDINATE_COUNTER_LIMIT = 0;
 
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
@@ -45,7 +45,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 3;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -61,10 +61,8 @@ public class LobbyController {
 
     private void createQueues() {
         // Create Queues
-        Comparator<Message> messageComparator = (m1, m2) -> (int) (m1.getTimestamp() - m2.getTimestamp());
-
-        receiveQueue = new PriorityBlockingQueue<>(100, messageComparator);
-        sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
+        receiveQueue = new PriorityBlockingQueue<>(100, Message.messageComparator);
+        sendQueue = new PriorityBlockingQueue<>(100, Message.messageComparator);
     }
 
     public void startServer(Clock serverClock){
@@ -150,24 +148,9 @@ public class LobbyController {
         cellCanvas.heightProperty().bind(cell.heightProperty());
         final GraphicsContext graphicsContext = cellCanvas.getGraphicsContext2D();
         initDraw(graphicsContext, this.playerID);
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onClick(event, rowNum, colNum);
-            }
-        });
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onDrag(graphicsContext, event, rowNum, colNum);
-            }
-        });
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onRelease(graphicsContext, event, rowNum, colNum);
-            }
-        });
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> onClick(event, rowNum, colNum));
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> onDrag(graphicsContext, event, rowNum, colNum));
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> onRelease(graphicsContext, event, rowNum, colNum));
         cell.getChildren().add(cellCanvas);
         cell.getStyleClass().add("cell");
         return cell;
@@ -249,6 +232,7 @@ public class LobbyController {
             initDraw(graphicsContext, playerID);
             graphicsContext.beginPath();
             graphicsContext.moveTo(coordinate.x, coordinate.y);
+            graphicsContext.stroke();
             graphicsContext.lineTo(coordinate.x, coordinate.y);
             graphicsContext.stroke();
             graphicsContext.closePath();

@@ -77,7 +77,7 @@ public class U {
         boolean equal = list1.size() == list2.size();
         if (equal) {
             Iterator iter = list2.iterator();
-            for(T obj : list1){
+            for(T obj : list1) {
                 equal = equal && obj.equals(iter.next());
             }
         }
