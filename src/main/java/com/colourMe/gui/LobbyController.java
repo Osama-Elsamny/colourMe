@@ -443,7 +443,9 @@ public class LobbyController {
                 handleDisconnect(data);
                 break;
             case ReconnectResponse:
+                Stage dialog = displayConnectingPopup();
                 handleReconnect(data);
+                dialog.close();
                 break;
             case ClockSyncResponse:
                 handleClockSync(data);
@@ -508,9 +510,6 @@ public class LobbyController {
 
     private void handleDisconnect(JsonObject data) {
         try {
-            PopUpWindow window = new PopUpWindow();
-            window.display("ColourMe",
-                    Arrays.asList("Connecting to the server, please wait ..."), true);
             boolean startServer = data.get("startServer").getAsBoolean();
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
@@ -518,10 +517,17 @@ public class LobbyController {
             } else {
                 waitForNextServer(nextIP);
             }
+
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private Stage displayConnectingPopup() {
+        PopUpWindow window = new PopUpWindow();
+        return window.display("ColourMe",
+                Arrays.asList("Connecting to the server, please wait ..."), true);
     }
 
     private void handleReconnect(JsonObject data) {
