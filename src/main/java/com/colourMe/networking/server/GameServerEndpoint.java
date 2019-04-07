@@ -3,6 +3,7 @@ package com.colourMe.networking.server;
 import com.colourMe.common.marshalling.MessageDecoder;
 import com.colourMe.common.marshalling.MessageEncoder;
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.util.Log;
 
 import javax.websocket.*;
 import javax.websocket.server.*;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Logger;
 
 @ServerEndpoint(
         value = "/connect/{username}",
@@ -31,8 +33,9 @@ public class GameServerEndpoint {
 
     @OnMessage
     public void onMessage(Session session, Message request) {
+        Logger logger = Log.get(this);
         boolean result = GameServer.addToIncoming(request);
-        System.out.println("Added message to incoming queue " +
+        logger.info("Added message to incoming queue " +
                 (result ? "successfully" : "unsuccessfully"));
     }
 

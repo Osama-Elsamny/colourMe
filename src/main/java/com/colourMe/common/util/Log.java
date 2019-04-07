@@ -1,5 +1,6 @@
 package com.colourMe.common.util;
 
+import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +19,12 @@ public class Log {
 
     public static <T> Logger get(T object) {
         Logger logger = Logger.getLogger(object.getClass().getName());
+        logger.setLevel(defaultLevel);
+        return logger;
+    }
+
+    public static Logger get(Type type) {
+        Logger logger = Logger.getLogger(type.getTypeName());
         logger.setLevel(defaultLevel);
         return logger;
     }

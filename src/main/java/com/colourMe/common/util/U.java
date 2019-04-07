@@ -5,10 +5,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 public class U {
     private static Gson gson = new Gson();
@@ -16,6 +19,14 @@ public class U {
     public static void handleExceptionBase(Exception ex) {
         System.err.println(ex.getMessage());
         ex.printStackTrace();
+    }
+
+    public static void handleExceptionBase(Logger logger, Exception ex){
+        logger.warning(ex.getMessage());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        logger.warning("\n" + pw.toString());
     }
 
     public static boolean sleep(long millis){
@@ -36,6 +47,17 @@ public class U {
             successful = true;
         } catch (Exception ex) {
             handleExceptionBase(ex);
+        }
+        return successful;
+    }
+
+    public static boolean wrapInTryCatch(Logger logger, Runnable function) {
+        boolean successful = false;
+        try {
+            function.run();
+            successful = true;
+        } catch (Exception ex) {
+            handleExceptionBase(logger, ex);
         }
         return successful;
     }

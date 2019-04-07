@@ -4,9 +4,12 @@ import java.net.URI;
 
 import com.colourMe.common.messages.Message;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 import javax.websocket.*;
 
 import com.colourMe.common.marshalling.*;
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 
 /**
  * ColourMe ClientEndPoint
@@ -43,7 +46,8 @@ public class GameClientEndpoint {
      */
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("Opening a WebSocket.");
+        Logger logger = Log.get(this);
+        logger.info("Connected to server endpoint successfully");
         this.session = session;
     }
 
@@ -55,7 +59,9 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, Message update) {
-        System.out.println("Received message with MessageType: " + update.getMessageType().name());
+        Logger logger = Log.get(this);
+        logger.info("Received message from server");
+        logger.info("Message received: " + U.json(update));
         receivedQueue.put(update);
     }
 

@@ -1,4 +1,5 @@
 package com.colourMe;
+import com.colourMe.common.util.Log;
 import com.colourMe.networking.server.GameServerEndpoint;
 import org.glassfish.tyrus.server.Server;
 import javafx.application.Application;
@@ -11,6 +12,7 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException{
+        Log.initLogging();
         Parent root = FXMLLoader.load(getClass().getResource("/mainPage.fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/mainPage.css").toExternalForm());
