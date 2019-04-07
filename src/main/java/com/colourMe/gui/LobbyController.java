@@ -45,7 +45,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 3;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -509,15 +509,17 @@ public class LobbyController {
 
     private void handleDisconnect(JsonObject data) {
         try {
+            PopUpWindow window = new PopUpWindow();
+            Stage dialog = window.display("ColourMe",
+                    Arrays.asList("Connecting to the server, please wait ..."), false);
             boolean startServer = data.get("startServer").getAsBoolean();
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
                 startNextServer();
             } else {
-                // TODO: display Popup
                 waitForNextServer(nextIP);
-                // TODO: close Popup
             }
+            dialog.close();
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
