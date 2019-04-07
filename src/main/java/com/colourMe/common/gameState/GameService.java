@@ -33,7 +33,7 @@ public class GameService implements Cloneable {
         }
     }
 
-    // Returns GameConfig as Json
+    // Returns GameConfig as json
     public JsonElement getGameConfigAsJson() {
         return gson.toJsonTree(this.gameConfig);
     }
