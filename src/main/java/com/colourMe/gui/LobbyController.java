@@ -55,7 +55,6 @@ public class LobbyController {
     private Clock serverClock;
     private Clock clientClock;
 
-
     public static PriorityBlockingQueue<Message> receiveQueue;
     public static PriorityBlockingQueue<Message> sendQueue;
 
@@ -519,6 +518,7 @@ public class LobbyController {
             } else {
                 waitForNextServer(nextIP);
             }
+            Thread.sleep(30000);
             dialog.close();
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
