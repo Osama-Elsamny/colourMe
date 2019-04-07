@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 public class Log {
     private static final String LOG_FORMAT
-            = "[%1$tF %1$tT].%1$tL] [%2$s] [%4$s] %5$s %6$s%n";
+            = "[%4$s] [%1$tF %1$tT.%1$tL] [%2$s]: %5$s %6$s%n";
     private static boolean initialized = false;
     private static Level defaultLevel = Level.INFO;
 
