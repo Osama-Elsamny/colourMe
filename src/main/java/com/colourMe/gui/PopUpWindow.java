@@ -19,6 +19,7 @@ public class PopUpWindow {
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);
         window.setMinWidth(250);
+        window.setMinHeight(250);
 
         Label label[] = new Label[size];
         setLabelText(label, message);

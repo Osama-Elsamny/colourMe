@@ -1,5 +1,6 @@
 package com.colourMe.gui;
 
+import com.colourMe.common.gameState.Cell;
 import com.colourMe.common.gameState.Coordinate;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
@@ -71,7 +72,7 @@ public class GameAPI {
             JsonObject data = new JsonObject();
             data.addProperty("row", row);
             data.addProperty("col", col);
-            data.addProperty("coordinates", gameService.getGson().toJson(coordinates));
+            data.add("coordinates", gameService.getGson().toJsonTree(coordinates));
             Message cellUpdateRequest = new Message(MessageType.CellUpdateRequest, data, playerID);
             sendQueue.add(cellUpdateRequest);
         });
@@ -157,5 +158,11 @@ public class GameAPI {
 
     public float getRatio() {
         return gameService.getGameConfig().getRatio();
+    }
+
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
+        this.messageExecutor = new MessageExecutor(gameService);
+        messageExecutor.buildClientActions();
     }
 }

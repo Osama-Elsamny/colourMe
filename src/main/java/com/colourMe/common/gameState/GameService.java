@@ -5,28 +5,10 @@ import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-import java.beans.Transient;
 import java.util.*;
+import java.util.function.Function;
 
 public class GameService implements Cloneable {
-
-    public static class ColorPair {
-        public Color COLOR;
-        public int COLOR_CODE;
-
-        public ColorPair(Color color, int colorCode) {
-            this.COLOR = color;
-            this.COLOR_CODE = colorCode;
-        }
-    }
-
-    private static ColorPair[] COLOR_PAIRS = {
-            new ColorPair(Color.BLUE, -16776961),
-            new ColorPair(Color.RED, -65536),
-            new ColorPair(Color.GREEN, -16744448),
-            new ColorPair(Color.BLACK, -16777216)
-    };
-
     public transient Gson gson = new Gson();
 
     private GameConfig gameConfig;
@@ -58,6 +40,10 @@ public class GameService implements Cloneable {
 
     // Return GameConfig
     public GameConfig getGameConfig() { return gameConfig; }
+
+    public Cell[][] getCells() {
+        return cells;
+    }
 
     // Acquire a cell
     public boolean acquireCell(int row, int col, double x, double y, String playerID) {
@@ -115,8 +101,8 @@ public class GameService implements Cloneable {
     // Spawns a new player in the game when connect
     public void spawnPlayer(String playerId, String ip) {
         if(!playerExists(playerId)) {
-            ColorPair pair = COLOR_PAIRS[players.size()];
-            players.put(playerId, new Player(ip, pair.COLOR, pair.COLOR_CODE));
+            int colorCode = ColorPair.COLOR_PAIRS[players.size()].COLOR_CODE;
+            players.put(playerId, new Player(ip, players.size(), colorCode));
             this.gameConfig.addplayerConfig(playerId, ip);
         }
     }
@@ -125,8 +111,8 @@ public class GameService implements Cloneable {
     public void spawnPlayersFromConfig() {
         for(Pair<String, String> entry : gameConfig.getIpAddresses()) {
             if(!playerExists(entry.getKey())) {
-                ColorPair pair = COLOR_PAIRS[players.size()];
-                players.put(entry.getKey(), new Player(entry.getValue(), pair.COLOR, pair.COLOR_CODE));
+                int colorCode = ColorPair.COLOR_PAIRS[players.size()].COLOR_CODE;
+                players.put(entry.getKey(), new Player(entry.getValue(), players.size(), colorCode));
             }
         }
     }
@@ -134,16 +120,9 @@ public class GameService implements Cloneable {
     // Remove a player
     public void killPlayer(String playerID) {
         // Release locks
-        for(Cell[] cellRow : cells) {
-            for(Cell cell : cellRow) {
-                if(cell.getPlayerID().equals(playerID)
-                    && cell.getState().equals(CellState.LOCKED)) {
-                    cell.setPlayerID("");
-                    cell.setState(CellState.AVAILABLE);
-                }
-            }
-        }
-
+        releaseAllAcquiredLocks(
+            x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
+        );
         // Remove player
         players.remove(playerID);
         gameConfig.removePlayerConfig(playerID);
@@ -193,8 +172,20 @@ public class GameService implements Cloneable {
         return players.containsKey(playerID);
     }
 
+    private void releaseAllAcquiredLocks(Function<Cell, Boolean> predicate) {
+        for (Cell[] row : cells) {
+            for (Cell cell : row) {
+                if (predicate.apply(cell)) {
+                    cell.setState(CellState.AVAILABLE);
+                    cell.setPlayerID("");
+                }
+            }
+        }
+    }
+
     @Override
     public GameService clone() throws CloneNotSupportedException {
+        releaseAllAcquiredLocks(x -> x.getState().equals(CellState.LOCKED));
         return (GameService) super.clone();
     }
 
