@@ -10,22 +10,20 @@ public class ReconnectResponseAction extends ActionBase {
     public Message execute(Message message, GameService gameService) {
         JsonObject data = message.getData().getAsJsonObject();
         if(data != null) {
-            gameService = gameService.getGson().fromJson(data, GameService.class);
-            return successResponse();
+            return successResponse(message);
         }
-
         return failureResponse();
     }
 
-    private Message successResponse() {
-        JsonObject data = new JsonObject();
-        data.addProperty("success", true);
+    private Message successResponse(Message message) {
+        JsonObject data = message.getData().getAsJsonObject();
+        data.addProperty("successful", true);
         return new Message(MessageType.ReconnectResponse, data, null);
     }
 
     private Message failureResponse() {
         JsonObject data = new JsonObject();
-        data.addProperty("success", false);
+        data.addProperty("successful", false);
         return new Message(MessageType.ReconnectResponse, data, null);
     }
 }

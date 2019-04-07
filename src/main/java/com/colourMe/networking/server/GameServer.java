@@ -130,7 +130,9 @@ public class GameServer extends Thread {
     public boolean initGameService(GameService gameService){
         boolean successful;
         try {
+            this.gameService = gameService;
             this.messageExecutor = new MessageExecutor(gameService);
+            this.messageExecutor.buildServerActions();
             reconnectState = true;
             successful = true;
         } catch (Exception ex) {

@@ -63,18 +63,10 @@ public class GameConfig implements Cloneable {
         }
     }
 
-    public void removeAllIPs() {
-        ipAddresses.clear();
-    }
-
-    public String getLastIP() {
-        return ipAddresses.get(ipAddresses.size() -  1).getValue();
-    }
-
-    public String getNextIP() {
+    public Pair<String, String> getNextIP() {
         if (ipAddresses.isEmpty()) return null;
         ipAddresses.remove(0);
-        return ipAddresses.get(0).getValue();
+        return ipAddresses.get(0);
     }
 
     public boolean equals(Object obj) {
@@ -94,7 +86,6 @@ public class GameConfig implements Cloneable {
     }
     
     public GameConfig clone() throws CloneNotSupportedException {
-        this.removeAllIPs();
         return (GameConfig) super.clone();
     }
 }

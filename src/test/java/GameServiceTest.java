@@ -25,6 +25,23 @@ public class GameServiceTest {
     }
 
     @Test
+    public void verifyGameServiceClone() {
+        GameService clonedService = new GameService();
+
+        try { clonedService = this.gameService.clone(); } catch (Exception ex) {}
+
+        assert(clonedService.equals(gameService));
+    }
+
+    @Test
+    public void verifyGameServiceDeserialization(){
+        String json = gameService.gson.toJson(gameService);
+        GameService gameServiceCopy = gameService.gson.fromJson(json, GameService.class);
+
+        assert(gameService.equals(gameServiceCopy));
+    }
+
+    @Test
     public void verifyGameConfigInit() {
         assertEquals (gameService.getGameConfig(), gameConfig);
     }

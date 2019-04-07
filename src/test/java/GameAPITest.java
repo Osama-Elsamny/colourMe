@@ -205,7 +205,7 @@ public class GameAPITest {
         JsonObject data = new JsonObject();
         data.addProperty("row", row);
         data.addProperty("col", col);
-        data.addProperty("coordinates", gson.toJson(coordinates));
+        data.add("coordinates", gson.toJsonTree(coordinates));
         return new Message(MessageType.CellUpdateRequest, data, playerID);
     }
 

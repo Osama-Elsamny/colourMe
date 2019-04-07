@@ -1,19 +1,16 @@
 package com.colourMe.gui;
 
-import com.colourMe.common.gameState.Coordinate;
-import com.colourMe.common.gameState.GameConfig;
-import com.colourMe.common.gameState.GameService;
+import com.colourMe.common.gameState.*;
 import com.colourMe.common.messages.Message;
-import com.colourMe.common.messages.MessageType;
 import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.*;
 import javafx.animation.AnimationTimer;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -58,7 +55,6 @@ public class LobbyController {
     private Clock serverClock;
     private Clock clientClock;
 
-
     public static PriorityBlockingQueue<Message> receiveQueue;
     public static PriorityBlockingQueue<Message> sendQueue;
 
@@ -89,6 +85,7 @@ public class LobbyController {
     }
 
     public void initClientMachine(String serverAddress, String playerID, String playerIP) {
+        System.out.println("Player IP: " + playerIP);
         this.playerID = playerID;
         this.playerIP = playerIP;
         createQueues();
@@ -122,16 +119,21 @@ public class LobbyController {
             startServer(serverClock);
             this.gameServer.initGameService(serverGameService);
 
+            String serverAddress = String.format("ws://%s:8080/connect/%s", "127.0.0.1", playerID);
+            gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+            gameClient.start();
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
     }
 
-    private void connectToNextServer(String nextIP) {
+    private void waitForNextServer(String nextIP) {
+        try {Thread.sleep(5000);} catch (Exception ex) {} // Wait for next server to be started
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
-        gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
-        gameClient.start();
+        System.out.println("Next IP: " + serverAddress);
+        this.gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
+        this.gameClient.start();
     }
 
     private void setGameAPI(PriorityBlockingQueue<Message> sendQueue,
@@ -440,6 +442,11 @@ public class LobbyController {
             case Disconnect:
                 handleDisconnect(data);
                 break;
+            case ReconnectResponse:
+                Stage dialog = displayConnectingPopup();
+                handleReconnect(data);
+                dialog.close();
+                break;
             case ClockSyncResponse:
                 handleClockSync(data);
                 break;
@@ -474,11 +481,8 @@ public class LobbyController {
         if (success && (! userID.equals(this.playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
-            JsonParser parser = new JsonParser();
-            String string = data.get("coordinates").toString();
-            string = string.replaceAll("\\\\\"(\\w+)\\\\\"(:)", "$1$2");
-            string = string.substring(1, string.length()-1);
-            List<Coordinate> coordinates = Arrays.asList(gson.fromJson(string, Coordinate[].class));
+            List<Coordinate> coordinates =
+                    Arrays.asList(gson.fromJson(data.get("coordinates"), Coordinate[].class));
             GraphicsContext cellGraphicsContext = getGraphicsContext("canvas-" + row + "-" + col);
             coordinates.forEach(x -> renderStroke(cellGraphicsContext, x, userID, row, col));
         }
@@ -486,7 +490,7 @@ public class LobbyController {
 
     private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
-        Boolean success = data.get("successful").getAsBoolean();
+        boolean success = data.get("successful").getAsBoolean();
         if (success && (! userID.equals(playerID))){
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
@@ -510,14 +514,44 @@ public class LobbyController {
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
                 startNextServer();
-                connectToNextServer("127.0.0.1");
             } else {
-                connectToNextServer(nextIP);
+                waitForNextServer(nextIP);
             }
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private Stage displayConnectingPopup() {
+        PopUpWindow window = new PopUpWindow();
+        return window.display("ColourMe",
+                Arrays.asList("Connecting to the server, please wait ..."), true);
+    }
+
+    private void handleReconnect(JsonObject data) {
+        if (data.get("successful").getAsBoolean()) {
+            Gson gson = gameAPI.getGameService().gson;
+            gameAPI.setGameService(gson.fromJson(data, GameService.class));
+            restoreCellStates();
+            updateScores();
+        }
+    }
+
+    private void restoreCellStates() {
+        Cell[][] cells = gameAPI.getGameService().getCells();
+        for (int r=0; r < cells.length; r++) {
+            for (int c=0; c < cells.length; c++) {
+                if (cells[r][c].getState().equals(CellState.AVAILABLE)) {
+                    GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
+                    clearCell(graphicsContext);
+                }
+            }
+        }
+    }
+
+    private void updateScores() {
+        gameAPI.getPlayerIds().forEach(this::updatePlayersScore);
     }
 
     private void handleClientDisconnect(JsonObject data) {

@@ -16,6 +16,8 @@ import com.colourMe.networking.ClockSynchronization.Clock;
  */
 public class GameClient extends Thread {
 
+    private boolean connected = false;
+
     private static final int maxTries = 3;
 
     private int connectionAttempt = 0;
@@ -72,6 +74,8 @@ public class GameClient extends Thread {
             try {
                 // Open WebSocket.
                 final GameClientEndpoint clientEndPoint = new GameClientEndpoint(new URI(serverAddr));
+                this.connectionAttempt = 0;
+                this.connected = true;
 
                 // Add receiveQueue.
                 clientEndPoint.addReceiveQueue(receivedQueue);
@@ -82,21 +86,23 @@ public class GameClient extends Thread {
                         Message msg = sendQueue.poll();
                         if (msg != null) {
                             msg.setTimestamp(clientClock.getTime());
+                            System.out.println("Sending message to server, with MessageType: " + msg.getMessageType().name());
                             clientEndPoint.sendMessage(msg);
                         }
                     }
                 }
-            } catch (URISyntaxException ex) {
-                if (connectionAttempt < maxTries){
+            } catch (Exception ex) {
+                if (connectionAttempt < maxTries) {
+                    System.out.println("Failed to connect to server, trying again.");
                     connectionAttempt++;
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 } else {
                     // Connection Failure
-                    handleFailure();
+                    if (connected) {
+                        handleFailure();
+                        connected = false;
+                    } else {
+                        System.out.println("Killing Client thread");
+                    }
                     break;
                 }
             }
