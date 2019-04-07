@@ -72,7 +72,7 @@ public class GameClientEndpoint {
      */
     @OnError
     public void onError(Session session, Throwable throwable){
-
+        U.handleExceptionBase(Log.get(this), (Exception) throwable);
     }
 
     public void addReceiveQueue(PriorityBlockingQueue<Message> queue) {
@@ -96,7 +96,8 @@ public class GameClientEndpoint {
      */
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        System.out.println("Closing WebSocket." + reason);
+        Logger logger = Log.get(this);
+        logger.warning("Closing WebSocket." + reason.getReasonPhrase());
         this.session = null;
     }
 }

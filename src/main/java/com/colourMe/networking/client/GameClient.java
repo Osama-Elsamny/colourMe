@@ -99,6 +99,7 @@ public class GameClient extends Thread {
                         }
                     }
                 }
+                handleFailure();
             } catch (Exception ex) {
                 U.handleExceptionBase(logger, ex);
                 if (connectionAttempt < maxTries) {

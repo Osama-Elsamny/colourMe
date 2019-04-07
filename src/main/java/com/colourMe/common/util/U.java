@@ -26,7 +26,7 @@ public class U {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         ex.printStackTrace(pw);
-        logger.warning("\n" + pw.toString());
+        logger.warning("\n" + sw.toString());
     }
 
     public static boolean sleep(long millis){
