@@ -86,6 +86,7 @@ public class LobbyController {
     }
 
     public void initClientMachine(String serverAddress, String playerID, String playerIP) {
+        System.out.println("Player IP: " + playerIP);
         this.playerID = playerID;
         this.playerIP = playerIP;
         createQueues();
