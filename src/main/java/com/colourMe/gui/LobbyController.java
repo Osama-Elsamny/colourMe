@@ -509,8 +509,8 @@ public class LobbyController {
     private void handleDisconnect(JsonObject data) {
         try {
             PopUpWindow window = new PopUpWindow();
-            Stage dialog = window.display("ColourMe",
-                    Arrays.asList("Connecting to the server, please wait ..."), false);
+            window.display("ColourMe",
+                    Arrays.asList("Connecting to the server, please wait ..."), true);
             boolean startServer = data.get("startServer").getAsBoolean();
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
@@ -519,7 +519,6 @@ public class LobbyController {
                 waitForNextServer(nextIP);
             }
             Thread.sleep(30000);
-            dialog.close();
         } catch(Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
