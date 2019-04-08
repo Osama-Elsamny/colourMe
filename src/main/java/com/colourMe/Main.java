@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException{
         Log.initLogging();
-        Log.setDefaultLevel(Level.WARNING);
+        Log.setDefaultLevel(Level.INFO);
         Parent root = FXMLLoader.load(getClass().getResource("/mainPage.fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/mainPage.css").toExternalForm());
