@@ -43,7 +43,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 1;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -66,7 +66,7 @@ public class LobbyController {
     public void startServer(Clock serverClock){
         gameServer = new GameServer(serverClock);
         gameServer.start();
-        while (!gameServer.isRunning()){
+        while (!gameServer.isRunning()) {
             // Wait for server to start
         }
     }
@@ -93,7 +93,6 @@ public class LobbyController {
         gameClient.start();
 
         setGameAPI(sendQueue, receiveQueue);
-        JsonObject data = new JsonObject();
         gameAPI.sendConnectRequest(playerID, playerIP);
 
         AnimationTimer timer = new AnimationTimer() {
@@ -426,7 +425,6 @@ public class LobbyController {
                 break;
             case ReconnectResponse:
                 PopUpWindow popup = displayConnectingPopup();
-                Platform.runLater(popup::display);
                 popup.setCloseHandler(() -> handleReconnect(data));
                 break;
             case ClockSyncResponse:
