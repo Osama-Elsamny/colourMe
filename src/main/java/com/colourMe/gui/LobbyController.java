@@ -523,6 +523,10 @@ public class LobbyController {
                     GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
                     clearCell(graphicsContext);
                 }
+                if (cells[r][c].getState().equals(CellState.COLOURED)) {
+                    GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
+                    colourCell(graphicsContext, gameAPI.getPlayerColour(cells[r][c].getPlayerID()));
+                }
             }
         }
     }
