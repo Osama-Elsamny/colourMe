@@ -5,13 +5,14 @@ import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageExecutor;
 import com.colourMe.common.messages.MessageType;
-import com.google.gson.JsonElement;
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
+import com.colourMe.networking.ClockSynchronization.Clock;
 import com.google.gson.JsonObject;
 import org.glassfish.tyrus.server.Server;
-import com.colourMe.networking.ClockSynchronization.Clock;
 
-import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 public class GameServer extends Thread {
     private MessageExecutor messageExecutor;
@@ -29,6 +30,8 @@ public class GameServer extends Thread {
 
     @Override
     public void run() {
+        Logger logger = Log.get(this);
+        logger.info("Starting a new GameServer ...");
         Server server = new Server("localhost", 8080, "",
                 null, GameServerEndpoint.class);
 
@@ -39,12 +42,12 @@ public class GameServer extends Thread {
         try {
             server.start();
             this.running = true;
-            System.out.println("GameServer has started!");
+            logger.info("GameServer has started!");
 
             while(!finished) {
                 processIncoming();
                 // Broadcast server time after every 10 seconds.
-                if (clockSyncCounter == 10000){
+                if (clockSyncCounter == 1000){
                     clockSyncCounter = 0;
                     GameServerEndpoint.broadcast(sendServerTime());
                 }
@@ -52,41 +55,48 @@ public class GameServer extends Thread {
                 Thread.sleep(1);
             }
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            ex.printStackTrace();
+            U.handleExceptionBase(logger, ex);
         } finally {
+            logger.info("Stopping Server ...");
             server.stop();
             this.running = false;
+            logger.info("Server stopped successfully");
         }
     }
 
     private void processIncoming() {
-
+        Logger logger = Log.get(this);
         // Read each message from Incoming
         synchronized (incoming) {
             try {
                 resetServerIfDisconnected();
                 while (!incoming.isEmpty()) {
                     // Read message
-                    Message m = incoming.take();
+                    logger.info("Waiting for message ...");
+                    Message message = incoming.take();
+                    logger.info("Message extracted from incoming queue");
+                    logger.info("Message:\n" + U.json(message));
 
                     // Process message
-                    Message response = messageExecutor.processMessage(m);
+                    Message response = messageExecutor.processMessage(message);
                     response.setTimestamp (serverClock.getTime());
+                    logger.info("Message processed");
+                    logger.info("Response:\n" + U.json(response));
 
                     // Broadcast response to everyone
                     GameServerEndpoint.broadcast(response);
                 }
             } catch(Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
+                U.handleExceptionBase(logger, ex);
             }
         }
     }
 
     private void resetServerIfDisconnected() {
+        Logger logger = Log.get(this);
         if(reconnectState && allClientsConnected()) {
             // Broadcast GameService to all clients
+            logger.warning("Sending reconnect message to all connected clients");
             Message reconnectRequest = new Message(MessageType.ReconnectRequest, null, null);
             incoming.put(reconnectRequest);
             reconnectState = false;
@@ -98,33 +108,20 @@ public class GameServer extends Thread {
     }
 
     static boolean addToIncoming(Message m) {
-        boolean successful;
-        try {
+        Logger logger = Log.get(GameServer.class);
+        return U.wrapInTryCatch(logger, () -> {
             synchronized (incoming) {
                 incoming.add(m);
-                successful = true;
             }
-        } catch(Exception ex){
-            System.err.println(ex.getMessage());
-            ex.printStackTrace();
-            successful = false;
-        }
-        return successful;
+        });
     }
 
     public boolean initGameService(GameConfig config) {
-        boolean successful;
-        try {
-            System.out.println("Config: " + config);
+        Logger logger = Log.get(GameServer.class);
+        return U.wrapInTryCatch(() -> {
+            logger.info("Initializing gameConfig with Config:\n" + U.json(config));
             messageExecutor.initGameConfig(config);
-            successful = true;
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            ex.printStackTrace();
-            successful = false;
-        }
-
-        return successful;
+        });
     }
 
     public boolean initGameService(GameService gameService){

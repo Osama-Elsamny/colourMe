@@ -1,8 +1,8 @@
 package com.colourMe.common.gameState;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class GameConfig implements Cloneable {
     private int size;

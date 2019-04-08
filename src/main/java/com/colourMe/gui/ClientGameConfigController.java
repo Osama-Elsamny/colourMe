@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -31,8 +32,8 @@ public class ClientGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
-        String clientIP = InetAddress.getLocalHost().getHostAddress();
-        String playerID = getPlayerID();
+        String clientIP = InetAddress.getLocalHost().getHostAddress().trim();
+        String playerID = getPlayerID().trim();
         String serverIP = String.format("ws://%s:8080/connect/%s", getIPAddress(), playerID);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();

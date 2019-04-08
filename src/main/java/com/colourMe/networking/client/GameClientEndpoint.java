@@ -1,12 +1,16 @@
 package com.colourMe.networking.client;
 
-import java.net.URI;
-
+import com.colourMe.common.marshalling.MessageDecoder;
+import com.colourMe.common.marshalling.MessageEncoder;
 import com.colourMe.common.messages.Message;
-import java.util.concurrent.PriorityBlockingQueue;
-import javax.websocket.*;
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 
-import com.colourMe.common.marshalling.*;
+import javax.websocket.*;
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * ColourMe ClientEndPoint
@@ -18,7 +22,7 @@ import com.colourMe.common.marshalling.*;
         encoders = MessageEncoder.class
 )
 public class GameClientEndpoint {
-
+    private volatile long lastMessageReceivedTime = System.currentTimeMillis() * 2;
     public Session session;
     private PriorityBlockingQueue<Message> receivedQueue;
 
@@ -43,7 +47,8 @@ public class GameClientEndpoint {
      */
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("Opening a WebSocket.");
+        Logger logger = Log.get(this);
+        logger.info("Connected to server endpoint successfully");
         this.session = session;
     }
 
@@ -55,7 +60,10 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, Message update) {
-        System.out.println("Received message with MessageType: " + update.getMessageType().name());
+        lastMessageReceivedTime = System.currentTimeMillis();
+        Logger logger = Log.get(this);
+        logger.info("Received message from server");
+        logger.info("Message received: " + U.json(update));
         receivedQueue.put(update);
     }
 
@@ -66,7 +74,7 @@ public class GameClientEndpoint {
      */
     @OnError
     public void onError(Session session, Throwable throwable){
-
+        U.handleExceptionBase(Log.get(this), (Exception) throwable);
     }
 
     public void addReceiveQueue(PriorityBlockingQueue<Message> queue) {
@@ -90,7 +98,19 @@ public class GameClientEndpoint {
      */
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        System.out.println("Closing WebSocket." + reason);
+        Logger logger = Log.get(this);
+        logger.warning("Closing WebSocket." + reason.getReasonPhrase());
         this.session = null;
     }
+
+    public void disconnect() throws IOException {
+        session.close();
+        session = null;
+    }
+
+    public long getLastMessageReceivedTime() {
+        return this.lastMessageReceivedTime;
+    }
+
+
 }

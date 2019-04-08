@@ -3,6 +3,7 @@ package com.colourMe.common.actions;
 import com.colourMe.common.gameState.GameService;
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.common.util.Log;
 import com.google.gson.JsonObject;
 
 public class ReleaseCellRequestAction extends ActionBase {
@@ -15,7 +16,14 @@ public class ReleaseCellRequestAction extends ActionBase {
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
 
-            if(gameService.releaseCell(row, col, playerID, hasColoured)) { return successResponse(data, playerID); }
+            if(gameService.releaseCell(row, col, playerID, hasColoured)) {
+                if(gameService.isGameFinished() && hasColoured) {
+                    Log.get(this).warning("\n\n\nGame Finished\n\n\n");
+                    data.addProperty("finish", true);
+                }
+                return successResponse(data, playerID);
+            }
+
         }
         return failureResponse(data, playerID);
     }
