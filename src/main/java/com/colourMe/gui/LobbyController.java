@@ -39,7 +39,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 2;
+    private int expectedPlayers = 4;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
