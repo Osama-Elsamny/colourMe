@@ -184,8 +184,10 @@ public class GameService implements Cloneable {
 
     public List<Pair<String, Player>> getWinners() {
         List<Pair<String, Player>> playerPairs = new LinkedList<>();
-        this.players.entrySet().stream()
-                .sorted(Comparator.comparingInt(m -> m.getValue().getScore()))
+        Comparator <Map.Entry<String, Player>> comp = Comparator.comparingInt(m -> m.getValue().getScore());
+        comp.reversed();
+
+        this.players.entrySet().stream().sorted(comp)
                 .forEach(x -> playerPairs.add(new Pair<>(x.getKey(), x.getValue())));
         return playerPairs;
     }
