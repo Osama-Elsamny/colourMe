@@ -1,5 +1,7 @@
 package com.colourMe.common.gameState;
 
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
@@ -184,11 +186,12 @@ public class GameService implements Cloneable {
 
     public List<Pair<String, Player>> getWinners() {
         List<Pair<String, Player>> playerPairs = new LinkedList<>();
-        Comparator <Map.Entry<String, Player>> comp = Comparator.comparingInt(m -> m.getValue().getScore());
-        comp.reversed();
+        Comparator <Map.Entry<String, Player>> comp =
+                (p1, p2) -> p2.getValue().getScore() - p1.getValue().getScore();
 
         this.players.entrySet().stream().sorted(comp)
                 .forEach(x -> playerPairs.add(new Pair<>(x.getKey(), x.getValue())));
+        Log.get(this).warning("Winner Pairs:\n" + U.json(playerPairs));
         return playerPairs;
     }
 
