@@ -119,12 +119,9 @@ public class GameClient extends Thread {
                     connectionAttempt++;
                 } else {
                     // Connection Failure
-                    if (connected) {
-                        handleFailure();
-                        connected = false;
-                    } else {
-                        logger.severe("Killing Client thread");
-                    }
+                    logger.severe("Killing Client thread");
+                    handleFailure();
+                    connected = false;
                     break;
                 }
             }
