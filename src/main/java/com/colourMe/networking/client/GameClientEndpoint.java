@@ -22,7 +22,7 @@ import java.util.logging.Logger;
         encoders = MessageEncoder.class
 )
 public class GameClientEndpoint {
-    private static volatile long lastMessageReceivedTime = System.currentTimeMillis() * 2;
+    private volatile long lastMessageReceivedTime = System.currentTimeMillis() * 2;
     public Session session;
     private PriorityBlockingQueue<Message> receivedQueue;
 

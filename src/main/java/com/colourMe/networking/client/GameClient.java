@@ -106,6 +106,7 @@ public class GameClient extends Thread {
                             }
                         }
                     } else {
+                        logger.warning("Disconnecting from the server endpoint");
                         clientEndPoint.disconnect();
                     }
                 }
