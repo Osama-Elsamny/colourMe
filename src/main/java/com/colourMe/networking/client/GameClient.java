@@ -74,7 +74,7 @@ public class GameClient extends Thread {
     }
 
     private boolean isServerAlive(GameClientEndpoint endpoint) throws IOException {
-        int SERVER_TIMEOUT = 2000;
+        int SERVER_TIMEOUT = 5000;
         long currentTime = System.currentTimeMillis();
         return currentTime - endpoint.getLastMessageReceivedTime() < SERVER_TIMEOUT;
     }
