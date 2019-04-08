@@ -6,6 +6,7 @@ import com.colourMe.common.util.Log;
 import com.colourMe.common.util.U;
 import com.colourMe.networking.ClockSynchronization.Clock;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Logger;
@@ -72,6 +73,12 @@ public class GameClient extends Thread {
         }
     }
 
+    private boolean isServerAlive(GameClientEndpoint endpoint) throws IOException {
+        int SERVER_TIMEOUT = 2000;
+        long currentTime = System.currentTimeMillis();
+        return currentTime - endpoint.getLastMessageReceivedTime() < SERVER_TIMEOUT;
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -88,14 +95,18 @@ public class GameClient extends Thread {
 
                 // Send message to WebSocket.
                 while (clientEndPoint.session != null) {
-                    synchronized (sendQueue) {
-                        Message msg = sendQueue.poll();
-                        if (msg != null) {
-                            msg.setTimestamp(clientClock.getTime());
-                            logger.info("Sending message to server, with MessageType: " + msg.getMessageType().name());
-                            logger.info("Message:\n" + U.json(msg));
-                            clientEndPoint.sendMessage(msg);
+                    if (isServerAlive(clientEndPoint)) {
+                        synchronized (sendQueue) {
+                            Message msg = sendQueue.poll();
+                            if (msg != null) {
+                                msg.setTimestamp(clientClock.getTime());
+                                logger.info("Sending message to server, with MessageType: " + msg.getMessageType().name());
+                                logger.info("Message:\n" + U.json(msg));
+                                clientEndPoint.sendMessage(msg);
+                            }
                         }
+                    } else {
+                        clientEndPoint.disconnect();
                     }
                 }
                 handleFailure();

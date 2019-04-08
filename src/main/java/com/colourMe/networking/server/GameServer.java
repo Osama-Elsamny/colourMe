@@ -47,7 +47,7 @@ public class GameServer extends Thread {
             while(!finished) {
                 processIncoming();
                 // Broadcast server time after every 10 seconds.
-                if (clockSyncCounter == 10000){
+                if (clockSyncCounter == 1000){
                     clockSyncCounter = 0;
                     GameServerEndpoint.broadcast(sendServerTime());
                 }

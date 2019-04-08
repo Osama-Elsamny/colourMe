@@ -7,6 +7,7 @@ import com.colourMe.common.util.Log;
 import com.colourMe.common.util.U;
 
 import javax.websocket.*;
+import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Logger;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
         encoders = MessageEncoder.class
 )
 public class GameClientEndpoint {
-
+    private static volatile long lastMessageReceivedTime = System.currentTimeMillis() * 2;
     public Session session;
     private PriorityBlockingQueue<Message> receivedQueue;
 
@@ -59,6 +60,7 @@ public class GameClientEndpoint {
      */
     @OnMessage
     public void onMessage(Session session, Message update) {
+        lastMessageReceivedTime = System.currentTimeMillis();
         Logger logger = Log.get(this);
         logger.info("Received message from server");
         logger.info("Message received: " + U.json(update));
@@ -100,4 +102,15 @@ public class GameClientEndpoint {
         logger.warning("Closing WebSocket." + reason.getReasonPhrase());
         this.session = null;
     }
+
+    public void disconnect() throws IOException {
+        session.close();
+        session = null;
+    }
+
+    public long getLastMessageReceivedTime() {
+        return this.lastMessageReceivedTime;
+    }
+
+
 }
