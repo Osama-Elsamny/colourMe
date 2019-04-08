@@ -20,7 +20,7 @@ public class GameClient extends Thread {
 
     private boolean connected = false;
 
-    private static final int maxTries = 3;
+    private static final int maxTries = 1;
 
     private int connectionAttempt = 0;
 
