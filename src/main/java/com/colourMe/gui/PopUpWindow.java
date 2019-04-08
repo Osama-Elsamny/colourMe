@@ -1,5 +1,7 @@
 package com.colourMe.gui;
 
+import com.colourMe.common.util.Log;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,10 +11,23 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class PopUpWindow {
-    public Stage display(String title, List<String> message, boolean canExit) {
-        Stage window = new Stage();
+    private Stage window = null;
+    private String title;
+    private List<String> message;
+    private boolean canExit;
+
+    public PopUpWindow(String title, List<String> message, boolean canExit) {
+        this.window = new Stage();
+        this.title = title;
+        this.message = message;
+        this.canExit = canExit;
+        build();
+    }
+
+    public void build() {
         int size = message.size();
 
         //Block events to other windows
@@ -30,7 +45,6 @@ public class PopUpWindow {
         //Display window and wait for it to be closed before returning
         Scene scene = new Scene(vbox);
         window.setScene(scene);
-//        window.showAndWait();
 
         Platform.setImplicitExit(false);
 
@@ -39,9 +53,22 @@ public class PopUpWindow {
                 event.consume();
             }
         });
+    }
 
-        window.show();
-        return window;
+    public void setCloseHandler(Runnable function){
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                function.run();
+                Log.get(this).severe("\n\n\nCLOSING POPUP\n\n\n");
+                window.close();
+                this.stop();
+            }
+        }.start();
+    }
+
+    public void display() {
+        window.showAndWait();
     }
 
     private void setLabelText(Label arr[], List<String> message) {

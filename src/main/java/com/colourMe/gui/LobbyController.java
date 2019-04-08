@@ -2,12 +2,15 @@ package com.colourMe.gui;
 
 import com.colourMe.common.gameState.*;
 import com.colourMe.common.messages.Message;
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -27,6 +30,7 @@ import javafx.util.Pair;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class LobbyController {
@@ -39,7 +43,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 4;
+    private int expectedPlayers = 1;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -421,9 +425,9 @@ public class LobbyController {
                 handleDisconnect(data);
                 break;
             case ReconnectResponse:
-                Stage dialog = displayConnectingPopup();
-                handleReconnect(data);
-                dialog.close();
+                PopUpWindow popup = displayConnectingPopup();
+                Platform.runLater(popup::display);
+                popup.setCloseHandler(() -> handleReconnect(data));
                 break;
             case ClockSyncResponse:
                 handleClockSync(data);
@@ -483,10 +487,10 @@ public class LobbyController {
                 clearCell(cellGraphicsContext);
             }
         }
+        updatePlayersScore(userID);
         if (data.has("finish")) {
             displayScores();
         }
-        updatePlayersScore(userID);
     }
 
     private void handleDisconnect(JsonObject data) {
@@ -506,19 +510,20 @@ public class LobbyController {
 
     private void displayScores() {
         List<String> scoreboard = new LinkedList<>();
-        PopUpWindow window = new PopUpWindow();
         for (Pair<String, Player> playerPair : gameAPI.getGameService().getWinners()) {
             String playerWithScore = String.format("%s : %s",
                     playerPair.getKey(), playerPair.getValue().getScore());
             scoreboard.add(playerWithScore);
         }
-        window.display("Winner Winner Chicken Dinner", scoreboard, true);
+        PopUpWindow window = new PopUpWindow("Winner Winner Chicken Dinner", scoreboard, true);
+        Platform.runLater(window::display);
     }
 
-    private Stage displayConnectingPopup() {
-        PopUpWindow window = new PopUpWindow();
-        return window.display("ColourMe",
+    private PopUpWindow displayConnectingPopup() {
+        PopUpWindow window = new PopUpWindow( "ColourMe",
                 Arrays.asList("Connecting to the server, please wait ..."), true);
+        Platform.runLater(new Thread(window::display));
+        return window;
     }
 
     private void handleReconnect(JsonObject data) {
