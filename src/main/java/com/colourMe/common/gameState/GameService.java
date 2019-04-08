@@ -5,11 +5,9 @@ import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class GameService implements Cloneable {
     public transient Gson gson = new Gson();
@@ -173,6 +171,23 @@ public class GameService implements Cloneable {
 
     private boolean playerExists(String playerID) {
         return players.containsKey(playerID);
+    }
+
+    public boolean isGameFinished(){
+        int sum = 0;
+        int size = gameConfig.getSize();
+        for (Player player : this.players.values()) {
+            sum += player.getScore();
+        }
+        return sum == (size*size);
+    }
+
+    public List<Pair<String, Player>> getWinners() {
+        List<Pair<String, Player>> playerPairs = new LinkedList<>();
+        this.players.entrySet().stream()
+                .sorted(Comparator.comparingInt(m -> m.getValue().getScore()))
+                .forEach(x -> playerPairs.add(new Pair<>(x.getKey(), x.getValue())));
+        return playerPairs;
     }
 
     private void releaseAllAcquiredLocks(Function<Cell, Boolean> predicate) {

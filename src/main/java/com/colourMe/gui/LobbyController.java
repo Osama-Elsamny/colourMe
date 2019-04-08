@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -38,7 +39,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 3;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -468,7 +469,7 @@ public class LobbyController {
     private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
         boolean success = data.get("successful").getAsBoolean();
-        if (success && (! userID.equals(playerID))){
+        if (success && (! userID.equals(playerID))) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
@@ -481,6 +482,9 @@ public class LobbyController {
             } else {
                 clearCell(cellGraphicsContext);
             }
+        }
+        if (data.has("finish")) {
+            displayScores();
         }
         updatePlayersScore(userID);
     }
@@ -498,6 +502,17 @@ public class LobbyController {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private void displayScores() {
+        List<String> scoreboard = new LinkedList<>();
+        PopUpWindow window = new PopUpWindow();
+        for (Pair<String, Player> playerPair : gameAPI.getGameService().getWinners()) {
+            String playerWithScore = String.format("%s : %s",
+                    playerPair.getKey(), playerPair.getValue().getScore());
+            scoreboard.add(playerWithScore);
+        }
+        window.display("Winner Winner Chicken Dinner", scoreboard, true);
     }
 
     private Stage displayConnectingPopup() {
