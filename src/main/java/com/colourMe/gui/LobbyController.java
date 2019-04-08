@@ -5,39 +5,33 @@ import com.colourMe.common.messages.Message;
 import com.colourMe.networking.ClockSynchronization.Clock;
 import com.colourMe.networking.client.GameClient;
 import com.colourMe.networking.server.GameServer;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import javafx.animation.AnimationTimer;
-import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.util.Pair;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class LobbyController {
-    private final int COORDINATE_BUFFER_MAX_SIZE = 6;
-    private final int COORDINATE_COUNTER_LIMIT = 3;
+    private final int COORDINATE_BUFFER_MAX_SIZE = 8;
+    private final int COORDINATE_COUNTER_LIMIT = 0;
 
     // Counts the number of coordinates handled by ON_DRAG and sends every COORDINATE_BUFFER_LIMIT th Coordinate
     private String playerID;
@@ -45,7 +39,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 3;
+    private int expectedPlayers = 2;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -61,10 +55,8 @@ public class LobbyController {
 
     private void createQueues() {
         // Create Queues
-        Comparator<Message> messageComparator = (m1, m2) -> (int) (m1.getTimestamp() - m2.getTimestamp());
-
-        receiveQueue = new PriorityBlockingQueue<>(100, messageComparator);
-        sendQueue = new PriorityBlockingQueue<>(100, messageComparator);
+        receiveQueue = new PriorityBlockingQueue<>(100, Message.messageComparator);
+        sendQueue = new PriorityBlockingQueue<>(100, Message.messageComparator);
     }
 
     public void startServer(Clock serverClock){
@@ -150,24 +142,9 @@ public class LobbyController {
         cellCanvas.heightProperty().bind(cell.heightProperty());
         final GraphicsContext graphicsContext = cellCanvas.getGraphicsContext2D();
         initDraw(graphicsContext, this.playerID);
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onClick(event, rowNum, colNum);
-            }
-        });
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onDrag(graphicsContext, event, rowNum, colNum);
-            }
-        });
-        cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent event) {
-                onRelease(graphicsContext, event, rowNum, colNum);
-            }
-        });
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> onClick(event, rowNum, colNum));
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> onDrag(graphicsContext, event, rowNum, colNum));
+        cellCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> onRelease(graphicsContext, event, rowNum, colNum));
         cell.getChildren().add(cellCanvas);
         cell.getStyleClass().add("cell");
         return cell;
@@ -249,6 +226,7 @@ public class LobbyController {
             initDraw(graphicsContext, playerID);
             graphicsContext.beginPath();
             graphicsContext.moveTo(coordinate.x, coordinate.y);
+            graphicsContext.stroke();
             graphicsContext.lineTo(coordinate.x, coordinate.y);
             graphicsContext.stroke();
             graphicsContext.closePath();
@@ -491,7 +469,7 @@ public class LobbyController {
     private void handleCellRelease(JsonObject data, String userID) {
         // Color the cell or make it empty based on hasColoured property for the cell.
         boolean success = data.get("successful").getAsBoolean();
-        if (success && (! userID.equals(playerID))){
+        if (success && (! userID.equals(playerID))) {
             int row = data.get("row").getAsInt();
             int col = data.get("col").getAsInt();
             boolean hasColoured = data.get("hasColoured").getAsBoolean();
@@ -504,6 +482,9 @@ public class LobbyController {
             } else {
                 clearCell(cellGraphicsContext);
             }
+        }
+        if (data.has("finish")) {
+            displayScores();
         }
         updatePlayersScore(userID);
     }
@@ -521,6 +502,17 @@ public class LobbyController {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private void displayScores() {
+        List<String> scoreboard = new LinkedList<>();
+        PopUpWindow window = new PopUpWindow();
+        for (Pair<String, Player> playerPair : gameAPI.getGameService().getWinners()) {
+            String playerWithScore = String.format("%s : %s",
+                    playerPair.getKey(), playerPair.getValue().getScore());
+            scoreboard.add(playerWithScore);
+        }
+        window.display("Winner Winner Chicken Dinner", scoreboard, true);
     }
 
     private Stage displayConnectingPopup() {
@@ -545,6 +537,10 @@ public class LobbyController {
                 if (cells[r][c].getState().equals(CellState.AVAILABLE)) {
                     GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
                     clearCell(graphicsContext);
+                }
+                if (cells[r][c].getState().equals(CellState.COLOURED)) {
+                    GraphicsContext graphicsContext = getGraphicsContext(String.format("canvas-%s-%s", r, c));
+                    colourCell(graphicsContext, gameAPI.getPlayerColour(cells[r][c].getPlayerID()));
                 }
             }
         }

@@ -1,9 +1,6 @@
 package com.colourMe.common.messages;
 
 import com.colourMe.common.actions.*;
-import com.colourMe.common.actions.ActionBase;
-import com.colourMe.common.actions.CellUpdateRequestAction;
-import com.colourMe.common.actions.ConnectRequestAction;
 import com.colourMe.common.gameState.GameConfig;
 import com.colourMe.common.gameState.GameService;
 

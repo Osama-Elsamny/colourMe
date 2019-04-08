@@ -1,5 +1,7 @@
 package com.colourMe.common.gameState;
 
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import javafx.scene.paint.Color;
@@ -7,6 +9,7 @@ import javafx.util.Pair;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class GameService implements Cloneable {
     public transient Gson gson = new Gson();
@@ -33,7 +36,7 @@ public class GameService implements Cloneable {
         }
     }
 
-    // Returns GameConfig as Json
+    // Returns GameConfig as json
     public JsonElement getGameConfigAsJson() {
         return gson.toJsonTree(this.gameConfig);
     }
@@ -170,6 +173,26 @@ public class GameService implements Cloneable {
 
     private boolean playerExists(String playerID) {
         return players.containsKey(playerID);
+    }
+
+    public boolean isGameFinished(){
+        int sum = 0;
+        int size = gameConfig.getSize();
+        for (Player player : this.players.values()) {
+            sum += player.getScore();
+        }
+        return sum == (size*size);
+    }
+
+    public List<Pair<String, Player>> getWinners() {
+        List<Pair<String, Player>> playerPairs = new LinkedList<>();
+        Comparator <Map.Entry<String, Player>> comp =
+                (p1, p2) -> p2.getValue().getScore() - p1.getValue().getScore();
+
+        this.players.entrySet().stream().sorted(comp)
+                .forEach(x -> playerPairs.add(new Pair<>(x.getKey(), x.getValue())));
+        Log.get(this).warning("Winner Pairs:\n" + U.json(playerPairs));
+        return playerPairs;
     }
 
     private void releaseAllAcquiredLocks(Function<Cell, Boolean> predicate) {

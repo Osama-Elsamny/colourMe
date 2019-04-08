@@ -1,13 +1,15 @@
 package com.colourMe.networking.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.concurrent.PriorityBlockingQueue;
-
 import com.colourMe.common.messages.Message;
 import com.colourMe.common.messages.MessageType;
+import com.colourMe.common.util.Log;
+import com.colourMe.common.util.U;
 import com.colourMe.networking.ClockSynchronization.Clock;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * ColourMe Client
@@ -22,7 +24,7 @@ public class GameClient extends Thread {
 
     private int connectionAttempt = 0;
 
-    private String serverAddr;
+    private String serverAddress;
 
     private String playerID;
 
@@ -48,32 +50,43 @@ public class GameClient extends Thread {
 
         this.receivedQueue = receive;
         this.sendQueue = send;
-        this.serverAddr = serverAddress;
+        this.serverAddress = serverAddress;
         this.playerID = playerID;
         this.clientClock = clientClock;
     }
 
-    private void handleFailure(){
+    private void handleFailure() {
 
         // Construct message
+        Logger logger = Log.get(this);
+        logger.warning("Handling server failure, sending Disconnect Message to GUI");
         Message msg = new Message(MessageType.Disconnect, null, playerID);
         msg.setTimestamp(clientClock.getTime());
 
-        synchronized (sendQueue){
+        logger.warning("Clearing send and receive queues, and adding disconnect message to receive queue");
+        synchronized (sendQueue) {
             sendQueue.clear();
         }
-        synchronized (receivedQueue){
+        synchronized (receivedQueue) {
             receivedQueue.clear();
             receivedQueue.put(msg);
         }
     }
 
+    private boolean isServerAlive(GameClientEndpoint endpoint) throws IOException {
+        int SERVER_TIMEOUT = 2000;
+        long currentTime = System.currentTimeMillis();
+        return currentTime - endpoint.getLastMessageReceivedTime() < SERVER_TIMEOUT;
+    }
+
     @Override
     public void run() {
         while (true) {
+            Logger logger = Log.get(this);
+            logger.info("Starting GameClient, trying to connect with server with address " + serverAddress);
             try {
                 // Open WebSocket.
-                final GameClientEndpoint clientEndPoint = new GameClientEndpoint(new URI(serverAddr));
+                final GameClientEndpoint clientEndPoint = new GameClientEndpoint(new URI(serverAddress));
                 this.connectionAttempt = 0;
                 this.connected = true;
 
@@ -82,18 +95,27 @@ public class GameClient extends Thread {
 
                 // Send message to WebSocket.
                 while (clientEndPoint.session != null) {
-                    synchronized (sendQueue) {
-                        Message msg = sendQueue.poll();
-                        if (msg != null) {
-                            msg.setTimestamp(clientClock.getTime());
-                            System.out.println("Sending message to server, with MessageType: " + msg.getMessageType().name());
-                            clientEndPoint.sendMessage(msg);
+                    if (isServerAlive(clientEndPoint)) {
+                        synchronized (sendQueue) {
+                            Message msg = sendQueue.poll();
+                            if (msg != null) {
+                                msg.setTimestamp(clientClock.getTime());
+                                logger.info("Sending message to server, with MessageType: " + msg.getMessageType().name());
+                                logger.info("Message:\n" + U.json(msg));
+                                clientEndPoint.sendMessage(msg);
+                            }
                         }
+                    } else {
+                        logger.warning("Disconnecting from the server endpoint");
+                        clientEndPoint.disconnect();
                     }
                 }
+                handleFailure();
+                break;
             } catch (Exception ex) {
+                U.handleExceptionBase(logger, ex);
                 if (connectionAttempt < maxTries) {
-                    System.out.println("Failed to connect to server, trying again.");
+                    logger.warning("Failed to connect to server, trying again.");
                     connectionAttempt++;
                 } else {
                     // Connection Failure
@@ -101,7 +123,7 @@ public class GameClient extends Thread {
                         handleFailure();
                         connected = false;
                     } else {
-                        System.out.println("Killing Client thread");
+                        logger.severe("Killing Client thread");
                     }
                     break;
                 }
