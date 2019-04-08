@@ -32,8 +32,8 @@ public class ClientGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
-        String clientIP = InetAddress.getLocalHost().getHostAddress().trim();
-        String playerID = getPlayerID().trim();
+        String clientIP = InetAddress.getLocalHost().getHostAddress();
+        String playerID = getPlayerID();
         String serverIP = String.format("ws://%s:8080/connect/%s", getIPAddress(), playerID);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/lobby.fxml"));
         Parent root = (Parent) loader.load();
@@ -46,10 +46,10 @@ public class ClientGameConfigController {
         startScene(event, "mainPage");
     }
     private String getPlayerID() {
-        return nameTF.getText();
+        return nameTF.getText().trim();
     }
     private String getIPAddress() {
-        return ipAddressTF.getText();
+        return ipAddressTF.getText().trim();
     }
     private void startScene(ActionEvent event, String fileName) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/" + fileName + ".fxml"));
