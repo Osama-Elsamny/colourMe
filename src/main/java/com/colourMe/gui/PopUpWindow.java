@@ -55,20 +55,20 @@ public class PopUpWindow {
         });
     }
 
-    public void setCloseHandler(Runnable function){
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                function.run();
-                Log.get(this).severe("\n\n\nCLOSING POPUP\n\n\n");
-                window.close();
-                this.stop();
-            }
-        }.start();
+    public void display() {
+        Log.get(this).info("Showing PopUp Window");
+        window.show();
     }
 
-    public void display() {
+    public void displayAndWait() {
         window.showAndWait();
+    }
+    public void close(){
+        Log.get(this).info("Closing PopUp Window");
+        if (window != null) {
+            this.window.close();
+            this.window = null;
+        }
     }
 
     private void setLabelText(Label arr[], List<String> message) {

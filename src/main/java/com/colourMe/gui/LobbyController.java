@@ -27,11 +27,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Logger;
 
 public class LobbyController {
     private final int COORDINATE_BUFFER_MAX_SIZE = 8;
@@ -43,7 +45,7 @@ public class LobbyController {
     private String serverAddress;
     private GameAPI gameAPI;
     private int coordinateCounter = 0;
-    private int expectedPlayers = 2;
+    private int expectedPlayers = 3;
     private LinkedList<Coordinate> coordinateBuffer = new LinkedList<>();
     private Scene scene;
     Color userColor;
@@ -52,6 +54,8 @@ public class LobbyController {
     private GameClient gameClient;
     private Clock serverClock;
     private Clock clientClock;
+
+    private BooleanProperty reconnecting = new SimpleBooleanProperty();
 
     public static PriorityBlockingQueue<Message> receiveQueue;
     public static PriorityBlockingQueue<Message> sendQueue;
@@ -102,6 +106,10 @@ public class LobbyController {
             }
         };
         timer.start();
+
+        MainPageController.getPrimaryStage().setOnCloseRequest(event -> {
+            killProcess();
+        });
     }
 
     public void startNextServer() {
@@ -124,7 +132,6 @@ public class LobbyController {
     }
 
     private void waitForNextServer(String nextIP) {
-        try {Thread.sleep(5000);} catch (Exception ex) {} // Wait for next server to be started
         String serverAddress = String.format("ws://%s:8080/connect/%s", nextIP, playerID);
         System.out.println("Next IP: " + serverAddress);
         this.gameClient = new GameClient(receiveQueue, sendQueue, serverAddress, playerID, clientClock);
@@ -356,6 +363,9 @@ public class LobbyController {
         primaryStage.setTitle("ColourMe");
         primaryStage.setScene(scene);
         primaryStage.show();
+//        primaryStage.setOnCloseRequest(event -> {
+//            killProcess();
+//        });
     }
 
     private void setVerticalBoxChildren(VBox vBox, AnchorPane playersAnchorPane[]) {
@@ -394,7 +404,7 @@ public class LobbyController {
     }
 
     private void update(){
-        if(gameAPI.hasResponse()) {
+        if (gameAPI.hasResponse()) {
             // processResponse()
             Message response = gameAPI.processResponse();
 
@@ -421,11 +431,16 @@ public class LobbyController {
                 handleClientDisconnect(data);
                 break;
             case Disconnect:
+                PopUpWindow popup = displayConnectingPopup();
                 handleDisconnect(data);
+                this.reconnecting.addListener((obs) -> {
+                    if (!reconnecting.get()) {
+                        popup.close();
+                    }
+                });
                 break;
             case ReconnectResponse:
-                PopUpWindow popup = displayConnectingPopup();
-                popup.setCloseHandler(() -> handleReconnect(data));
+                handleReconnect(data);
                 break;
             case ClockSyncResponse:
                 handleClockSync(data);
@@ -493,6 +508,7 @@ public class LobbyController {
 
     private void handleDisconnect(JsonObject data) {
         try {
+            this.reconnecting.set(true);
             boolean startServer = data.get("startServer").getAsBoolean();
             String nextIP = data.get("nextIP").getAsString();
             if (startServer) {
@@ -514,14 +530,14 @@ public class LobbyController {
             scoreboard.add(playerWithScore);
         }
         PopUpWindow window = new PopUpWindow("Winner Winner Chicken Dinner", scoreboard, true);
-        Platform.runLater(window::display);
+        window.display();
     }
 
     private PopUpWindow displayConnectingPopup() {
-        PopUpWindow window = new PopUpWindow( "ColourMe",
+        PopUpWindow popup = new PopUpWindow( "ColourMe",
                 Arrays.asList("Connecting to the server, please wait ..."), true);
-        Platform.runLater(new Thread(window::display));
-        return window;
+        popup.display();
+        return popup;
     }
 
     private void handleReconnect(JsonObject data) {
@@ -530,6 +546,7 @@ public class LobbyController {
             gameAPI.setGameService(gson.fromJson(data, GameService.class));
             restoreCellStates();
             updateScores();
+            this.reconnecting.set(false);
         }
     }
 
@@ -609,5 +626,22 @@ public class LobbyController {
         int score = gameAPI.getPlayerScore(userID);
         Label scoreToUpdate = (Label) lookup("score-" + userID);
         scoreToUpdate.setText(Integer.toString(score));
+    }
+
+    private void killProcess() {
+        if(gameServer == null)
+            gameAPI.sendClientDisconnectRequest(playerID, "User quit application");
+        U.sleep(2);
+        killThreads();
+        Platform.exit();
+        System.exit(-1);
+    }
+
+    private void killThreads() {
+        Logger logger = Log.get(this);
+        U.wrapInTryCatch(logger, () -> gameClient.interrupt());
+        U.wrapInTryCatch(logger, () -> gameServer.interrupt());
+        U.wrapInTryCatch(logger, () -> clientClock.interrupt());
+        U.wrapInTryCatch(logger, () -> serverClock.interrupt());
     }
 }

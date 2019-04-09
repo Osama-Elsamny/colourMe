@@ -127,7 +127,6 @@ public class GameService implements Cloneable {
             x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
         );
         // Remove player
-        players.remove(playerID);
         gameConfig.removePlayerConfig(playerID);
     }
 
