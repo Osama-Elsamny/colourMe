@@ -1,7 +1,6 @@
 package com.colourMe.gui;
 
 import com.colourMe.common.util.Log;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,7 +10,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class PopUpWindow {
     private Stage window = null;

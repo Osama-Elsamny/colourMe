@@ -9,8 +9,6 @@ import com.colourMe.common.util.U;
 import com.google.gson.JsonObject;
 import javafx.util.Pair;
 
-import java.util.logging.Logger;
-
 public class DisconnectAction extends ActionBase {
     @Override
     public Message execute(Message message, GameService gameService) {
