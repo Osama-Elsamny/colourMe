@@ -9,7 +9,6 @@ import javafx.util.Pair;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class GameService implements Cloneable {
     public transient Gson gson = new Gson();
@@ -127,7 +126,6 @@ public class GameService implements Cloneable {
             x -> x.getPlayerID().equals(playerID) && x.getState().equals(CellState.LOCKED)
         );
         // Remove player
-        players.remove(playerID);
         gameConfig.removePlayerConfig(playerID);
     }
 

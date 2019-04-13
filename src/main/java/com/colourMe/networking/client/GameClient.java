@@ -20,7 +20,7 @@ public class GameClient extends Thread {
 
     private boolean connected = false;
 
-    private static final int maxTries = 3;
+    private static final int maxTries = 1;
 
     private int connectionAttempt = 0;
 
@@ -119,12 +119,9 @@ public class GameClient extends Thread {
                     connectionAttempt++;
                 } else {
                     // Connection Failure
-                    if (connected) {
-                        handleFailure();
-                        connected = false;
-                    } else {
-                        logger.severe("Killing Client thread");
-                    }
+                    logger.severe("Killing Client thread");
+                    handleFailure();
+                    connected = false;
                     break;
                 }
             }

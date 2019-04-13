@@ -1,5 +1,6 @@
 package com.colourMe.gui;
 
+import com.colourMe.common.util.Log;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,8 +12,20 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class PopUpWindow {
-    public Stage display(String title, List<String> message, boolean canExit) {
-        Stage window = new Stage();
+    private Stage window = null;
+    private String title;
+    private List<String> message;
+    private boolean canExit;
+
+    public PopUpWindow(String title, List<String> message, boolean canExit) {
+        this.window = new Stage();
+        this.title = title;
+        this.message = message;
+        this.canExit = canExit;
+        build();
+    }
+
+    public void build() {
         int size = message.size();
 
         //Block events to other windows
@@ -30,7 +43,6 @@ public class PopUpWindow {
         //Display window and wait for it to be closed before returning
         Scene scene = new Scene(vbox);
         window.setScene(scene);
-//        window.showAndWait();
 
         Platform.setImplicitExit(false);
 
@@ -39,9 +51,22 @@ public class PopUpWindow {
                 event.consume();
             }
         });
+    }
 
+    public void display() {
+        Log.get(this).info("Showing PopUp Window");
         window.show();
-        return window;
+    }
+
+    public void displayAndWait() {
+        window.showAndWait();
+    }
+    public void close(){
+        Log.get(this).info("Closing PopUp Window");
+        if (window != null) {
+            this.window.close();
+            this.window = null;
+        }
     }
 
     private void setLabelText(Label arr[], List<String> message) {
