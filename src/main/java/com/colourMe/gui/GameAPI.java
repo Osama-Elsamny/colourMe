@@ -91,7 +91,8 @@ public class GameAPI {
         return wrapInTryCatch( () -> {
             JsonObject data = new JsonObject();
             data.addProperty("reason", reason);
-            Message disconnectRequest = new Message(null, data, playerID);
+            Message disconnectRequest = new Message(MessageType.ClientDisconnectRequest, data, playerID);
+            sendQueue.add(disconnectRequest);
         });
     }
 

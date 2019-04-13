@@ -40,8 +40,8 @@ public class ServerGameConfigController {
 
     @FXML
     void getGameConfigInput(ActionEvent event) throws IOException {
-        String serverIP = InetAddress.getLocalHost().getHostAddress().trim();
-        String playerID = getPlayerID().trim();
+        String serverIP = InetAddress.getLocalHost().getHostAddress();
+        String playerID = getPlayerID();
         int thickness = getThickness();
         int boardSize = getBoardSize();
         float ratio = getRatio();
@@ -58,7 +58,7 @@ public class ServerGameConfigController {
         startScene(event, "mainPage");
     }
     private String getPlayerID() {
-        return nameTF.getText();
+        return nameTF.getText().trim();
     }
     private int getThickness() {
         return Integer.parseInt(penSizeTF.getText());
